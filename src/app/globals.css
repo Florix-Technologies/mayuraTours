@@ -1,0 +1,322 @@
+@import "tailwindcss";
+
+:root {
+  /* Ink / dark surfaces */
+  --color-ink: #04102a;
+  --color-ink-2: #071a3c;
+  --color-navy: #0b2a6b;
+
+  /* Primary accent */
+  --color-accent: #e5007e;
+  --color-accent-light: #ff3ba0;
+
+  /* Secondary blue accents (used sparingly) */
+  --color-blue: #1358c4;
+  --color-sky: #7fd3f5;
+
+  /* Featured / rating accent — reserved for a single use at a time */
+  --color-gold: #f5a623;
+
+  /* Light surfaces & neutrals */
+  --color-paper: #f3f7fc;
+  --color-line: #dde7f4;
+  --color-slate: #5a6e8c;
+  --color-white: #ffffff;
+
+  --background: var(--color-paper);
+  --foreground: var(--color-ink);
+
+  /* Radius scale */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
+
+  /* Shadow scale */
+  --shadow-sm: 0 4px 14px -6px rgba(4, 16, 42, 0.18);
+  --shadow-lg: 0 24px 48px -20px rgba(4, 16, 42, 0.35);
+
+  /* Layout */
+  --container-width: 1280px;
+}
+
+@theme inline {
+  --color-ink: var(--color-ink);
+  --color-ink-2: var(--color-ink-2);
+  --color-navy: var(--color-navy);
+  --color-accent: var(--color-accent);
+  --color-accent-light: var(--color-accent-light);
+  --color-blue: var(--color-blue);
+  --color-sky: var(--color-sky);
+  --color-gold: var(--color-gold);
+  --color-paper: var(--color-paper);
+  --color-line: var(--color-line);
+  --color-slate: var(--color-slate);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --font-display: var(--font-playfair), Georgia, serif;
+  --font-sans: var(--font-poppins), "Segoe UI", system-ui, sans-serif;
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-lg: var(--shadow-lg);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 0.9, 0.28, 1),
+    transform 0.8s cubic-bezier(0.22, 0.9, 0.28, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Hero letter-drop title */
+@keyframes letter-in {
+  from {
+    opacity: 0;
+    transform: translateY(46px) rotate(4deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.hero-letter {
+  display: inline-block;
+  opacity: 0;
+  animation: letter-in 0.7s cubic-bezier(0.22, 0.9, 0.28, 1) both;
+}
+
+/* Slow cinematic camera push on the active hero scene — kept almost imperceptible */
+@keyframes slow-zoom {
+  from {
+    transform: scale(1) translateZ(0);
+  }
+  to {
+    transform: scale(1.025) translateZ(0);
+  }
+}
+.animate-slow-zoom {
+  animation: slow-zoom 7s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* Infinite horizontal marquee / gallery strips */
+@keyframes marquee-run {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee-run 34s linear infinite;
+}
+.animate-marquee-slow {
+  animation: marquee-run 46s linear infinite;
+}
+.animate-marquee-gallery {
+  animation: marquee-run 40s linear infinite;
+}
+.pause-on-hover:hover {
+  animation-play-state: paused;
+}
+
+/* WhatsApp float button pulse */
+@keyframes pulse-accent {
+  0%,
+  100% {
+    box-shadow:
+      0 16px 36px -12px rgba(229, 0, 126, 0.95),
+      0 0 0 0 rgba(229, 0, 126, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 16px 36px -12px rgba(229, 0, 126, 0.95),
+      0 0 0 16px rgba(229, 0, 126, 0);
+  }
+}
+.animate-pulse-accent {
+  animation: pulse-accent 2.6s ease-in-out infinite;
+}
+
+/* Hero cinematic crossfade layer — background, copy and cards fade together as one scene */
+.hero-layer {
+  opacity: 0;
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hero-layer-visible {
+  opacity: 1;
+}
+
+/* Hero copy / cards fade-up, played once when a scene layer mounts */
+@keyframes hero-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.hero-fade-up {
+  opacity: 0;
+  animation: hero-content-in 0.65s cubic-bezier(0.45, 0, 0.2, 1) both;
+}
+
+/* Short viewports (small-phone landscape-ish heights): drop the long
+   description so the CTA row never gets pushed under the fixed header. */
+@media (max-height: 700px) {
+  .hero-description {
+    display: none;
+  }
+}
+
+/* Hero card track — physical movement, not a fixed-position crossfade.
+   Entering cards travel in from the right and settle; exiting cards travel
+   out to the left. Timed independently of the background's own crossfade
+   so the motion reads clearly instead of being washed out by a parent fade. */
+@keyframes hero-card-enter {
+  from {
+    opacity: 0;
+    transform: translateX(46px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+.hero-card-enter {
+  opacity: 0;
+  animation: hero-card-enter 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes hero-card-exit {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-36px) scale(0.9);
+  }
+}
+.hero-card-exit {
+  animation: hero-card-exit 0.8s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+
+@keyframes hero-card-enter-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-46px) scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.hero-card-enter-prev {
+  opacity: 0;
+  animation: hero-card-enter-prev 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes hero-card-exit-prev {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(36px) scale(0.9);
+  }
+}
+
+.hero-card-exit-prev {
+  animation: hero-card-exit-prev 0.8s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* Hero title / copy — outgoing and incoming lines overlap briefly rather
+   than one instantly replacing the other. */
+@keyframes hero-title-enter {
+  from {
+    transform: translate3d(0, 105%, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.hero-title-enter {
+  animation: hero-title-enter 2.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+@keyframes hero-title-exit {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, -105%, 0);
+  }
+}
+
+.hero-title-exit {
+  animation: hero-title-exit 2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+/* One-time cinematic "settle" push on a freshly-entering background,
+   layered on top of the perpetual slow-zoom loop underneath it. */
+@keyframes hero-bg-settle {
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+.hero-bg-settle {
+  animation: hero-bg-settle 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform;
+}
