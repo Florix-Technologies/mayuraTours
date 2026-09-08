@@ -179,7 +179,7 @@ export default function Hero() {
   }, [reduceMotion]);
 
   return (
-    <section id="hero" className="relative h-screen min-h-[640px] w-full overflow-hidden bg-ink">
+    <section id="hero" className="relative h-[100svh] min-h-[600px] w-full overflow-hidden bg-ink sm:min-h-[640px]">
       <div className="absolute inset-0">
         <div ref={sceneStackRef} className="absolute inset-0">
           {/* Background — two permanently-mounted videos on desktop/tablet (data-friendly on
@@ -278,8 +278,8 @@ export default function Hero() {
 
             return (
               <div key={layer.id} className="absolute inset-0" style={{ zIndex: idx + 10 }}>
-                <div className="relative flex h-full flex-col justify-end px-5 pb-8 sm:justify-center sm:px-8 sm:pb-0 lg:px-14">
-                  <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-4">
+                <div className="relative flex h-full flex-col justify-start px-5 pt-24 pb-24 sm:justify-center sm:px-8 sm:pt-0 sm:pb-0 lg:px-14">
+                  <div className="flex flex-col gap-4 sm:gap-6 lg:flex-row lg:items-center lg:gap-4">
                     {/* Copy — left ~46% */}
                     
                     <div className="min-w-0 lg:w-[46%]">
@@ -312,7 +312,7 @@ export default function Hero() {
       {exp.category}
     </h1>*/}
       <h1
-    className={`${titleClass} font-display mb-2.5 text-[clamp(42px,6.4vw,96px)] leading-[0.88] font-extrabold tracking-tight text-white uppercase [text-shadow:0_3px_16px_rgba(0,0,0,0.55)]`}
+    className={`${titleClass} font-display mb-2.5 text-[clamp(34px,10vw,58px)] leading-[0.9] font-extrabold tracking-tight text-white uppercase [text-shadow:0_3px_16px_rgba(0,0,0,0.55)] sm:text-[clamp(42px,6.4vw,96px)] sm:leading-[0.88]`}
     style={{ animationDelay: "0ms" }}
   >
     <span>
@@ -344,7 +344,7 @@ export default function Hero() {
 
   {/* Longer description — unchanged */}
   <p
-    className={`${titleClass} hero-description mb-5 max-w-[400px] text-[13.5px] leading-[1.6] font-normal text-white/75`}
+    className={`${titleClass} hero-description mb-4 hidden max-w-[400px] text-[13.5px] leading-[1.6] font-normal text-white/75 sm:mb-5 sm:block`}
     style={{ animationDelay: isExiting ? "40ms" : "180ms" }}
   >
     {exp.description}
@@ -387,28 +387,19 @@ export default function Hero() {
                     {/* Destination card track — cards physically travel in/out, not a fixed-position crossfade.
                         [container-type:inline-size] lives HERE (not on the whole panel) so the cqw units
                         below size cards relative to their own ~46%-wide zone, not the full hero width. */}
-                    <div className="mt-2 flex items-end gap-3 [container-type:inline-size] lg:mt-0 lg:w-[46%] lg:justify-end lg:gap-3.5">
+                    <div className="mt-1 flex items-end gap-2 [container-type:inline-size] sm:gap-3 lg:mt-0 lg:w-[46%] lg:justify-end lg:gap-3.5">
                       {exp.destinations.map((d, i) => (
                         <div
                           key={d.name}
-                          className={`${cardClass} group relative min-w-0 overflow-hidden rounded-xl shadow-[0_18px_40px_-16px_rgba(0,0,0,0.65)]`}
+                          className={`${cardClass} group relative min-w-0 shrink-0 overflow-hidden rounded-xl shadow-[0_18px_40px_-16px_rgba(0,0,0,0.65)] ${
+                            i === 0
+                              ? "h-[58cqw] w-[36cqw] lg:h-[67cqw] lg:w-[40cqw]"
+                              : i === 1
+                                ? "mb-[18px] h-[52cqw] w-[31cqw] sm:mb-[30px] lg:h-[57cqw] lg:w-[34cqw]"
+                                : "mb-[34px] h-[46cqw] w-[27cqw] sm:mb-[56px] lg:h-[49cqw] lg:w-[29cqw]"
+                          }`}
                           style={{
                             animationDelay: isExiting ? `${i * 40}ms` : `${180 + i * 70}ms`,
-                            // Portrait cards — height noticeably greater than width, matching the reference.
-                            width:
-                              i === 0
-                                ? "clamp(210px, 40cqw, 400px)"
-                                : i === 1
-                                  ? "clamp(182px, 34cqw, 345px)"
-                                  : "clamp(156px, 29cqw, 295px)",
-                            height:
-                              i === 0
-                                ? "clamp(340px, 67cqw, 650px)"
-                                : i === 1
-                                  ? "clamp(292px, 57cqw, 560px)"
-                                  : "clamp(248px, 49cqw, 480px)",
-                            flexShrink: 1,
-                            marginBottom: i === 0 ? 0 : i === 1 ? 30 : 56,
                           }}
                         >
                           <Image

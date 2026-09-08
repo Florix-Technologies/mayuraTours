@@ -119,9 +119,11 @@ export default function SiteFooter() {
         >
           {/* Fixed logo area */}
           <div className="flex h-6 w-20 shrink-0 items-center justify-start">
-            <img
+            <Image
               src={platformLogo[platform]}
               alt={platform}
+              width={64}
+              height={28}
               className={`object-contain ${
     platform === "Direct Booking"
       ? "max-h-7 max-w-16"

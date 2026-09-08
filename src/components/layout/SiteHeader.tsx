@@ -73,16 +73,16 @@ export default function SiteHeader() {
 
     {/* Bus */}
       <div
-         className="pointer-events-none fixed top-[2px] z-[201] -translate-x-1/2 -translate-y-[3px] text-[16px] leading-none transition-[left] duration-75"
+        className="pointer-events-none fixed top-[9px] z-[201] -translate-x-1/2 -translate-y-1/2 leading-none transition-[left] duration-300 ease-out"
          style={{ left: `${progress}%` }}
          aria-hidden="true"
        >
        <Image
         src="/bus.png"
         alt=""
-        width={45}
-        height={40}
-        className="object-contain"
+        width={72}
+        height={48}
+        className="h-8 w-12 object-contain sm:h-12 sm:w-[72px]"
         />
 
 
@@ -94,8 +94,8 @@ export default function SiteHeader() {
         }`}
       >
         <div
-          className={`mx-auto flex max-w-(--container-width) items-center gap-6 px-5 transition-[padding] duration-300 sm:px-10 ${
-            solid ? "py-3" : "py-5"
+          className={`mx-auto flex max-w-(--container-width) items-center gap-3 px-4 transition-[padding] duration-300 sm:gap-6 sm:px-10 ${
+            solid ? "py-2.5 sm:py-3" : "py-2.5 sm:py-5"
           }`}
         >
      {/*   <a href="#top" className="flex items-center gap-3">
@@ -126,7 +126,9 @@ export default function SiteHeader() {
     width={solid ? 68 : 150}
     height={solid ? 68 : 150}
     priority
-    className="rounded-xl object-contain transition-[width,height] duration-300"
+    className={`rounded-xl object-contain transition-[width,height] duration-300 ${
+      solid ? "h-[54px] w-[68px]" : "h-16 w-[92px] sm:h-[100px] sm:w-[150px]"
+    }`}
   />
 
 
@@ -196,7 +198,7 @@ export default function SiteHeader() {
         aria-hidden="true"
       />
       <div
-        className={`fixed inset-y-0 right-0 z-[220] flex w-[82%] max-w-sm flex-col gap-8 bg-ink px-8 py-8 shadow-2xl transition-transform duration-300 lg:hidden ${
+        className={`fixed inset-y-0 left-[18vw] right-auto z-[220] flex w-[82vw] max-w-sm flex-col gap-8 bg-ink px-8 py-8 shadow-2xl transition-transform duration-300 lg:hidden ${
           menuOpen ? "translate-x-0" : "translate-x-full"
         }`}
         role="dialog"

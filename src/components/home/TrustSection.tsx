@@ -1,4 +1,5 @@
 import Reveal from "@/components/ui/Reveal";
+import Image from "next/image";
 import { business } from "@/lib/data/business";
 import { trustBadges, trustCards } from "@/lib/data/stats";
 
@@ -100,20 +101,17 @@ export default function TrustSection() {
             Book on these platforms
           </span>
           <div className="flex items-center gap-15">
-            {business.bookingPlatforms.map((platform, i) => (
+            {business.bookingPlatforms.map((platform) => (
               <span
                 key={platform}
-                className={`flex flex-col items-center gap-1.5 whitespace-nowrap ${
-  //i !== business.bookingPlatforms.length - 1
-    //</div>? "border-r border-white/20 pr-8"
-    //:
-         ""
-}`}
+                className="flex flex-col items-center gap-1.5 whitespace-nowrap"
               >
                 {PLATFORM_LOGO[platform] && (
-                <img
+                <Image
                   src={PLATFORM_LOGO[platform]}
                   alt={platform}
+                  width={80}
+                  height={32}
                    className={`w-auto object-contain ${
                    platform === "Direct Booking" ? "h-8 scale-160"  : "h-7"
                  }`}
