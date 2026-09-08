@@ -64,6 +64,13 @@
 
   --shadow-sm: var(--shadow-sm);
   --shadow-lg: var(--shadow-lg);
+
+  /* Every bare `transition-*` utility site-wide (hover states, card lifts, nav
+     underlines…) inherits this curve unless a component sets its own `ease-*`.
+     Swapping the browser-default ease for the same gentle-deceleration cubic-bezier
+     already used for the hero's cinematic moves makes all of those feel like one
+     consistent, "butter smooth" motion language instead of two different feels. */
+  --default-transition-timing-function: cubic-bezier(0.22, 0.8, 0.28, 1);
 }
 
 html {
@@ -143,6 +150,12 @@ body {
   to {
     transform: translateX(-50%);
   }
+}
+.animate-marquee,
+.animate-marquee-slow,
+.animate-marquee-gallery {
+  will-change: transform;
+  backface-visibility: hidden;
 }
 .animate-marquee {
   animation: marquee-run 34s linear infinite;

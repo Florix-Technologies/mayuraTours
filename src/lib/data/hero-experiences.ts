@@ -28,10 +28,9 @@ export const heroExperiences: HeroExperience[] = [
     headline: "Palaces, forts and centuries of story",
     description:
       "Walk illuminated palace halls, island fortresses and hilltop ramparts built by kings and empires — Karnataka's heritage circuit, told the way it deserves.",
-    backgroundImage:
-      "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=2400&q=85&auto=format&fit=crop",
-    backgroundImageAlt: "Mysore Palace illuminated at night, Karnataka heritage architecture",
-    video: "/video/heritage and history.mp4",
+    backgroundImage: "/video/posters/heritage.jpg",
+    backgroundImageAlt: "Illuminated heritage spires at dusk",
+    video: "/video/heritage-and-history.mp4",
     packageSlug: "mysore-srirangapatna",
     destinations: [
       {
@@ -64,10 +63,9 @@ export const heroExperiences: HeroExperience[] = [
     headline: "Misty peaks and endless tea country",
     description:
       "Winding ghat roads, cloud-wrapped ridgelines and slopes carpeted in tea and coffee — the Western Ghats at their most cinematic, from Bengaluru's own back yard.",
-    backgroundImage:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=2400&q=85&auto=format&fit=crop",
-    backgroundImageAlt: "Misty green Nilgiri hills with tea gardens",
-    video: "/video/hills and mountain.mp4",
+    backgroundImage: "/video/posters/hills.jpg",
+    backgroundImageAlt: "Misty green hills and valleys at golden hour",
+    video: "/video/hills-and-mountains.mp4",
     packageSlug: "ooty-coonoor",
     destinations: [
       {
@@ -100,9 +98,8 @@ export const heroExperiences: HeroExperience[] = [
     headline: "Golden coastlines, endless horizon",
     description:
       "North and south coast in one trip — swaying palms, Portuguese forts and the Arabian Sea at your feet. Leave at 7 p.m., wake up on the coast.",
-    backgroundImage:
-      "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=2400&q=85&auto=format&fit=crop",
-    backgroundImageAlt: "Goa coastline with turquoise water and golden sand",
+    backgroundImage: "/video/posters/beaches.jpg",
+    backgroundImageAlt: "Aerial view of a golden coastline with rolling waves",
     video: "/video/goa-beach-aerial.mp4",
     packageSlug: "goa",
     destinations: [
@@ -136,10 +133,9 @@ export const heroExperiences: HeroExperience[] = [
     headline: "Backwaters, wildlife and untouched green",
     description:
       "Drift a houseboat through still backwaters, walk mist-wrapped forest trails and track wildlife through Periyar's reserve — Kerala's greatest hits in one journey.",
-    backgroundImage:
-      "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=2400&q=85&auto=format&fit=crop",
-    backgroundImageAlt: "Kerala backwaters houseboat at sunset with palm trees",
-    video: "/video/nature and wildlife.mp4",
+    backgroundImage: "/video/posters/nature.jpg",
+    backgroundImageAlt: "Golden-hour light on a rugged, wave-washed coastline",
+    video: "/video/nature-and-wildlife.mp4",
     packageSlug: "kerala-munnar",
     destinations: [
       {
@@ -172,10 +168,9 @@ export const heroExperiences: HeroExperience[] = [
     headline: "Temples, traditions and sacred ground",
     description:
       "From hilltop shrines to island temple towns and the meeting point of three seas — journeys built around Karnataka and Tamil Nadu's most sacred sites.",
-    backgroundImage:
-      "https://images.unsplash.com/photo-1560273436-eaa99ede2d44?w=2400&q=85&auto=format&fit=crop",
-    backgroundImageAlt: "Kanyakumari ocean sunset where three seas meet",
-    video: "/video/spiritual and cultural.mp4",
+    backgroundImage: "/video/posters/spiritual.jpg",
+    backgroundImageAlt: "Boats on calm water at sunrise near a sacred waterfront",
+    video: "/video/spiritual-and-cultural.mp4",
     packageSlug: "mysore-srirangapatna",
     destinations: [
       {
@@ -208,10 +203,9 @@ export const heroExperiences: HeroExperience[] = [
     headline: "Trails, peaks and open-air exploring",
     description:
       "Trek to Karnataka's highest summit, walk coffee-estate trails through the clouds and wander misty forest paths — the outdoor side of the Western Ghats.",
-    backgroundImage:
-      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=2400&q=85&auto=format&fit=crop",
-    backgroundImageAlt: "Chikmagalur coffee hills trekking misty mountains",
-    video: "/video/adventures and outdoors.mp4",
+    backgroundImage: "/video/posters/adventure.jpg",
+    backgroundImageAlt: "Hikers on a misty forest trail beside a waterfall",
+    video: "/video/adventures-and-outdoors.mp4",
     packageSlug: "chikmagalur",
     destinations: [
       {

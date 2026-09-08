@@ -2,7 +2,7 @@ export const business = {
   legalName: "Gautam's Mayura Package Tours",
   shortName: "Mayura",
   tagline: "Package Tours · Bengaluru",
-  foundedYear: 2000,
+  foundedYear: 1990,
 
   phone: "+91 80 2200 1234",
   whatsapp: "+91 80 2200 1234",

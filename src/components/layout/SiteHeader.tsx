@@ -80,9 +80,9 @@ export default function SiteHeader() {
        <Image
         src="/bus.png"
         alt=""
-        width={72}
-        height={48}
-        className="h-8 w-12 object-contain sm:h-12 sm:w-[72px]"
+        width={124}
+        height={40}
+        className="h-7 w-[87px] object-contain sm:h-10 sm:w-[124px]"
         />
 
 
@@ -134,10 +134,10 @@ export default function SiteHeader() {
 
  <span
   className={`font-display font-semibold tracking-[0.6em] text-white/70 transition-all duration-300 ${
-    solid ? "text-[11px]" : "text-[11px] sm:text-xs"
+    solid ? "text-sm" : "text-sm sm:text-lg"
   }`}
 >
-  SINCE.1990
+  SINCE.{business.foundedYear}
 </span>
 
  {/* <span className="font-display text-lg font-extrabold text-white sm:text-xl">
@@ -198,7 +198,13 @@ export default function SiteHeader() {
         aria-hidden="true"
       />
       <div
-        className={`fixed inset-y-0 left-[18vw] right-auto z-[220] flex w-[82vw] max-w-sm flex-col gap-8 bg-ink px-8 py-8 shadow-2xl transition-transform duration-300 lg:hidden ${
+        // Right-anchored, not left-[18vw]: translate-x-full only ever moves an element
+        // by its OWN width. Once w-[82vw] hit its max-w-sm cap (any viewport roughly
+        // 470-1023px — most tablets), that translation stopped being enough to clear
+        // a left-anchored panel, so it sat permanently on-screen over the hero even
+        // while "closed". Anchoring to the right edge instead means translating by
+        // its own width always lands it exactly off-screen, at any width.
+        className={`fixed inset-y-0 right-0 z-[220] flex w-[82vw] max-w-sm flex-col gap-8 bg-ink px-8 py-8 shadow-2xl transition-transform duration-300 lg:hidden ${
           menuOpen ? "translate-x-0" : "translate-x-full"
         }`}
         role="dialog"
