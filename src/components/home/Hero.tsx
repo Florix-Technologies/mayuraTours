@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { heroExperiences } from "@/lib/data/hero-experiences";
+import { packages } from "@/lib/data/packages";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
 
 /** ~4.8s on screen per category, ~900ms cinematic crossfade — shared by background and cards; title runs a touch faster. */
@@ -24,7 +25,7 @@ export default function Hero() {
   const [layers, setLayers] = useState<Layer[]>([{ id: 0, expIndex: 0 }]);
   const [enteringId, setEnteringId] = useState<number | null>(null);
   const [videoFront, setVideoFront] = useState<Slot>(0);
-  const canPlayVideo = useMediaQuery("(min-width: 768px)");
+  const canPlayVideo = useMediaQuery("(min-width: 1px)");
   const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const [direction, setDirection] = useState<"next" | "prev">("next");
 
@@ -179,7 +180,7 @@ export default function Hero() {
   }, [reduceMotion]);
 
   return (
-    <section id="hero" className="relative h-[100svh] min-h-[600px] w-full overflow-hidden bg-ink sm:min-h-[640px]">
+    <section id="hero" className="relative h-[100svh] min-h-[600px] w-full overflow-hidden bg-ink sm:h-screen sm:min-h-[640px]">
       <div className="absolute inset-0">
         <div ref={sceneStackRef} className="absolute inset-0">
           {/* Background — two permanently-mounted videos on desktop/tablet (data-friendly on
@@ -202,7 +203,7 @@ export default function Hero() {
                         muted
                         loop
                         playsInline
-                        preload="auto"
+                        preload={slot === videoFront ? "auto" : "metadata"}
                         onPause={(e) => {
                           // Safety net: if the visible video ever stalls/pauses on its own
                           // (buffering, a browser quirk), resume it rather than leave a frozen frame.
@@ -265,6 +266,8 @@ export default function Hero() {
           {/* Content — cards/title track, unchanged: still crossfades per category via `layers`. */}
           {layers.map((layer, idx) => {
             const exp = heroExperiences[layer.expIndex];
+            const pkg = packages.find((p) => p.slug === exp.packageSlug);
+            const metaSub = pkg?.tags?.[0] ? pkg.tags[0].toUpperCase() : "";
             const isNewest = idx === layers.length - 1;
             const isExiting = !isNewest && layers.length > 1;
             const titleClass = isExiting ? "hero-title-exit" : "hero-title-enter";
@@ -278,14 +281,14 @@ export default function Hero() {
 
             return (
               <div key={layer.id} className="absolute inset-0" style={{ zIndex: idx + 10 }}>
-                <div className="relative flex h-full flex-col justify-start px-5 pt-24 pb-24 sm:justify-center sm:px-8 sm:pt-0 sm:pb-0 lg:px-14">
+                <div className="relative flex h-full flex-col justify-end px-5 pt-28 pb-36 max-[350px]:pb-24 sm:justify-center sm:px-8 sm:pt-0 sm:pb-0 lg:px-14">
                   <div className="flex flex-col gap-4 sm:gap-6 lg:flex-row lg:items-center lg:gap-4">
                     {/* Copy — left ~46% */}
                     
-                    <div className="min-w-0 lg:w-[46%]">
+                    <div className="hidden min-w-0 sm:block lg:w-[46%]">
 
-  {/* Small text */}
-  <div className="mb-3 overflow-hidden">
+  {/* Small text (tablet/desktop) */}
+  <div className="mb-3 hidden overflow-hidden sm:block">
     <div
       className={`${titleClass} flex items-center gap-2.5`}
       style={{ animationDelay: "0ms" }}
@@ -302,6 +305,24 @@ export default function Hero() {
     </div>
   </div>
 
+  {/* Mobile badge + trip meta */}
+  <div
+    className={`${titleClass} mb-4 flex items-center gap-3 sm:hidden`}
+    style={{ animationDelay: "0ms" }}
+  >
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-ink/50 py-1.5 pr-3.5 pl-3 backdrop-blur-md">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white" aria-hidden="true">
+        <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" />
+      </svg>
+      <span className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-white/90">
+        {exp.tag.replace("✦ ", "")}
+      </span>
+    </span>
+    <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-sky">
+      {metaSub}
+    </span>
+  </div>
+
 
   {/* Main heading */}
   <div className=" overflow-hidden">
@@ -312,7 +333,7 @@ export default function Hero() {
       {exp.category}
     </h1>*/}
       <h1
-    className={`${titleClass} font-display mb-2.5 text-[clamp(34px,10vw,58px)] leading-[0.9] font-extrabold tracking-tight text-white uppercase [text-shadow:0_3px_16px_rgba(0,0,0,0.55)] sm:text-[clamp(42px,6.4vw,96px)] sm:leading-[0.88]`}
+    className={`${titleClass} font-display mb-2.5 text-[clamp(36px,10vw,58px)] leading-[0.9] font-extrabold tracking-tight text-white uppercase [text-shadow:0_3px_16px_rgba(0,0,0,0.55)] sm:text-[clamp(42px,6.4vw,96px)] sm:leading-[0.88]`}
     style={{ animationDelay: "0ms" }}
   >
     <span>
@@ -331,8 +352,8 @@ export default function Hero() {
   </div>
 
 
-  {/* Short description */}
-  <div className="mb-2 overflow-hidden">
+  {/* Short description (tablet/desktop) */}
+  <div className="mb-2 hidden overflow-hidden sm:block">
     <p
       className={`${titleClass} max-w-[420px] text-[15px] leading-[1.4] font-medium text-sky`}
       style={{ animationDelay: "0ms" }}
@@ -342,9 +363,9 @@ export default function Hero() {
   </div>
 
 
-  {/* Longer description — unchanged */}
+  {/* Longer description */}
   <p
-    className={`${titleClass} hero-description mb-4 hidden max-w-[400px] text-[13.5px] leading-[1.6] font-normal text-white/75 sm:mb-5 sm:block`}
+    className={`${titleClass} hero-description mb-4 w-full max-w-[400px] text-[14px] leading-[1.55] font-normal text-white/85 sm:text-[13.5px] sm:leading-[1.6] sm:text-white/75 sm:mb-5`}
     style={{ animationDelay: isExiting ? "40ms" : "180ms" }}
   >
     {exp.description}
@@ -362,24 +383,36 @@ export default function Hero() {
 >
     <a
       href="#packages"
-      className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-bold text-ink transition-all duration-300 hover:scale-[1.03] hover:bg-white"
+      className="inline-flex items-center rounded-full bg-accent px-6 py-3 text-sm font-bold text-white shadow-[0_16px_30px_-12px_rgba(229,0,126,0.9)] transition-all duration-300 hover:scale-[1.03] hover:bg-white sm:gap-3 sm:px-5 sm:py-2.5 sm:text-ink sm:shadow-none sm:hover:bg-white"
     >
-      Explore Packages
-
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
+      <span className="sm:hidden">Book now</span>
+      <span className="hidden sm:inline">Explore Packages</span>
+      <span className="ml-1 flex h-9 w-9 items-center justify-center rounded-full bg-white text-ink sm:hidden">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M5 12h14" />
+          <path d="m13 6 6 6-6 6" />
+        </svg>
+      </span>
+      <svg className="hidden sm:block" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M5 12h14" />
         <path d="m13 6 6 6-6 6" />
       </svg>
     </a>
+  </div>
+
+  {/* Mobile price */}
+  <div className="mt-1 sm:hidden">
+    <span className="block text-[9px] font-semibold uppercase tracking-[0.24em] text-white/55">
+      Starting from
+    </span>
+    <div className="flex items-baseline gap-1.5">
+      <span className="font-display text-[26px] leading-none font-extrabold text-white">
+        {pkg?.price}
+      </span>
+      {pkg?.priceUnit ? (
+        <span className="text-[11px] font-medium text-white/70">{pkg.priceUnit}</span>
+      ) : null}
+    </div>
   </div>
 
 </div>
@@ -387,19 +420,28 @@ export default function Hero() {
                     {/* Destination card track — cards physically travel in/out, not a fixed-position crossfade.
                         [container-type:inline-size] lives HERE (not on the whole panel) so the cqw units
                         below size cards relative to their own ~46%-wide zone, not the full hero width. */}
-                    <div className="mt-1 flex items-end gap-2 [container-type:inline-size] sm:gap-3 lg:mt-0 lg:w-[46%] lg:justify-end lg:gap-3.5">
+                    <div className="mt-1 hidden items-end gap-3 [container-type:inline-size] sm:flex lg:mt-0 lg:w-[46%] lg:justify-end lg:gap-3.5">
                       {exp.destinations.map((d, i) => (
                         <div
                           key={d.name}
-                          className={`${cardClass} group relative min-w-0 shrink-0 overflow-hidden rounded-xl shadow-[0_18px_40px_-16px_rgba(0,0,0,0.65)] ${
-                            i === 0
-                              ? "h-[58cqw] w-[36cqw] lg:h-[67cqw] lg:w-[40cqw]"
-                              : i === 1
-                                ? "mb-[18px] h-[52cqw] w-[31cqw] sm:mb-[30px] lg:h-[57cqw] lg:w-[34cqw]"
-                                : "mb-[34px] h-[46cqw] w-[27cqw] sm:mb-[56px] lg:h-[49cqw] lg:w-[29cqw]"
-                          }`}
+                          className={`${cardClass} group relative min-w-0 overflow-hidden rounded-xl shadow-[0_18px_40px_-16px_rgba(0,0,0,0.65)]`}
                           style={{
                             animationDelay: isExiting ? `${i * 40}ms` : `${180 + i * 70}ms`,
+                            // Portrait cards — height noticeably greater than width, matching the reference.
+                            width:
+                              i === 0
+                                ? "clamp(210px, 40cqw, 400px)"
+                                : i === 1
+                                  ? "clamp(182px, 34cqw, 345px)"
+                                  : "clamp(156px, 29cqw, 295px)",
+                            height:
+                              i === 0
+                                ? "clamp(340px, 67cqw, 650px)"
+                                : i === 1
+                                  ? "clamp(292px, 57cqw, 560px)"
+                                  : "clamp(248px, 49cqw, 480px)",
+                            flexShrink: 1,
+                            marginBottom: i === 0 ? 0 : i === 1 ? 30 : 56,
                           }}
                         >
                           <Image
@@ -421,7 +463,54 @@ export default function Hero() {
                       ))}
                     </div>
                   </div>
-<div className="absolute bottom-20 left-1/2 z-[100] flex -translate-x-1/2 gap-2">
+                  <div className="flex min-h-0 flex-1 flex-col justify-end pb-5 max-[350px]:pb-2 sm:hidden">
+                    <div className="mb-4 flex items-center gap-3">
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-[10px] font-bold tracking-[0.18em] text-white uppercase backdrop-blur-md">
+                        <span className="text-sm leading-none text-white">✦</span>
+                        {exp.tag.replace("✦ ", "")}
+                      </span>
+                      <span className="text-[11px] font-bold tracking-[0.18em] text-sky uppercase">
+                        {pkg?.tags[0] ?? "Curated journey"}
+                      </span>
+                    </div>
+
+                    <h1 className="font-display max-w-[11ch] break-words text-[clamp(38px,11vw,58px)] leading-[0.86] font-extrabold tracking-tight text-white uppercase [text-shadow:0_3px_18px_rgba(0,0,0,0.6)]">
+                      {pkg?.name.split(" + ")[0] ?? exp.category.split(" ")[0]}
+                    </h1>
+                    <p className="mt-4 max-w-[34ch] text-[15px] leading-[1.48] text-white/85 max-[350px]:hidden">
+                      {pkg?.description ?? exp.description}
+                    </p>
+
+                    <a
+                      href="#packages"
+                      className="mt-5 inline-flex w-fit items-center gap-4 rounded-full bg-accent py-2 pl-6 pr-2 text-base font-bold text-white shadow-[0_18px_34px_-14px_rgba(229,0,126,0.95)] max-[350px]:mt-3"
+                    >
+                      Book now
+                      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-navy">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M5 12h14" />
+                          <path d="m13 6 6 6-6 6" />
+                        </svg>
+                      </span>
+                    </a>
+
+                    <div className="mt-6 max-[350px]:mt-3">
+                      <span className="block text-[10px] font-bold tracking-[0.24em] text-white/60 uppercase">Starting from</span>
+                      <div className="mt-1 flex items-baseline gap-2">
+                        <span className="font-display text-[34px] leading-none font-extrabold text-white">{pkg?.price ?? "On request"}</span>
+                        {pkg?.priceUnit && <span className="text-sm font-semibold text-sky">{pkg.priceUnit}</span>}
+                      </div>
+                    </div>
+
+                    <div className="mt-5 flex flex-wrap gap-2 max-[350px]:mt-3">
+                      {(pkg?.tags ?? exp.destinations.map((destination) => destination.name)).map((tag) => (
+                        <span key={tag} className="rounded-full border border-white/25 bg-ink/35 px-3.5 py-2 text-[11px] font-medium text-white/90 backdrop-blur-md max-[350px]:px-2.5 max-[350px]:py-1.5">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+<div className="absolute bottom-20 left-1/2 z-[100] hidden -translate-x-1/2 gap-2 sm:flex">
   <button
     type="button"
     onClick={() => {
@@ -470,9 +559,8 @@ export default function Hero() {
 </svg>
   </button>
 </div>
-                  {/* Compact category pills — mobile and tablet (desktop switches to the dot rail); part of
-                      normal content flow, never fights the fixed WhatsApp button */}
-                  <div className="mt-4 flex gap-1.5 overflow-x-auto lg:hidden">
+                  {/* Compact category pills — tablet only (mobile uses arrows, desktop the dot rail) */}
+                  <div className="mt-4 hidden gap-1.5 overflow-x-auto sm:flex lg:hidden">
                     {heroExperiences.map((navExp, i) => (
                       <button
                         key={navExp.slug}
@@ -487,6 +575,36 @@ export default function Hero() {
                         {navExp.category}
                       </button>
                     ))}
+                  </div>
+
+                  {/* Mobile prev / next navigation */}
+                  <div className="absolute bottom-20 left-5 z-20 flex items-center gap-2 sm:hidden">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDirection("prev");
+                        switchTo(current - 1);
+                      }}
+                      className="flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-black/30 text-white backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-white/15"
+                      aria-label="Previous category"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="m15 18-6-6 6-6" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDirection("next");
+                        switchTo(current + 1);
+                      }}
+                      className="flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-black/30 text-white backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-white/15"
+                      aria-label="Next category"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="m9 18 6-6-6-6" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>
