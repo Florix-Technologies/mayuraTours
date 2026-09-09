@@ -27,7 +27,6 @@ export default function HowItWorks() {
   }, []);
 
   return (
-    //<section className="py-16 sm:py-26">
     <section className="pt-16 pb-12 sm:pt-26 sm:pb-16">
       <div className="mx-auto max-w-(--container-width) px-5 sm:px-10">
         <div className="mb-11 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">

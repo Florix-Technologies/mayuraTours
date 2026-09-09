@@ -1,5 +1,10 @@
+import { business, yearsInBusiness } from "./business";
+
+/** Rounded down to the nearest 5 for a clean marketing figure ("36 years" -> "35+"). */
+const roundedYears = Math.floor(yearsInBusiness() / 5) * 5;
+
 export const stats = [
-  { to: 25, suffix: "+", label: "Years of trusted\ntravel expertise" },
+  { to: roundedYears, suffix: "+", label: "Years of trusted\ntravel expertise" },
   { to: 50000, suffix: "+", label: "Happy travellers\ntransported safely" },
   { to: 20, suffix: "+", label: "Destinations across\nSouth & Central India" },
   { to: 4.4, suffix: "★", label: "Avg. customer rating\non Google & JustDial" },
@@ -38,10 +43,9 @@ export const howItWorksSteps = [
 export const trustCards = [
   {
     icon: "trophy",
-    stat: "25+",
+    stat: `${roundedYears}+`,
     title: "Years in Business",
-    description:
-      "Established in Gandhi Nagar, Bengaluru since 2000 — one of the longest-running tour operators in Karnataka.",
+    description: `Established in Gandhi Nagar, Bengaluru since ${business.foundedYear} — one of the longest-running tour operators in Karnataka.`,
   },
   {
     icon: "bus",

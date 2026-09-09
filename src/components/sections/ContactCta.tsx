@@ -32,7 +32,6 @@ export default function ContactCta() {
   }
 
   return (
-    //<section id="contact" className="py-16 sm:py-26">
     <section id="contact" className="scroll-mt-24 pt-0 pb-16 sm:pt-3 sm:pb-26">
       <div className="mx-auto max-w-(--container-width) px-5 sm:px-10">
         <Reveal className="relative grid grid-cols-1 gap-10 overflow-hidden rounded-3xl bg-linear-140 from-navy to-ink to-62% px-6 py-11 text-white sm:px-9 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14 lg:px-15 lg:py-16">
@@ -54,13 +53,9 @@ export default function ContactCta() {
 
             <div className="mt-7 flex flex-col gap-3.5">
               <div className="flex items-center gap-2.5 text-white/80">
-             
-              {/* New phone icon*/}
-              {/* <span className="text-xl">📞</span>*/}
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5">
-  <Phone size={18} strokeWidth={1.7} className="text-sky" />
-</div>
-
+                  <Phone size={18} strokeWidth={1.7} className="text-sky" />
+                </div>
                 <div>
                   <div className="text-[11px] font-semibold tracking-[0.14em] text-sky uppercase">Call / WhatsApp</div>
                   <a href={telHref(business.phone)} className="text-lg font-bold text-white">
@@ -69,13 +64,9 @@ export default function ContactCta() {
                 </div>
               </div>
               <div className="flex items-center gap-2.5 text-white/80">
-
-              {/* New map icon*/}
-                {/* <span className="text-xl">📍</span>*/}
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5">
-  <MapPin size={18} strokeWidth={1.7} className="text-sky" />
-</div>
-
+                  <MapPin size={18} strokeWidth={1.7} className="text-sky" />
+                </div>
                 <div>
                   <div className="text-[11px] font-semibold tracking-[0.14em] text-sky uppercase">Office</div>
                   <span className="text-[15px] font-medium text-white">
@@ -84,13 +75,9 @@ export default function ContactCta() {
                 </div>
               </div>
               <div className="flex items-center gap-2.5 text-white/80">
-
-            {/*<New mail icon*/}
-                {/*<span className="text-xl">✉️</span>*/}
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5">
-  <Mail size={18} strokeWidth={1.7} className="text-sky" />
-</div>
-
+                  <Mail size={18} strokeWidth={1.7} className="text-sky" />
+                </div>
                 <div>
                   <div className="text-[11px] font-semibold tracking-[0.14em] text-sky uppercase">Email</div>
                   <a href={`mailto:${business.email}`} className="text-[15px] font-medium text-white">

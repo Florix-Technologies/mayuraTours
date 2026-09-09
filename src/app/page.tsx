@@ -20,7 +20,6 @@ export default function Home() {
       <VideoSection />
       <DestinationsGrid />
       <GalleryStrip />
-      {/*<StatsSection />*/}
       <FleetSection />
       <HowItWorks />
       <TrustSection />

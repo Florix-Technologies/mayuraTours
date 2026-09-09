@@ -94,7 +94,7 @@ export default function SiteHeader() {
         }`}
       >
         <div
-          className={`mx-auto flex max-w-(--container-width) items-center gap-3 px-4 transition-[padding] duration-300 sm:gap-6 sm:px-10 ${
+          className={`mx-auto flex max-w-[1680px] items-center gap-3 px-4 transition-[padding] duration-300 sm:gap-6 sm:px-8 ${
             solid ? "py-2.5 sm:py-3" : "py-2.5 sm:py-5"
           }`}
         >

@@ -1,16 +1,17 @@
-const TICKER_ITEMS = [
-  "GOA · 2N·3D from ₹6,475",
-  "OOTY + COONOOR · 5N·6D from ₹15,600",
-  "MYSORE HERITAGE · Day Trip on Request",
-  "COORG · 3N·4D from ₹12,200",
-  "KERALA · 6N·7D from ₹22,500",
-  "CHIKMAGALUR · 2N·3D from ₹9,800",
-  "AC SLEEPER COACHES · Volvo & Multi-Axle",
-  "TRUSTED SINCE 2000 · Own Fleet",
-];
+import { business } from "@/lib/data/business";
 
 export default function Marquee() {
-  const loop = [...TICKER_ITEMS, ...TICKER_ITEMS];
+  const tickerItems = [
+    "GOA · 2N·3D from ₹6,475",
+    "OOTY + COONOOR · 5N·6D from ₹15,600",
+    "MYSORE HERITAGE · Day Trip on Request",
+    "COORG · 3N·4D from ₹12,200",
+    "KERALA · 6N·7D from ₹22,500",
+    "CHIKMAGALUR · 2N·3D from ₹9,800",
+    "AC SLEEPER COACHES · Volvo & Multi-Axle",
+    `TRUSTED SINCE ${business.foundedYear} · Own Fleet`,
+  ];
+  const loop = [...tickerItems, ...tickerItems];
 
   return (
     <div className="mt-14 overflow-hidden bg-ink py-4 text-white/90" aria-hidden="true">

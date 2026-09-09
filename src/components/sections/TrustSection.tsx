@@ -2,8 +2,7 @@ import Reveal from "@/components/ui/Reveal";
 import Image from "next/image";
 import { business } from "@/lib/data/business";
 import { trustBadges, trustCards } from "@/lib/data/stats";
-
-//const CARD_EMOJI: Record<string, string> = { trophy: "🏆", bus: "🚌", badge: "📋", star: "⭐" };
+import { yearsInBusiness } from "@/lib/data/business";
 
 import { Trophy,
   Bus,
@@ -29,15 +28,6 @@ const BADGE_ICON: Record<string, React.ElementType> = {
   cost: BadgeIndianRupee,
 };
 
-{/* const BADGE_EMOJI: Record<string, string> = {
-  secure: "🏦",
-  support: "📞",
-  itinerary: "🗺️",
-  cost: "💰",
-  fleet: "🚌",
-  license: "📋",
-}; */}
-
 const TINT: Record<string, string> = { green: "bg-[#E8FAF0]", blue: "bg-[#E8F0FA]", gold: "bg-[#FEF7E0]" };
 
 const PLATFORM_LOGO: Record<string, string> = {
@@ -58,10 +48,10 @@ export default function TrustSection() {
               Why Choose Us
             </span>
             <h2 className="text-[clamp(30px,3.4vw,44px)] leading-[1.06] font-extrabold tracking-tight text-ink">
-              Trust built over 25+ years
+              Trust built over {Math.floor(yearsInBusiness() / 5) * 5}+ years
             </h2>
             <p className="mt-4 max-w-[50ch] text-[15px] text-slate">
-            {business.legalName} — Gandhi Nagar, Bengaluru&apos;s most recognised travel operator since 2000. Listed
+            {business.legalName} — Gandhi Nagar, Bengaluru&apos;s most recognised travel operator since {business.foundedYear}. Listed
             on {business.bookingPlatforms.filter((p) => p !== "Direct Booking").join(", ")}.
           </p>
           </div>
@@ -72,7 +62,6 @@ export default function TrustSection() {
           {trustCards.map((card, i) => (
             <Reveal key={card.title} delay={i * 80} className="flex flex-col gap-2.5 rounded-2xl border-t-3 border-accent bg-white px-6.5 pt-7 pb-6.5 shadow-[0_16px_42px_-30px_rgba(8,33,76,0.5)]">
 
-{/* New card icons from "lucide-react" */}
               <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border border-accent/20 bg-accent/5">
   {(() => {
     const Icon = CARD_ICON[card.icon];
@@ -151,7 +140,6 @@ export default function TrustSection() {
         className="group flex min-h-28 items-center gap-4 rounded-2xl border border-line bg-[#F9FBFE] px-5 py-5 transition-all duration-300 hover:-translate-y-1 hover:border-accent/25 hover:shadow-lg"
       >
 
-        {/* Icon */}
         {/* Icon */}
 <div
   className={`relative flex h-16 w-16 shrink-0 items-center justify-center rounded-full ${TINT[badge.tint]} transition-transform duration-300 group-hover:scale-105`}

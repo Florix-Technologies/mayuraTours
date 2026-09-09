@@ -20,7 +20,7 @@ const platformLogo: Record<string, string> = {
 
 export default function SiteFooter() {
   return (
-    <footer className="mt-26 bg-ink px-5 pt-16 pb-28 text-white/70 sm:px-10 sm:pb-10">
+    <footer className="bg-ink px-5 pt-16 pb-28 text-white/70 sm:px-10 sm:pb-10">
       <div className="mx-auto grid max-w-(--container-width) grid-cols-1 gap-11 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1.3fr]">
         <div>
           <div className="mb-5 flex items-center gap-3">

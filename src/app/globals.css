@@ -222,18 +222,98 @@ body {
   }
 }
 
-/* Hero card track — physical movement, not a fixed-position crossfade.
-   Entering cards travel in from the right and settle; exiting cards travel
-   out to the left. Timed independently of the background's own crossfade
-   so the motion reads clearly instead of being washed out by a parent fade. */
+/* Hero card TRACK — a depth-aware system, not a uniform slide. The front
+   (dominant, slot-0) card gets its own keyframes that emphasize scale/z
+   depth — entering, it surfaces from smaller/lower as if arriving from
+   behind the row before growing into its full dominant size; exiting, it
+   briefly pushes toward the viewer before being carried away, reading as
+   "pushed out" rather than a plain fade. Back-row cards (slots 1-2) use a
+   lighter lateral+depth slide, so the two roles read as one coordinated
+   track advancing together rather than three cards doing the same generic
+   move. Timed independently of the background's own crossfade so the
+   motion reads clearly instead of being washed out by a parent fade. */
+@keyframes hero-card-front-enter {
+  0% {
+    opacity: 0;
+    transform: translate3d(74px, 46px, 0) scale(0.72);
+  }
+  55% {
+    opacity: 1;
+    transform: translate3d(-6px, -5px, 0) scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+.hero-card-front-enter {
+  opacity: 0;
+  animation: hero-card-front-enter 0.85s cubic-bezier(0.22, 0.8, 0.28, 1) both;
+}
+
+@keyframes hero-card-front-exit {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  30% {
+    opacity: 1;
+    transform: translate3d(-16px, -9px, 0) scale(1.06);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-124px, 46px, 0) scale(0.68);
+  }
+}
+.hero-card-front-exit {
+  animation: hero-card-front-exit 0.68s cubic-bezier(0.22, 0.8, 0.28, 1) both;
+}
+
+@keyframes hero-card-front-enter-prev {
+  0% {
+    opacity: 0;
+    transform: translate3d(-74px, 46px, 0) scale(0.72);
+  }
+  55% {
+    opacity: 1;
+    transform: translate3d(6px, -5px, 0) scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+.hero-card-front-enter-prev {
+  opacity: 0;
+  animation: hero-card-front-enter-prev 0.85s cubic-bezier(0.22, 0.8, 0.28, 1) both;
+}
+
+@keyframes hero-card-front-exit-prev {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  30% {
+    opacity: 1;
+    transform: translate3d(16px, -9px, 0) scale(1.06);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(124px, 46px, 0) scale(0.68);
+  }
+}
+.hero-card-front-exit-prev {
+  animation: hero-card-front-exit-prev 0.68s cubic-bezier(0.22, 0.8, 0.28, 1) both;
+}
+
 @keyframes hero-card-enter {
   from {
     opacity: 0;
-    transform: translateX(46px) scale(0.92);
+    transform: translate3d(100px, 20px, 0) scale(0.83);
   }
   to {
     opacity: 1;
-    transform: translateX(0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 .hero-card-enter {
@@ -244,11 +324,11 @@ body {
 @keyframes hero-card-exit {
   from {
     opacity: 1;
-    transform: translateX(0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
   to {
     opacity: 0;
-    transform: translateX(-36px) scale(0.9);
+    transform: translate3d(-80px, 20px, 0) scale(0.83);
   }
 }
 .hero-card-exit {
@@ -259,12 +339,12 @@ body {
 @keyframes hero-card-enter-prev {
   from {
     opacity: 0;
-    transform: translateX(-46px) scale(0.92);
+    transform: translate3d(-100px, 20px, 0) scale(0.83);
   }
 
   to {
     opacity: 1;
-    transform: translateX(0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
@@ -276,12 +356,12 @@ body {
 @keyframes hero-card-exit-prev {
   from {
     opacity: 1;
-    transform: translateX(0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 
   to {
     opacity: 0;
-    transform: translateX(36px) scale(0.9);
+    transform: translate3d(80px, 20px, 0) scale(0.83);
   }
 }
 
@@ -289,37 +369,52 @@ body {
   animation: hero-card-exit-prev 0.62s cubic-bezier(0.22, 0.8, 0.28, 1) both;
 }
 
-/* Hero title / copy — outgoing and incoming lines overlap briefly rather
-   than one instantly replacing the other. */
+/* Hero title / copy — the incoming line doesn't just fade in: it visibly
+   travels up from below, passing through a lower, subdued "still arriving"
+   stage before settling into its final resting position — and the outgoing
+   line fades as it's carried up and out, rather than both cutting instantly.
+   Font/size/weight are untouched by this class; only the element's own
+   transform/opacity animate. */
 @keyframes hero-title-enter {
-  from {
+  0% {
+    opacity: 0;
     transform: translate3d(0, 105%, 0);
   }
-
-  to {
+  45% {
+    opacity: 0.5;
+    transform: translate3d(0, 40%, 0);
+  }
+  100% {
+    opacity: 1;
     transform: translate3d(0, 0, 0);
   }
 }
 
 .hero-title-enter {
-  animation: hero-title-enter 0.72s cubic-bezier(0.22, 0.8, 0.28, 1) both;
-  will-change: transform;
+  opacity: 0;
+  animation: hero-title-enter 0.8s cubic-bezier(0.22, 0.8, 0.28, 1) both;
+  will-change: transform, opacity;
   backface-visibility: hidden;
 }
 
 @keyframes hero-title-exit {
-  from {
+  0% {
+    opacity: 1;
     transform: translate3d(0, 0, 0);
   }
-
-  to {
+  55% {
+    opacity: 0.45;
+    transform: translate3d(0, -55%, 0);
+  }
+  100% {
+    opacity: 0;
     transform: translate3d(0, -105%, 0);
   }
 }
 
 .hero-title-exit {
   animation: hero-title-exit 0.62s cubic-bezier(0.22, 0.8, 0.28, 1) both;
-  will-change: transform;
+  will-change: transform, opacity;
   backface-visibility: hidden;
 }
 /* One-time cinematic "settle" push on a freshly-entering background,

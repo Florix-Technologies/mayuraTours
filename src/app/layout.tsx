@@ -23,7 +23,7 @@ const poppins = Poppins({
 });
 
 const description =
-  "Bengaluru's trusted travel company since 2000. AC sleeper buses and luxury tour packages to Goa, Ooty, Kerala, Coorg, Mysore and Chikmagalur. Own fleet, Karnataka Tourism licensed.";
+  `Bengaluru's trusted travel company since ${business.foundedYear}. AC sleeper buses and luxury tour packages to Goa, Ooty, Kerala, Coorg, Mysore and Chikmagalur. Own fleet, Karnataka Tourism licensed.`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(business.siteUrl),

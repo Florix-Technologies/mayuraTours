@@ -32,6 +32,13 @@ export const business = {
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.mayurapackagetours.com",
 } as const;
 
+/** Single source of truth for "X+ years in business" copy — derived from
+ * foundedYear so it can't drift out of sync the way hardcoded "since 2000" /
+ * "25+ years" text scattered across components did. */
+export function yearsInBusiness() {
+  return new Date().getFullYear() - business.foundedYear;
+}
+
 export function telHref(phone: string) {
   return `tel:${phone.replace(/[^+\d]/g, "")}`;
 }

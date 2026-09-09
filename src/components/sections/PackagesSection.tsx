@@ -42,7 +42,6 @@ export default function PackagesSection() {
              
             </span>
             <h2 className="max-w-[12ch] text-[clamp(30px,3.4vw,44px)] leading-[1.06] font-extrabold tracking-tight text-ink">
-              {/*Handpicked journeys from Bengaluru*/}
               Packages Under One Roof:
             </h2>
 
