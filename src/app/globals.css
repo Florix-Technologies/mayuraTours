@@ -9,6 +9,12 @@
   /* Primary accent */
   --color-accent: #e5007e;
   --color-accent-light: #ff3ba0;
+  /* Same brand pink, darkened for use as small text directly on light/paper
+     backgrounds — the vivid --color-accent only clears WCAG AA (4.5:1) on
+     pure white or dark navy; on the site's #F3F7FC/#F7FAFE paper tones it
+     lands at ~4.2:1. Reserved for text; buttons/backgrounds keep the vivid
+     --color-accent unchanged. */
+  --color-accent-ink: #c2007a;
 
   /* Secondary blue accents (used sparingly) */
   --color-blue: #1358c4;
@@ -45,6 +51,7 @@
   --color-navy: var(--color-navy);
   --color-accent: var(--color-accent);
   --color-accent-light: var(--color-accent-light);
+  --color-accent-ink: var(--color-accent-ink);
   --color-blue: var(--color-blue);
   --color-sky: var(--color-sky);
   --color-gold: var(--color-gold);
@@ -170,22 +177,24 @@ body {
   animation-play-state: paused;
 }
 
-/* WhatsApp float button pulse */
-@keyframes pulse-accent {
-  0%,
-  100% {
-    box-shadow:
-      0 16px 36px -12px rgba(229, 0, 126, 0.95),
-      0 0 0 0 rgba(229, 0, 126, 0.5);
+/* WhatsApp float button pulse ring — a same-sized layer *behind* the button
+   (see WhatsAppFloatButton.tsx) that scales up and fades using only
+   `transform`/`opacity`, so the browser can run it entirely on the compositor.
+   The previous version animated `box-shadow` directly on the button, which is
+   not a compositable property and forced a full repaint every frame. */
+@keyframes pulse-accent-ring {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.6;
   }
-  50% {
-    box-shadow:
-      0 16px 36px -12px rgba(229, 0, 126, 0.95),
-      0 0 0 16px rgba(229, 0, 126, 0);
+  100% {
+    transform: scale(1.55);
+    opacity: 0;
   }
 }
-.animate-pulse-accent {
-  animation: pulse-accent 2.6s ease-in-out infinite;
+.animate-pulse-accent-ring {
+  animation: pulse-accent-ring 2.6s ease-out infinite;
+  will-change: transform, opacity;
 }
 
 /* Hero cinematic crossfade layer — background, copy and cards fade together as one scene */

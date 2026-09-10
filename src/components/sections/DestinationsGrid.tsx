@@ -8,7 +8,7 @@ export default function DestinationsGrid() {
       <div className="mx-auto max-w-(--container-width) px-5 sm:px-10">
         <div className="mb-11 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
           <div>
-            <span className="mb-3 block text-[11px] font-bold tracking-[0.22em] text-accent uppercase">Where We Go</span>
+            <span className="mb-3 block text-[11px] font-bold tracking-[0.22em] text-accent-ink uppercase">Where We Go</span>
             <h2 className="text-[clamp(30px,3.4vw,44px)] leading-[1.06] font-extrabold tracking-tight text-ink">
               Top destinations from Bengaluru
             </h2>

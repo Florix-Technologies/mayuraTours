@@ -21,7 +21,7 @@ export default function PackagesSection() {
     MAYURA
   </span>
 
-  <span className="mt-0.5 text-[14px] font-bold tracking-[0.45em] text-accent uppercase">
+  <span className="mt-0.5 text-[14px] font-bold tracking-[0.45em] text-accent-ink uppercase">
     HOLIDAYS
   </span>
 </div>
@@ -37,9 +37,9 @@ export default function PackagesSection() {
 
         <div className="mb-11 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
           <div>
-            <span className="mb-3 block text-[11px] font-bold tracking-[0.22em] text-accent uppercase">
+            <span className="mb-3 block text-[11px] font-bold tracking-[0.22em] text-accent-ink uppercase">
               Curated Packages
-             
+
             </span>
             <h2 className="max-w-[12ch] text-[clamp(30px,3.4vw,44px)] leading-[1.06] font-extrabold tracking-tight text-ink">
               Packages Under One Roof:

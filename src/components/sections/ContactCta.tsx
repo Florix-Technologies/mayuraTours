@@ -93,6 +93,7 @@ export default function ContactCta() {
             <input
               type="text"
               placeholder="Your Full Name"
+              aria-label="Your full name"
               autoComplete="name"
               required
               value={name}
@@ -102,6 +103,7 @@ export default function ContactCta() {
             <input
               type="tel"
               placeholder="Mobile Number (WhatsApp)"
+              aria-label="Mobile number for WhatsApp"
               autoComplete="tel"
               required
               value={phone}
@@ -111,6 +113,7 @@ export default function ContactCta() {
             <select
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
+              aria-label="Choose destination"
               className="w-full rounded-[9px] border border-white/20 bg-white/10 px-4 py-3.5 text-[14.5px] text-white outline-none focus:border-accent-light focus:bg-white/15"
             >
               <option value="" className="text-ink">
@@ -129,11 +132,13 @@ export default function ContactCta() {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
+              aria-label="Select travel date"
               className="w-full rounded-[9px] border border-white/20 bg-white/10 px-4 py-3.5 text-[14.5px] text-white outline-none focus:border-accent-light focus:bg-white/15"
             />
             <input
               type="number"
               placeholder="Number of travellers"
+              aria-label="Number of travellers"
               min={1}
               max={100}
               value={count}

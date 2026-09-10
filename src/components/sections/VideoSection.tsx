@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { optimizedPoster } from "@/lib/optimized-poster";
 
 /** Matches the hero's cinematic playback rate — footage this smooth reads better a touch slower than real time. */
 const PLAYBACK_RATE = 0.85;
@@ -85,7 +86,10 @@ export default function VideoSection() {
                 loop
                 playsInline
                 preload="none"
-                poster="/video/posters/western-ghats.jpg"
+                // Raw file is a 318KB, un-resized 1439x900 JPEG for a box that
+                // renders at ~580x363 — route it through the image optimizer
+                // the same way a `next/image` <Image> would be served.
+                poster={optimizedPoster("/video/posters/western-ghats.jpg", 828, 75)}
                 className="absolute inset-0 h-full w-full object-cover"
               >
                 <source src="/video/western-ghats-aerial.mp4" type="video/mp4" />

@@ -1,10 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { preload } from "react-dom";
 import Image from "next/image";
 import { heroExperiences } from "@/lib/data/hero-experiences";
 import { packages } from "@/lib/data/packages";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
+import { optimizedPoster } from "@/lib/optimized-poster";
 
 /** ~4.8s on screen per category, ~900ms cinematic crossfade — shared by background and cards; title runs a touch faster. */
 const DISPLAY_MS = 4800;
@@ -153,6 +155,14 @@ function getCardClass(slotIndex: number, isExiting: boolean, direction: "next" |
 }
 
 export default function Hero() {
+  // The very first category's poster is the Hero's LCP candidate — hint the
+  // browser to fetch it at the highest priority immediately, before it would
+  // otherwise be discovered. Only this one image, not every slide's poster.
+  preload(optimizedPoster(heroExperiences[0].backgroundImage, 1920, 75), {
+    as: "image",
+    fetchPriority: "high",
+  });
+
   const [current, setCurrent] = useState(0);
   const [layers, setLayers] = useState<Layer[]>([{ id: 0, expIndex: 0 }]);
   const [enteringId, setEnteringId] = useState<number | null>(null);
@@ -315,7 +325,10 @@ export default function Hero() {
     slotContent.current[slot] = expIndex;
     const exp = heroExperiences[expIndex];
     el.src = exp.video;
-    el.poster = exp.backgroundImage;
+    // Raw poster files are un-resized/un-recompressed 100-350KB JPEGs — a
+    // `<video poster>` attribute only accepts a plain URL, so it can't use
+    // `next/image` directly; route it through the same optimizer manually.
+    el.poster = optimizedPoster(exp.backgroundImage, 1920, 75);
     // `load()` resets playbackRate, so it must be (re)applied after, not before.
     el.load();
     el.playbackRate = VIDEO_PLAYBACK_RATE;
@@ -503,10 +516,13 @@ export default function Hero() {
                       <video
                         ref={setVideoRef(slot)}
                         src={heroExperiences[slot].video}
-                        poster={heroExperiences[slot].backgroundImage}
+                        poster={optimizedPoster(heroExperiences[slot].backgroundImage, 1920, 75)}
                         muted={videoMuted}
                         loop
                         playsInline
+                        // `fetchPriority` isn't a valid attribute on <video> per spec (only
+                        // img/link/script) — the LCP hint for slot 0's poster instead comes
+                        // from the `preload()` call above, which resolves to the same URL.
                         // No native `autoPlay`: with both slots mounted, it made the browser
                         // decode both videos independently on load, on top of this component's
                         // own play() calls. Playback is driven entirely by those calls instead.
@@ -548,7 +564,7 @@ export default function Hero() {
                         fill
                         priority={layer.id === 0}
                         sizes="96vw"
-                        quality={90}
+                        quality={75}
                         className="object-cover object-center"
                       />
                     </div>
@@ -708,7 +724,10 @@ export default function Hero() {
 >
     <a
       href="#packages"
-      className="inline-flex items-center rounded-full bg-accent px-6 py-3 text-sm font-bold text-white shadow-[0_16px_30px_-12px_rgba(229,0,126,0.9)] transition-all duration-300 hover:scale-[1.03] hover:bg-white sm:gap-3 sm:px-5 sm:py-2.5 sm:text-ink sm:shadow-none sm:hover:bg-white"
+      // text-white on the solid accent pink is what clears WCAG AA (4.5:1) —
+      // the previous sm:text-ink combination measured 4.16:1. Kept white on
+      // hover too (sm:hover:bg-white would otherwise leave white-on-white).
+      className="inline-flex items-center rounded-full bg-accent px-6 py-3 text-sm font-bold text-white shadow-[0_16px_30px_-12px_rgba(229,0,126,0.9)] transition-all duration-300 hover:scale-[1.03] hover:bg-white hover:text-ink sm:gap-3 sm:px-5 sm:py-2.5 sm:shadow-none"
     >
       <span className="sm:hidden">Book now</span>
       <span className="hidden sm:inline">Explore Packages</span>
@@ -884,7 +903,7 @@ export default function Hero() {
                                     alt={d.imageAlt}
                                     fill
                                     sizes="400px"
-                                    quality={90}
+                                    quality={75}
                                     className="object-cover object-[50%_50%]"
                                   />
                                 </div>
@@ -1054,31 +1073,46 @@ export default function Hero() {
             the Hero slider, reusing the exact same `switchTo` transition every
             other trigger (dot rail, tablet/mobile arrows) already uses, so
             background + title + cards + progress track + pagination all advance
-            together identically no matter which control fired it. */}
-        <div className="absolute bottom-8 left-1/2 z-20 hidden -translate-x-1/2 items-center gap-3 lg:flex">
+            together identically no matter which control fired it. Sized and
+            lit (glowing accent ring, bottom-heavy shadow) to read clearly
+            against any background frame, with a small dash-row slide
+            indicator between them mirroring the requested reference look. */}
+        <div className="absolute bottom-24 left-1/2 z-20 hidden -translate-x-1/2 items-center gap-5 lg:flex">
           <button
             type="button"
             onClick={() => {
               setDirection("prev");
               switchTo(current - 1);
             }}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-black/20 text-white backdrop-blur-md transition-all duration-300 hover:border-white/80 hover:bg-white/15 active:scale-95"
+            className="flex h-[70px] w-[70px] items-center justify-center rounded-full border-2 border-accent/70 bg-ink/30 text-white shadow-[0_14px_32px_-8px_rgba(229,0,126,0.85),0_0_0_1px_rgba(229,0,126,0.35)] backdrop-blur-md transition-all duration-300 hover:border-accent hover:bg-ink/45 hover:shadow-[0_16px_38px_-6px_rgba(229,0,126,1),0_0_0_1px_rgba(229,0,126,0.55)] active:scale-95"
             aria-label="Previous category"
           >
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="m15 18-6-6 6-6" />
             </svg>
           </button>
+
+          <div className="flex items-center gap-1.5" aria-hidden="true">
+            {heroExperiences.map((exp, i) => (
+              <span
+                key={exp.slug}
+                className={`h-1 rounded-full transition-all duration-500 ${
+                  i === current ? "w-6 bg-accent" : "w-3 bg-white/35"
+                }`}
+              />
+            ))}
+          </div>
+
           <button
             type="button"
             onClick={() => {
               setDirection("next");
               switchTo(current + 1);
             }}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-black/20 text-white backdrop-blur-md transition-all duration-300 hover:border-white/80 hover:bg-white/15 active:scale-95"
+            className="flex h-[70px] w-[70px] items-center justify-center rounded-full border-2 border-accent/70 bg-ink/30 text-white shadow-[0_14px_32px_-8px_rgba(229,0,126,0.85),0_0_0_1px_rgba(229,0,126,0.35)] backdrop-blur-md transition-all duration-300 hover:border-accent hover:bg-ink/45 hover:shadow-[0_16px_38px_-6px_rgba(229,0,126,1),0_0_0_1px_rgba(229,0,126,0.55)] active:scale-95"
             aria-label="Next category"
           >
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="m9 18 6-6-6-6" />
             </svg>
           </button>

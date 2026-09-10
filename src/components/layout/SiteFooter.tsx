@@ -50,12 +50,12 @@ export default function SiteFooter() {
             <b className="font-semibold text-white">Email:</b> {business.email}
             <br />
             <br />
-            <span className="text-xs text-white/40">{business.credentials.join(" · ")}</span>
+            <span className="text-xs text-white/60">{business.credentials.join(" · ")}</span>
           </p>
         </div>
 
         <div>
-          <h4 className="mb-4 text-[11px] font-bold tracking-[0.2em] text-accent uppercase">Destinations</h4>
+          <h3 className="mb-4 text-[11px] font-bold tracking-[0.2em] text-accent-light uppercase">Destinations</h3>
           <ul className="grid gap-2.5 text-sm">
             {packages.map((pkg) => (
               <li key={pkg.slug}>
@@ -73,7 +73,7 @@ export default function SiteFooter() {
         </div>
 
         <div>
-          <h4 className="mb-4 text-[11px] font-bold tracking-[0.2em] text-accent uppercase">Company</h4>
+          <h3 className="mb-4 text-[11px] font-bold tracking-[0.2em] text-accent-light uppercase">Company</h3>
           <ul className="grid gap-2.5 text-sm">
             <li>
               <a href="#trust" className="transition-colors hover:text-sky">
@@ -104,9 +104,9 @@ export default function SiteFooter() {
         </div>
 
         <div>
-  <h4 className="mb-4 text-[11px] font-bold tracking-[0.2em] text-accent uppercase">
+  <h3 className="mb-4 text-[11px] font-bold tracking-[0.2em] text-accent-light uppercase">
     Book on
-  </h4>
+  </h3>
 
   <ul className="grid gap-3.5 text-sm">
     {business.bookingPlatforms.map((platform) => (
@@ -143,7 +143,7 @@ export default function SiteFooter() {
 </div>
       </div>
 
-      <div className="mx-auto mt-11 flex max-w-(--container-width) flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-6 text-xs text-white/45">
+      <div className="mx-auto mt-11 flex max-w-(--container-width) flex-wrap items-center justify-between gap-4 border-t border-white/15 pt-6 text-xs text-white/50">
         <span>
           © {new Date().getFullYear()} {business.legalName} · {business.address.city}
         </span>

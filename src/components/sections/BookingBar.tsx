@@ -75,7 +75,10 @@ export default function BookingBar() {
                 <circle cx="12" cy="10" r="3" />
                 <path d="M12 2a8 8 0 0 1 8 8c0 5.25-8 13-8 13S4 15.25 4 10a8 8 0 0 1 8-8z" />
               </svg>
-              <select className="w-full cursor-pointer border-none bg-transparent text-base font-medium text-ink outline-none">
+              <select
+                aria-label="Choose destination"
+                className="w-full cursor-pointer border-none bg-transparent text-base font-medium text-ink outline-none"
+              >
                 {packages.map((pkg) => (
                   <option key={pkg.slug}>{pkg.name}</option>
                 ))}
@@ -94,8 +97,8 @@ export default function BookingBar() {
               </svg>
               <input
                 type="date"
-                aria-label="Travel date"
-                className="w-full cursor-pointer border-none bg-transparent text-base text-[#93A4BE] outline-none"
+                aria-label="Select travel date"
+                className="w-full cursor-pointer border-none bg-transparent text-base text-slate outline-none"
               />
             </span>
           </label>
@@ -108,7 +111,10 @@ export default function BookingBar() {
                 <circle cx="9" cy="7" r="4" />
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
               </svg>
-              <select className="w-full cursor-pointer border-none bg-transparent text-base font-medium text-ink outline-none">
+              <select
+                aria-label="Select number of travellers"
+                className="w-full cursor-pointer border-none bg-transparent text-base font-medium text-ink outline-none"
+              >
                 {TRAVELLER_OPTIONS.map((opt) => (
                   <option key={opt}>{opt}</option>
                 ))}

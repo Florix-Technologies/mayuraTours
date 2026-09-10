@@ -1,0 +1,30 @@
+# Gautam's Mayura Package Tours
+
+> Bengaluru-based travel operator running its own AC sleeper/Volvo coach fleet since 1990. Books multi-day tour packages and day trips across South & Central India, plus corporate and group bus charters.
+
+Mayura Package Tours is a Karnataka Tourism–licensed operator headquartered in Gandhi Nagar, Bengaluru. It owns and GPS-tracks its own coach fleet (no contract buses), and sells both curated packages and direct bus/charter bookings.
+
+## Key pages
+
+- [Home](https://www.mayurapackagetours.com/): overview, hero categories, curated packages, destinations, fleet, and booking/contact panel.
+- Packages section (`/#packages`): all-inclusive tour packages with pricing, duration, and inclusions.
+- Destinations section (`/#destinations`): quick links to individual destinations served from Bengaluru.
+- Fleet section (`/#fleet`): coach types and amenities.
+- Trust section (`/#trust`): credentials, ratings, and booking-platform listings.
+- Contact section (`/#contact`): phone, WhatsApp, email, office address, and a quote-request form.
+
+## Popular destinations
+
+Goa, Ooty & Coonoor, Mysore & Srirangapatna, Coorg, Kerala (Munnar/Alleppey/Periyar), Chikmagalur, Hampi, Wayanad, Kanyakumari.
+
+## Contact
+
+- Phone / WhatsApp: +91 80 2200 1234
+- Email: bookings@mayurapackagetours.com
+- Address: Gandhi Nagar (Anandrao Circle), Bengaluru – 560 009, Karnataka, India
+- Hours: 9 AM – 9 PM daily
+
+## Notes for agents
+
+- Prices and availability change; always confirm the current price and departure date shown on the live page rather than relying on cached figures.
+- Booking is completed via phone, WhatsApp, or the listed third-party platforms (RedBus, AbhiBus, MakeMyTrip, EaseMyTrip) — there is no on-site payment checkout.
