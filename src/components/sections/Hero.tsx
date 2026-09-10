@@ -167,10 +167,13 @@ export default function Hero() {
   const [layers, setLayers] = useState<Layer[]>([{ id: 0, expIndex: 0 }]);
   const [enteringId, setEnteringId] = useState<number | null>(null);
   const [videoFront, setVideoFront] = useState<Slot>(0);
-  // Video is desktop/tablet only — mobile gets a lighter static-image crossfade
-  // instead (see the `canPlayVideo` branches below). `sm` matches the rest of
-  // this component's mobile/tablet split.
-  const canPlayVideo = useMediaQuery("(min-width: 640px)");
+  // Background video now plays at every breakpoint, using the same
+  // object-cover/object-center treatment as desktop/tablet — that alone
+  // keeps it correctly filled and centered at any screen size. The static-
+  // image crossfade below the video branch is kept but currently unreachable
+  // (canPlayVideo is now always true); it's the fastest path back to a
+  // lighter mobile fallback if that's ever needed again.
+  const canPlayVideo = true;
   const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const [direction, setDirection] = useState<"next" | "prev">("next");
   // Top-center transport controls — real playback controls for the existing
