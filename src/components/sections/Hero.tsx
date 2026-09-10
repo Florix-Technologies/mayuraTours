@@ -585,16 +585,19 @@ export default function Hero() {
             className="pointer-events-none absolute inset-0 z-5"
             style={{
               background:
-                "linear-gradient(150deg, rgba(11,42,107,0.22) 0%, rgba(229,0,126,0.05) 50%, rgba(4,16,42,0.25) 100%)",
+                "linear-gradient(150deg, rgba(11,42,107,0.3) 0%, rgba(229,0,126,0.07) 50%, rgba(4,16,42,0.32) 100%)",
             }}
           />
-          {/* Localized text-readability tint — only the left side where copy sits darkens;
-              the right side (cards, video) stays bright, not a flat dark scrim over everything. */}
+          {/* Localized text-readability tint — the left side (copy) darkens most, but this
+              no longer bottoms out at fully transparent on the right: a bright, light-toned
+              video frame (sand, sky, stone) could still wash out the card titles and the
+              top-center transport controls over there, so a low flat floor (0.14) now
+              carries all the way across instead of fading to 0 by 78%. */}
           <div
             className="pointer-events-none absolute inset-0 z-5"
             style={{
              background:
-              "linear-gradient(90deg, rgba(3,20,35,0.68) 0%, rgba(3,20,35,0.45) 35%, rgba(3,20,35,0.16) 60%, rgba(3,20,35,0) 78%)",
+              "linear-gradient(90deg, rgba(3,20,35,0.78) 0%, rgba(3,20,35,0.55) 35%, rgba(3,20,35,0.3) 60%, rgba(3,20,35,0.14) 100%)",
             }}
           />
           {/* Faint bottom vignette — keeps mobile-stacked content and the panel's lower edge readable */}
@@ -976,20 +979,31 @@ export default function Hero() {
           // is visually clear but never actually clickable (confirmed: a control
           // at top-24/96px silently ate every click, "header subtree intercepts
           // pointer events").
-          <div className="absolute top-40 left-1/2 z-20 hidden -translate-x-1/2 items-center gap-2.5 lg:flex">
+          //
+          // Left-14, not centered: the destination cards are sized off the
+          // viewport's own width/height (cqw units, deliberately NOT shrunk to
+          // make room for chrome), so a horizontally-centered control here would
+          // land in the cards' own airspace on plenty of real laptop windows —
+          // confirmed via Playwright across widths at 700-900px heights, with
+          // the front card's title text sitting right where a centered control
+          // would. left-14 matches the copy column's own left padding
+          // (`lg:px-14` on the content row below), tucking the controls above
+          // the headline instead — clear of the card deck at any card size,
+          // by construction rather than by fitting a budget.
+          <div className="absolute top-40 left-14 z-20 hidden items-center gap-2 lg:flex">
             <button
               type="button"
               onClick={toggleVideoPlayback}
               aria-label={videoPaused ? "Play background video" : "Pause background video"}
               aria-pressed={videoPaused}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/25 text-white backdrop-blur-md transition-all duration-300 hover:border-white/70 hover:bg-black/40"
+              className="flex h-7 w-7 items-center justify-center rounded-full border border-white/25 bg-black/25 text-white backdrop-blur-md transition-all duration-300 hover:border-white/70 hover:bg-black/40"
             >
               {videoPaused ? (
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                   <path d="M8 5v14l11-7z" />
                 </svg>
               ) : (
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                   <rect x="6" y="5" width="4" height="14" rx="1" />
                   <rect x="14" y="5" width="4" height="14" rx="1" />
                 </svg>
@@ -1000,16 +1014,16 @@ export default function Hero() {
               onClick={() => setVideoMuted((m) => !m)}
               aria-label={videoMuted ? "Unmute background video" : "Mute background video"}
               aria-pressed={!videoMuted}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/25 text-white backdrop-blur-md transition-all duration-300 hover:border-white/70 hover:bg-black/40"
+              className="flex h-7 w-7 items-center justify-center rounded-full border border-white/25 bg-black/25 text-white backdrop-blur-md transition-all duration-300 hover:border-white/70 hover:bg-black/40"
             >
               {videoMuted ? (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M11 5 6 9H2v6h4l5 4V5z" />
                   <line x1="23" y1="9" x2="17" y2="15" />
                   <line x1="17" y1="9" x2="23" y2="15" />
                 </svg>
               ) : (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M11 5 6 9H2v6h4l5 4V5z" />
                   <path d="M15.5 8.5a5 5 0 0 1 0 7" />
                   <path d="M18.5 5.5a9 9 0 0 1 0 13" />
@@ -1080,17 +1094,17 @@ export default function Hero() {
             lit (glowing accent ring, bottom-heavy shadow) to read clearly
             against any background frame, with a small dash-row slide
             indicator between them mirroring the requested reference look. */}
-        <div className="absolute bottom-24 left-1/2 z-20 hidden -translate-x-1/2 items-center gap-5 lg:flex">
+        <div className="absolute bottom-14 left-1/2 z-20 hidden -translate-x-1/2 items-center gap-4 lg:flex">
           <button
             type="button"
             onClick={() => {
               setDirection("prev");
               switchTo(current - 1);
             }}
-            className="flex h-[70px] w-[70px] items-center justify-center rounded-full border-2 border-accent/70 bg-ink/30 text-white shadow-[0_14px_32px_-8px_rgba(229,0,126,0.85),0_0_0_1px_rgba(229,0,126,0.35)] backdrop-blur-md transition-all duration-300 hover:border-accent hover:bg-ink/45 hover:shadow-[0_16px_38px_-6px_rgba(229,0,126,1),0_0_0_1px_rgba(229,0,126,0.55)] active:scale-95"
+            className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-accent/70 bg-ink/30 text-white shadow-[0_14px_32px_-8px_rgba(229,0,126,0.85),0_0_0_1px_rgba(229,0,126,0.35)] backdrop-blur-md transition-all duration-300 hover:border-accent hover:bg-ink/45 hover:shadow-[0_16px_38px_-6px_rgba(229,0,126,1),0_0_0_1px_rgba(229,0,126,0.55)] active:scale-95"
             aria-label="Previous category"
           >
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="m15 18-6-6 6-6" />
             </svg>
           </button>
@@ -1112,10 +1126,10 @@ export default function Hero() {
               setDirection("next");
               switchTo(current + 1);
             }}
-            className="flex h-[70px] w-[70px] items-center justify-center rounded-full border-2 border-accent/70 bg-ink/30 text-white shadow-[0_14px_32px_-8px_rgba(229,0,126,0.85),0_0_0_1px_rgba(229,0,126,0.35)] backdrop-blur-md transition-all duration-300 hover:border-accent hover:bg-ink/45 hover:shadow-[0_16px_38px_-6px_rgba(229,0,126,1),0_0_0_1px_rgba(229,0,126,0.55)] active:scale-95"
+            className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-accent/70 bg-ink/30 text-white shadow-[0_14px_32px_-8px_rgba(229,0,126,0.85),0_0_0_1px_rgba(229,0,126,0.35)] backdrop-blur-md transition-all duration-300 hover:border-accent hover:bg-ink/45 hover:shadow-[0_16px_38px_-6px_rgba(229,0,126,1),0_0_0_1px_rgba(229,0,126,0.55)] active:scale-95"
             aria-label="Next category"
           >
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="m9 18 6-6-6-6" />
             </svg>
           </button>

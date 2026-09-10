@@ -2,13 +2,17 @@
 
 import { useEffect, useRef, useState } from "react";
 import { packages } from "@/lib/data/packages";
+import Select from "@/components/ui/Select";
 
 const TRAVELLER_OPTIONS = ["1 Person", "2 People", "3–5 People", "6–10 People", "Group (10+)"];
+const DESTINATION_OPTIONS = packages.map((pkg) => pkg.name);
 
 export default function BookingBar() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
   const [away, setAway] = useState(false);
+  const [destination, setDestination] = useState(DESTINATION_OPTIONS[0]);
+  const [travellers, setTravellers] = useState(TRAVELLER_OPTIONS[0]);
   const bookTop = useRef(0);
   const lastY = useRef(0);
 
@@ -75,14 +79,12 @@ export default function BookingBar() {
                 <circle cx="12" cy="10" r="3" />
                 <path d="M12 2a8 8 0 0 1 8 8c0 5.25-8 13-8 13S4 15.25 4 10a8 8 0 0 1 8-8z" />
               </svg>
-              <select
-                aria-label="Choose destination"
-                className="w-full cursor-pointer border-none bg-transparent text-base font-medium text-ink outline-none"
-              >
-                {packages.map((pkg) => (
-                  <option key={pkg.slug}>{pkg.name}</option>
-                ))}
-              </select>
+              <Select
+                ariaLabel="Choose destination"
+                options={DESTINATION_OPTIONS}
+                value={destination}
+                onChange={setDestination}
+              />
             </span>
           </label>
 
@@ -111,14 +113,12 @@ export default function BookingBar() {
                 <circle cx="9" cy="7" r="4" />
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
               </svg>
-              <select
-                aria-label="Select number of travellers"
-                className="w-full cursor-pointer border-none bg-transparent text-base font-medium text-ink outline-none"
-              >
-                {TRAVELLER_OPTIONS.map((opt) => (
-                  <option key={opt}>{opt}</option>
-                ))}
-              </select>
+              <Select
+                ariaLabel="Select number of travellers"
+                options={TRAVELLER_OPTIONS}
+                value={travellers}
+                onChange={setTravellers}
+              />
             </span>
           </label>
 
