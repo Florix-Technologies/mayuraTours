@@ -22,7 +22,7 @@ export default function ContactCta() {
     const message =
       `Hi Mayura Team! 👋\n\n` +
       `🧳 *New Enquiry*\n` +
-      `📛 Name: ${name.trim()}\n` +
+      `🧳 Name: ${name.trim()}\n` +
       (destination ? `📍 Destination: ${destination}\n` : "") +
       (date ? `📅 Travel Date: ${date}\n` : "") +
       (count ? `👥 Travellers: ${count}\n` : "") +
