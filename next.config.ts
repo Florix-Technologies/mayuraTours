@@ -25,6 +25,20 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // Baseline security headers on every response. This site doesn't embed
+        // third-party frames or need cross-origin isolation, so the policy is
+        // deliberately conservative rather than exhaustive (e.g. no CSP, which
+        // would need real auditing of the video/image/WhatsApp/Google Fonts
+        // origins already in use before it could be turned on without breakage).
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        ],
+      },
+      {
         source: "/video/:path*",
         headers: [
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
