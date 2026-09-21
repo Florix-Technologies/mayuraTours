@@ -3,21 +3,24 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { business, telHref } from "@/lib/data/business";
+import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
-  { href: "#packages", label: "Packages" },
-  { href: "#destinations", label: "Destinations" },
-  { href: "#fleet", label: "Our Fleet" },
-  { href: "#trust", label: "Why Us" },
-  { href: "#contact", label: "Contact" },
+  { href: "/#packages", label: "Packages" },
+  { href: "/#destinations", label: "Destinations" },
+  { href: "/#fleet", label: "Our Fleet" },
+  { href: "/#trust", label: "Why Us" },
+  { href: "/#contact", label: "Contact" },
 ];
 
 export default function SiteHeader() {
+  const pathname = usePathname();
   const [solid, setSolid] = useState(false);
   const [progress, setProgress] = useState(0);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const ticking = useRef(false);
+  
 
   useEffect(() => {
     function onScroll() {
@@ -119,7 +122,7 @@ export default function SiteHeader() {
           </a>
 */}
  
- <a href="#top" className="flex items-center gap-3">
+ <a href="/" className="flex items-center gap-3">
   <Image
     src="/mayura.png"
     alt={`${business.legalName} logo`}
@@ -154,7 +157,8 @@ export default function SiteHeader() {
                 key={link.href}
                 href={link.href}
                 className={`relative rounded-full border bg-white/10 px-4 py-2 backdrop-blur-sm transition-all duration-300 hover:border-accent/60 hover:bg-white/15 hover:text-white ${
-                  activeId === link.href.slice(1)
+                  (pathname === "/packages" && link.href === "/#packages") ||
+                  activeId === link.href.replace("/#", "").replace("#", "")               
                     ? "border-accent text-white"
                     : "border-white/20 text-white/85"
              }`}

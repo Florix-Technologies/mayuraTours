@@ -76,22 +76,22 @@ export default function SiteFooter() {
           <h3 className="mb-4 text-[11px] font-bold tracking-[0.2em] text-accent-light uppercase">Company</h3>
           <ul className="grid gap-2.5 text-sm">
             <li>
-              <a href="#trust" className="transition-colors hover:text-sky">
+              <a href="/#trust" className="transition-colors hover:text-sky">
                 About Us
               </a>
             </li>
             <li>
-              <a href="#fleet" className="transition-colors hover:text-sky">
+              <a href="/#fleet" className="transition-colors hover:text-sky">
                 Our Fleet
               </a>
             </li>
             <li>
-              <a href="#contact" className="transition-colors hover:text-sky">
+              <a href="/#contact" className="transition-colors hover:text-sky">
                 Corporate Bookings
               </a>
             </li>
             <li>
-              <a href="#contact" className="transition-colors hover:text-sky">
+              <a href="/#contact" className="transition-colors hover:text-sky">
                 Group Tours
               </a>
             </li>
