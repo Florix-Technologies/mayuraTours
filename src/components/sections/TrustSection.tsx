@@ -1,5 +1,6 @@
 import Reveal from "@/components/ui/Reveal";
 import Image from "next/image";
+import Link from "next/link";
 import { business } from "@/lib/data/business";
 import { trustBadges, trustCards } from "@/lib/data/stats";
 import { yearsInBusiness } from "@/lib/data/business";
@@ -51,11 +52,17 @@ export default function TrustSection() {
               Trust built over {Math.floor(yearsInBusiness() / 5) * 5}+ years
             </h2>
             <p className="mt-4 max-w-[50ch] text-[15px] text-slate">
-            {business.legalName} — Gandhi Nagar, Bengaluru&apos;s most recognised travel operator since {business.foundedYear}. Listed
+            {business.legalName} — Gandhi Nagar, Bengaluru's most recognised travel operator since {business.foundedYear}. Listed
             on {business.bookingPlatforms.filter((p) => p !== "Direct Booking").join(", ")}.
           </p>
           </div>
-          
+
+          <Link
+            href="/about"
+            className="border-b-2 border-blue pb-1 text-[13.5px] font-bold tracking-[0.06em] whitespace-nowrap text-blue uppercase transition-colors hover:border-accent hover:text-accent"
+          >
+            Discover Our Story →
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 gap-5.5 sm:grid-cols-2 lg:grid-cols-4">

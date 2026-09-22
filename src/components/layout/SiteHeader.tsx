@@ -9,7 +9,7 @@ const NAV_LINKS = [
   { href: "/#packages", label: "Packages" },
   { href: "/#destinations", label: "Destinations" },
   { href: "/#fleet", label: "Our Fleet" },
-  { href: "/#trust", label: "Why Us" },
+  { href: "/about", label: "About Us" },
   { href: "/#contact", label: "Contact" },
 ];
 
@@ -20,7 +20,13 @@ export default function SiteHeader() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const ticking = useRef(false);
-  
+
+  // The Package Details page (/packages/[slug]) opens on a white background, so the
+  // transparent-at-top header (correct for the homepage/dark heroes) would render its
+  // white nav text invisibly. Force the existing solid header state there from first
+  // paint; every other route keeps the normal scroll-triggered behaviour.
+  const isPackageDetail = /^\/packages\/[^/]+$/.test(pathname);
+  const isSolid = solid || isPackageDetail;
 
   useEffect(() => {
     function onScroll() {
@@ -93,12 +99,12 @@ export default function SiteHeader() {
 
       <header
         className={`fixed inset-x-0 top-0 z-[150] transition-[background-color,box-shadow,padding] duration-300 ${
-          solid ? "bg-ink/95 shadow-lg backdrop-blur-md" : "bg-transparent"
+          isSolid ? "bg-ink/95 shadow-lg backdrop-blur-md" : "bg-transparent"
         }`}
       >
         <div
           className={`mx-auto flex max-w-[1680px] items-center gap-3 px-4 transition-[padding] duration-300 sm:gap-6 sm:px-8 ${
-            solid ? "py-2.5 sm:py-3" : "py-2.5 sm:py-5"
+            isSolid ? "py-2.5 sm:py-3" : "py-2.5 sm:py-5"
           }`}
         >
      {/*   <a href="#top" className="flex items-center gap-3">
@@ -126,18 +132,18 @@ export default function SiteHeader() {
   <Image
     src="/mayura.png"
     alt={`${business.legalName} logo`}
-    width={solid ? 68 : 150}
-    height={solid ? 68 : 150}
+    width={isSolid ? 68 : 150}
+    height={isSolid ? 68 : 150}
     priority
     className={`rounded-xl object-contain transition-[width,height] duration-300 ${
-      solid ? "h-[54px] w-[68px]" : "h-16 w-[92px] sm:h-[100px] sm:w-[150px]"
+      isSolid ? "h-[54px] w-[68px]" : "h-16 w-[92px] sm:h-[100px] sm:w-[150px]"
     }`}
   />
 
 
  <span
   className={`font-display font-semibold tracking-[0.6em] text-white/70 transition-all duration-300 ${
-    solid ? "text-sm" : "text-sm sm:text-lg"
+    isSolid ? "text-sm" : "text-sm sm:text-lg"
   }`}
 >
   SINCE.{business.foundedYear}
@@ -158,6 +164,7 @@ export default function SiteHeader() {
                 href={link.href}
                 className={`relative rounded-full border bg-white/10 px-4 py-2 backdrop-blur-sm transition-all duration-300 hover:border-accent/60 hover:bg-white/15 hover:text-white ${
                   (pathname === "/packages" && link.href === "/#packages") ||
+                  (pathname === "/about" && link.href === "/about") ||
                   activeId === link.href.replace("/#", "").replace("#", "")               
                     ? "border-accent text-white"
                     : "border-white/20 text-white/85"
