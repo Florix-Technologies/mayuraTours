@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Poppins } from "next/font/google";
 import { business } from "@/lib/data/business";
-import SiteHeader from "@/components/layout/SiteHeader";
-import SiteFooter from "@/components/layout/SiteFooter";
-import WhatsAppFloatButton from "@/components/layout/WhatsAppFloatButton";
-import MobileBottomBar from "@/components/layout/MobileBottomBar";
+import { AuthProvider } from "@/components/auth/AuthProvider";
+import SiteChrome from "@/components/layout/SiteChrome";
 import "./globals.css";
 
 // Only the weights/styles actually referenced anywhere in the app (verified via a
@@ -101,11 +99,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
-        <SiteHeader />
-        {children}
-        <SiteFooter />
-        <WhatsAppFloatButton />
-        <MobileBottomBar />
+        <AuthProvider>
+          <SiteChrome>{children}</SiteChrome>
+        </AuthProvider>
       </body>
     </html>
   );

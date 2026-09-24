@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { business, telHref } from "@/lib/data/business";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 const NAV_LINKS = [
   { href: "/#packages", label: "Packages" },
@@ -15,6 +17,7 @@ const NAV_LINKS = [
 
 export default function SiteHeader() {
   const pathname = usePathname();
+  const { isAuthenticated } = useAuth();
   const [solid, setSolid] = useState(false);
   const [progress, setProgress] = useState(0);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -26,7 +29,13 @@ export default function SiteHeader() {
   // white nav text invisibly. Force the existing solid header state there from first
   // paint; every other route keeps the normal scroll-triggered behaviour.
   const isPackageDetail = /^\/packages\/[^/]+$/.test(pathname);
-  const isSolid = solid || isPackageDetail;
+  const forceSolid =
+    isPackageDetail ||
+    pathname.startsWith("/account") ||
+    pathname.startsWith("/booking");
+  const isSolid = solid || forceSolid;
+  const accountHref = isAuthenticated ? "/account" : "/login";
+  const accountLabel = isAuthenticated ? "My Account" : "Sign In";
 
   useEffect(() => {
     function onScroll() {
@@ -175,29 +184,42 @@ export default function SiteHeader() {
             ))}
           </nav>
 
-          <a
-            href={telHref(business.phone)}
-            className="ml-auto hidden items-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(229,0,126,0.95)] transition-transform hover:-translate-y-0.5 sm:inline-flex lg:ml-0"
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 1.9.6 2.8a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.2-1.1a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.8.6a2 2 0 0 1 1.8 2.1z" />
-            </svg>
-            Call Us
-          </a>
+          <div className="ml-auto flex items-center gap-2 sm:gap-3 lg:ml-0">
+            <Link
+              href={accountHref}
+              className={`inline-flex rounded-full border px-3 py-2 text-sm font-medium backdrop-blur-sm transition-all duration-300 hover:border-accent/60 hover:bg-white/15 hover:text-white sm:px-4 ${
+                pathname.startsWith("/login") || pathname.startsWith("/account")
+                  ? "border-accent bg-white/15 text-white"
+                  : "border-white/20 bg-white/10 text-white/85"
+              }`}
+            >
+              {accountLabel}
+            </Link>
 
-          <button
-            type="button"
-            onClick={() => setMenuOpen(true)}
-            aria-label="Open menu"
-            aria-expanded={menuOpen}
-            className="ml-auto flex items-center justify-center p-1 lg:hidden"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
-          </button>
+            <a
+              href={telHref(business.phone)}
+              className="hidden items-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(229,0,126,0.95)] transition-transform hover:-translate-y-0.5 sm:inline-flex"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 1.9.6 2.8a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.2-1.1a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.8.6a2 2 0 0 1 1.8 2.1z" />
+              </svg>
+              Call Us
+            </a>
+
+            <button
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              aria-label="Open menu"
+              aria-expanded={menuOpen}
+              className="flex items-center justify-center p-1 lg:hidden"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -249,8 +271,15 @@ export default function SiteHeader() {
             >
               {link.label}
             </a>
-          ))}
-        </nav>
+            ))}
+            <Link
+              href={accountHref}
+              onClick={() => setMenuOpen(false)}
+              className="border-b border-white/10 py-4 transition-colors hover:text-accent"
+            >
+              {accountLabel}
+            </Link>
+          </nav>
         <a
           href={telHref(business.phone)}
           className="mt-auto inline-flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-4 text-sm font-bold text-white"

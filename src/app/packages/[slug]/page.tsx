@@ -2,7 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { loginHref } from "@/lib/auth/paths";
+import { saveBookingIntent } from "@/lib/booking/intent";
 import {
   ArrowLeft,
   CalendarDays,
@@ -57,8 +61,12 @@ const excludedItems = [
 export default function PackageDetailsPage({
   params,
 }: PackageDetailsPageProps) {
+  const router = useRouter();
+  const { isAuthenticated, isReady } = useAuth();
   const [openDay, setOpenDay] = useState(0);
-
+  const [travelDate, setTravelDate] = useState("");
+  const [travellers, setTravellers] = useState("2");
+  const [accommodation, setAccommodation] = useState("");
   const [slug, setSlug] = useState<string | null>(null);
 
   // Resolve the async route params on the client.
@@ -74,6 +82,23 @@ export default function PackageDetailsPage({
 
   if (!pkg) {
     return null;
+  }
+
+  function continueBooking() {
+    saveBookingIntent({
+      slug: pkg.slug,
+      packageName: pkg.name,
+      travelDate,
+      travellers,
+      accommodation,
+    });
+
+    const next = "/booking/traveler-details";
+    if (isReady && isAuthenticated) {
+      router.push(next);
+      return;
+    }
+    router.push(loginHref(next));
   }
 
   return (
@@ -407,6 +432,8 @@ export default function PackageDetailsPage({
 
         <input
           type="date"
+          value={travelDate}
+          onChange={(event) => setTravelDate(event.target.value)}
           className="mt-1.5 w-full bg-transparent text-sm font-semibold text-navy outline-none"
         />
       </label>
@@ -418,7 +445,8 @@ export default function PackageDetailsPage({
         </span>
 
         <select
-          defaultValue="2"
+          value={travellers}
+          onChange={(event) => setTravellers(event.target.value)}
           className="mt-1.5 w-full cursor-pointer bg-transparent text-sm font-semibold text-navy outline-none"
         >
           <option value="1">1 Adult</option>
@@ -441,7 +469,8 @@ export default function PackageDetailsPage({
         </span>
 
         <select
-          defaultValue=""
+          value={accommodation}
+          onChange={(event) => setAccommodation(event.target.value)}
           className="mt-1.5 w-full cursor-pointer bg-transparent text-sm font-semibold text-navy outline-none"
         >
           <option value="" disabled>
@@ -475,6 +504,7 @@ export default function PackageDetailsPage({
 
     <button
       type="button"
+      onClick={continueBooking}
       className="mt-6 w-full rounded-full bg-accent px-5 py-3.5 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-navy"
     >
       Continue to Booking
