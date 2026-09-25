@@ -88,6 +88,8 @@ export default function PackageDetailsPage({
 
     if (!pkg) return;
     
+    if (!pkg) return;
+
     saveBookingIntent({
       slug: pkg.slug,
       packageName: pkg.name,
