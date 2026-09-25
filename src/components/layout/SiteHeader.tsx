@@ -12,7 +12,7 @@ const NAV_LINKS = [
   { href: "/#destinations", label: "Destinations" },
   { href: "/#fleet", label: "Our Fleet" },
   { href: "/about", label: "About Us" },
-  { href: "/#contact", label: "Contact" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export default function SiteHeader() {
@@ -29,10 +29,11 @@ export default function SiteHeader() {
   // white nav text invisibly. Force the existing solid header state there from first
   // paint; every other route keeps the normal scroll-triggered behaviour.
   const isPackageDetail = /^\/packages\/[^/]+$/.test(pathname);
-  const forceSolid =
-    isPackageDetail ||
-    pathname.startsWith("/account") ||
-    pathname.startsWith("/booking");
+ const forceSolid =
+  isPackageDetail ||
+  pathname === "/contact" ||
+  pathname.startsWith("/account") ||
+  pathname.startsWith("/booking");
   const isSolid = solid || forceSolid;
   const accountHref = isAuthenticated ? "/account" : "/login";
   const accountLabel = isAuthenticated ? "My Account" : "Sign In";
@@ -174,6 +175,7 @@ export default function SiteHeader() {
                 className={`relative rounded-full border bg-white/10 px-4 py-2 backdrop-blur-sm transition-all duration-300 hover:border-accent/60 hover:bg-white/15 hover:text-white ${
                   (pathname === "/packages" && link.href === "/#packages") ||
                   (pathname === "/about" && link.href === "/about") ||
+                  (pathname === "/contact" && link.href === "/contact") ||
                   activeId === link.href.replace("/#", "").replace("#", "")               
                     ? "border-accent text-white"
                     : "border-white/20 text-white/85"
