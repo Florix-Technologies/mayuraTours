@@ -8,6 +8,7 @@ export type TourPackage = {
   description: string;
   tags: string[];
   price: string;
+  priceValue?: number;
   priceUnit?: string;
   image: string;
   imageAlt: string;
@@ -26,6 +27,7 @@ export const packages: TourPackage[] = [
       "North & South Goa beaches, Bom Jesus Basilica, Fort Aguada & the vibrant Calangute strip. Leave Friday evening, return Monday morning fresh.",
     tags: ["2 Nights · 3 Days", "Deluxe Hotel", "AC Sleeper", "Breakfast"],
     price: "₹6,475",
+    priceValue: 6475,
     priceUnit: "per person",
     image:
       "https://images.unsplash.com/photo-1682743710558-b338ba285925?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
@@ -41,6 +43,7 @@ export const packages: TourPackage[] = [
       "Tea slopes, Doddabetta peak, Sim's Park, and the famous Nilgiri Mountain Railway. A free day built in for relaxed exploring at your own pace.",
     tags: ["5 Nights · 6 Days", "3-Star Hotels", "Volvo Coach", "Sightseeing"],
     price: "₹15,600",
+    priceValue: 15600,
     priceUnit: "per person",
     image:
        "https://images.unsplash.com/photo-1672748930862-a17dc466e58b?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
@@ -73,6 +76,7 @@ export const packages: TourPackage[] = [
       "Scotland of India — misty hills, fragrant coffee estates, Abbey Falls, Raja's Seat, and the golden Bhagamandala temple confluence.",
     tags: ["3 Nights · 4 Days", "Estate Stay", "AC Volvo"],
     price: "₹12,200",
+    priceValue: 12200,
     priceUnit: "per person",
     image:
          "https://images.unsplash.com/photo-1683665446527-0bfa0d7a8822?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
@@ -92,6 +96,7 @@ export const packages: TourPackage[] = [
       "Munnar tea hills, Alleppey houseboat cruise, Periyar wildlife sanctuary and the serene Kochi backwaters — Kerala's greatest hits in 7 days.",
     tags: ["6 Nights · 7 Days", "Houseboat", "3-star Hotels", "AC Coach"],
     price: "₹22,500",
+    priceValue: 22500,
     priceUnit: "per person",
     image:
         "https://images.unsplash.com/photo-1593693411515-c20261bcad6e?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
@@ -108,6 +113,7 @@ export const packages: TourPackage[] = [
       "Trek to Karnataka's highest peak at 1,930m, explore pristine coffee plantations, Bhadra Wildlife Sanctuary, and the ancient Hoysala temples of Belur.",
     tags: ["2 Nights · 3 Days", "Coffee Resort", "Trekking"],
     price: "₹9,800",
+    priceValue: 9800,
     priceUnit: "per person",
     image:
        "https://images.unsplash.com/photo-1578496034584-2d95250334b5?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
