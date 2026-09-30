@@ -14,7 +14,7 @@ export default function DestinationsGrid() {
             </h2>
           </div>
           <a
-            href="#contact"
+            href="/destinations"
             className="border-b-2 border-blue pb-1 text-[13.5px] font-bold tracking-[0.06em] whitespace-nowrap text-blue uppercase transition-colors hover:border-accent hover:text-accent"
           >
             See all routes →

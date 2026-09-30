@@ -9,7 +9,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 
 const NAV_LINKS = [
   { href: "/#packages", label: "Packages" },
-  { href: "/#destinations", label: "Destinations" },
+  { href: "/destinations", label: "Destinations" },
   { href: "/#fleet", label: "Our Fleet" },
   { href: "/about", label: "About Us" },
   { href: "/contact", label: "Contact" },
@@ -172,14 +172,22 @@ export default function SiteHeader() {
              <a
                 key={link.href}
                 href={link.href}
-                className={`relative rounded-full border bg-white/10 px-4 py-2 backdrop-blur-sm transition-all duration-300 hover:border-accent/60 hover:bg-white/15 hover:text-white ${
-                  (pathname === "/packages" && link.href === "/#packages") ||
-                  (pathname === "/about" && link.href === "/about") ||
-                  (pathname === "/contact" && link.href === "/contact") ||
-                  activeId === link.href.replace("/#", "").replace("#", "")               
-                    ? "border-accent text-white"
-                    : "border-white/20 text-white/85"
-             }`}
+               className={`relative rounded-full border bg-white/10 px-4 py-2 backdrop-blur-sm transition-all duration-300 hover:border-accent/60 hover:bg-white/15 hover:text-white ${
+  (pathname === "/packages" && link.href === "/#packages") ||
+  (pathname === "/destinations" && link.href === "/destinations") ||
+  (pathname === "/about" && link.href === "/about") ||
+  (pathname === "/contact" && link.href === "/contact") ||
+  (pathname === "/" && link.href === "/destinations" && activeId === "destinations") ||
+  (pathname === "/" &&
+    link.href === "/about" &&
+    (activeId === "about" ||
+      activeId === "why-us" ||
+      activeId === "trust")) ||
+  (pathname === "/" && link.href === "/contact" && activeId === "contact") ||
+  activeId === link.href.replace("/#", "").replace("#", "")
+    ? "border-accent text-white"
+    : "border-white/20 text-white/85"
+}`}
 >
   {link.label}
 </a>

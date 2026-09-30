@@ -19,15 +19,20 @@ import {
   MapPin,
   Check,
   Phone,
+  Hotel,
+  Users,
+  Plane,
 } from "lucide-react";
 
 const roundedYears = Math.floor(yearsInBusiness() / 5) * 5;
 
-/** Existing project imagery, re-served at the higher widths these large
- * editorial placements need (the shared source lists were sized for small
- * thumbnails). */
+/**
+ * Existing project imagery, re-served at the higher widths these large
+ * editorial placements need.
+ */
 const aboutImages = {
-  hero: "https://images.unsplash.com/photo-1593693411515-c20261bcad6e?q=80&w=1974&auto=format&fit=crop",
+  hero:
+    "https://images.unsplash.com/photo-1593693411515-c20261bcad6e?q=80&w=1974&auto=format&fit=crop",
   whoWeAre:
     "https://images.unsplash.com/photo-1665376620694-fc0c4bab7294?q=80&w=1400&auto=format&fit=crop",
   story:
@@ -52,14 +57,41 @@ const BADGE_ICON: Record<string, React.ElementType> = {
 
 const HERO_FACTS = [
   `Since ${business.foundedYear}`,
-  "Gandhi Nagar, Bengaluru",
-  business.credentials[0],
+  "Bengaluru Based",
+  "South India Tours",
   "Own AC Sleeper Fleet",
+];
+
+const SERVICE_CARDS = [
+  {
+    icon: Bus,
+    title: "Comfortable Travel",
+    description:
+      "Our travel experience extends from convenient pick-up and drop-off to comfortable transportation throughout your holiday.",
+  },
+  {
+    icon: Hotel,
+    title: "Hotel Arrangements",
+    description:
+      "Through our network of hotel associates, we help travellers access comfortable stays and value across different categories.",
+  },
+  {
+    icon: Route,
+    title: "Curated Package Tours",
+    description:
+      "We offer a wide range of holiday packages covering popular destinations across South India, planned around a smooth travel experience.",
+  },
+  {
+    icon: Users,
+    title: "Group & Corporate Travel",
+    description:
+      "Our packages can be arranged for individuals, families, groups and corporate travellers, with advance planning for larger bookings.",
+  },
 ];
 
 export const metadata: Metadata = {
   title: "About Us",
-  description: `${business.legalName} — a Bengaluru-based travel company operating since ${business.foundedYear}. Own fleet, in-house itineraries and dependable tours across South & Central India.`,
+  description: `${business.legalName} — a Bengaluru-based holiday maker serving travellers across South India with organised tours, comfortable travel and personalised hospitality.`,
   alternates: { canonical: "/about" },
 };
 
@@ -78,20 +110,28 @@ export default function AboutPage() {
             background: `linear-gradient(120deg, rgba(4,16,42,.95) 0%, rgba(11,42,107,.72) 52%, rgba(4,16,42,.35) 100%), url('${aboutImages.hero}') center/cover`,
           }}
         />
-        <div className="absolute inset-0 bg-linear-to-b from-ink/10 via-ink/30 to-ink/75" aria-hidden="true" />
+
+        <div
+          className="absolute inset-0 bg-linear-to-b from-ink/10 via-ink/30 to-ink/75"
+          aria-hidden="true"
+        />
 
         <div className="relative mx-auto max-w-(--container-width)">
           <Reveal className="max-w-3xl">
             <span className="mb-4 block text-[11px] font-bold tracking-[0.24em] text-sky uppercase">
               About Mayura
             </span>
+
             <h1 className="font-display text-[clamp(38px,6vw,74px)] leading-[1.02] font-bold tracking-[-0.035em]">
-              Dependable journeys, crafted in Bengaluru since {business.foundedYear}.
+              Creating memorable holidays with hospitality at heart.
             </h1>
+
             <p className="mt-6 max-w-xl text-[15px] leading-[1.8] text-white/72 sm:text-lg">
-              {business.legalName} is an established Karnataka tour operator — one of the
-              state's longest-running. We plan, own and run our own holidays so every
-              journey is comfortable, well-organised and free of surprises.
+              {business.legalName} is a Bengaluru-based holiday maker serving
+              travellers from different parts of the country. With years of
+              experience in travel and hospitality, we create well-organised
+              holidays designed around comfort, convenience and memorable
+              experiences.
             </p>
           </Reveal>
 
@@ -116,19 +156,24 @@ export default function AboutPage() {
             <span className="mb-3 block text-[11px] font-bold tracking-[0.22em] text-accent-ink uppercase">
               Who We Are
             </span>
+
             <h2 className="text-[clamp(30px,3.4vw,44px)] leading-[1.06] font-extrabold tracking-tight text-ink">
-              A Bengaluru travel company built on doing the basics brilliantly.
+              A travel company built around comfort, care and experience.
             </h2>
+
             <p className="mt-5 max-w-[52ch] text-[15px] leading-[1.85] text-slate">
-              {business.legalName} operates from {business.address.line1},{" "}
-              {business.address.city}. For over {roundedYears} years we have planned and run
-              holidays across South and Central India — Goa beaches, Nilgiri hill stations,
-              Kerala backwaters and Karnataka's heritage circuits among them.
+              {business.legalName} is a Bengaluru-based holiday maker serving
+              thousands of travellers every year from different parts of the
+              country. Established by Mr. Gautham, Mayura has grown through a
+              simple commitment — to serve every guest better with every
+              journey.
             </p>
+
             <p className="mt-4 max-w-[52ch] text-[15px] leading-[1.85] text-slate">
-              We are not a listings page or a middleman. We own and operate our fleet, plan our
-              itineraries in-house, and stay accountable from the first enquiry to the final
-              drop-off. That is what makes a Mayura journey dependable.
+              Our experience goes beyond simply arranging a tour. From picking
+              you up at your point of arrival to arranging transportation,
+              accommodation and other travel requirements, our team works to
+              make your holiday comfortable and hassle-free.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4">
@@ -138,6 +183,7 @@ export default function AboutPage() {
                 </span>
                 {business.address.city}, Karnataka
               </div>
+
               <div className="flex items-center gap-2.5 text-sm font-semibold text-navy">
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent/8 text-accent">
                   <BadgeCheck size={16} aria-hidden="true" />
@@ -157,11 +203,14 @@ export default function AboutPage() {
                 className="object-cover"
               />
             </div>
+
             <div className="absolute -bottom-5 left-5 rounded-2xl border border-line bg-white px-5 py-4 shadow-[0_20px_50px_-30px_rgba(8,33,76,0.6)] sm:left-8">
               <span className="block font-display text-3xl font-extrabold tracking-tight text-navy">
                 {roundedYears}+
               </span>
-              <span className="text-[12px] font-medium text-slate">years of travel expertise</span>
+              <span className="text-[12px] font-medium text-slate">
+                years of travel experience
+              </span>
             </div>
           </Reveal>
         </div>
@@ -186,19 +235,32 @@ export default function AboutPage() {
             <span className="mb-3 block text-[11px] font-bold tracking-[0.22em] text-accent-ink uppercase">
               Our Story
             </span>
+
             <h2 className="text-[clamp(30px,3.4vw,44px)] leading-[1.06] font-extrabold tracking-tight text-ink">
-              From Gandhi Nagar to every corner of the South.
+              Years of experience, one simple promise.
             </h2>
+
             <p className="mt-5 max-w-[52ch] text-[15px] leading-[1.85] text-slate">
-              Mayura began in {business.foundedYear} as a small Bengaluru tour operation with a
-              simple belief — that a holiday should be comfortable, well-planned and free of
-              hidden costs. That belief has not changed as we have grown.
+              Mayura Holidays was established by Mr. Gautham with the vision of
+              creating a holiday experience where guests could travel with
+              confidence and enjoy genuine hospitality throughout their trip.
+              Over the years, that vision has continued to shape the way we
+              serve our travellers.
             </p>
+
             <p className="mt-4 max-w-[52ch] text-[15px] leading-[1.85] text-slate">
-              Today we are registered with Karnataka Tourism and listed on{" "}
-              {business.bookingPlatforms.filter((p) => p !== "Direct Booking").join(", ")}. We
-              remain family-run, locally rooted, and personally answerable for every trip we
-              operate.
+              Today, Mayura offers a wide spectrum of package tours across
+              South India under one roof. Our experienced team coordinates the
+              important details of a holiday — from arrival and transportation
+              to accommodation and sightseeing — so travellers can focus on
+              enjoying the journey.
+            </p>
+
+            <p className="mt-4 max-w-[52ch] text-[15px] leading-[1.85] text-slate">
+              We welcome individual travellers, families, corporate groups and
+              larger group bookings. For corporate and group travel, we
+              recommend contacting our team in advance so the itinerary and
+              arrangements can be planned according to your requirements.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-x-3 gap-y-3">
@@ -217,7 +279,54 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* SECTION 04 — WHY CHOOSE MAYURA */}
+      {/* SECTION 04 — WHAT WE OFFER */}
+      <section className="px-5 py-16 sm:px-10 sm:py-26">
+        <div className="mx-auto max-w-(--container-width)">
+          <Reveal className="max-w-2xl">
+            <span className="mb-3 block text-[11px] font-bold tracking-[0.22em] text-accent-ink uppercase">
+              What We Offer
+            </span>
+
+            <h2 className="text-[clamp(30px,3.4vw,44px)] leading-[1.06] font-extrabold tracking-tight text-ink">
+              Everything you need for a smoother holiday.
+            </h2>
+
+            <p className="mt-4 max-w-[52ch] text-[15px] leading-[1.8] text-slate">
+              From the moment you arrive until your holiday comes to an end,
+              our team focuses on making every part of your journey comfortable
+              and well organised.
+            </p>
+          </Reveal>
+
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {SERVICE_CARDS.map((service, index) => {
+              const Icon = service.icon;
+
+              return (
+                <Reveal
+                  key={service.title}
+                  delay={index * 80}
+                  className="group rounded-3xl border border-line bg-white px-6 py-7 transition-all duration-300 hover:-translate-y-1 hover:border-accent/30 hover:shadow-[0_20px_50px_-35px_rgba(8,33,76,0.5)]"
+                >
+                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/8 text-accent transition-colors duration-300 group-hover:bg-accent group-hover:text-white">
+                    <Icon size={22} strokeWidth={1.8} aria-hidden="true" />
+                  </span>
+
+                  <h3 className="mt-5 text-lg font-extrabold tracking-tight text-navy">
+                    {service.title}
+                  </h3>
+
+                  <p className="mt-2.5 text-[13.5px] leading-[1.75] text-slate">
+                    {service.description}
+                  </p>
+                </Reveal>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 05 — WHY CHOOSE MAYURA */}
       <section className="px-5 py-16 sm:px-10 sm:py-26">
         <div className="mx-auto max-w-(--container-width)">
           <Reveal className="mb-11 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
@@ -225,79 +334,114 @@ export default function AboutPage() {
               <span className="mb-3 block text-[11px] font-bold tracking-[0.22em] text-accent-ink uppercase">
                 Why Choose Mayura
               </span>
+
               <h2 className="max-w-[16ch] text-[clamp(30px,3.4vw,44px)] leading-[1.06] font-extrabold tracking-tight text-ink">
                 You should be able to trust the trip before you board.
               </h2>
             </div>
+
             <p className="max-w-[42ch] text-[15px] leading-[1.8] text-slate">
-              Every promise we make is backed by something concrete — vehicles we own, a licence
-              we hold, and terms we put in writing.
+              Our experience in travel and hospitality helps us take care of
+              the details that make a holiday comfortable, convenient and
+              memorable.
             </p>
           </Reveal>
 
-          {/* Asymmetric feature pair — one dark, one light */}
+          {/* Asymmetric feature pair */}
           <div className="grid gap-5 lg:grid-cols-3">
             <Reveal className="relative overflow-hidden rounded-3xl bg-linear-140 from-navy to-ink to-62% px-7 py-9 text-white sm:px-9 sm:py-10 lg:col-span-2">
               <div
                 aria-hidden="true"
                 className="pointer-events-none absolute -top-24 -right-20 h-64 w-64 rounded-full"
-                style={{ background: "radial-gradient(circle, rgba(229,0,126,.4), transparent 68%)" }}
+                style={{
+                  background:
+                    "radial-gradient(circle, rgba(229,0,126,.4), transparent 68%)",
+                }}
               />
+
               <div className="relative flex h-full flex-col justify-between gap-8 sm:flex-row sm:items-end">
                 <div className="max-w-[34ch]">
                   <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/12 bg-white/8">
                     {(() => {
                       const Icon = CARD_ICON[ownFleet.icon];
-                      return <Icon size={26} strokeWidth={1.7} className="text-sky" />;
+                      return (
+                        <Icon
+                          size={26}
+                          strokeWidth={1.7}
+                          className="text-sky"
+                        />
+                      );
                     })()}
                   </span>
+
                   <span className="block text-[12px] font-bold tracking-[0.18em] text-sky uppercase">
                     {ownFleet.stat}
                   </span>
+
                   <h3 className="mt-1.5 text-2xl font-extrabold tracking-tight">
                     {ownFleet.title}
                   </h3>
+
                   <p className="mt-3 text-[14px] leading-[1.75] text-white/72">
                     {ownFleet.description}
                   </p>
                 </div>
+
                 <div className="flex shrink-0 gap-6 sm:flex-col sm:gap-4 sm:text-right">
                   <div>
-                    <b className="block font-display text-3xl font-extrabold tracking-tight">24/7</b>
-                    <span className="text-[11.5px] text-white/60">Travel support</span>
+                    <b className="block font-display text-3xl font-extrabold tracking-tight">
+                      24/7
+                    </b>
+                    <span className="text-[11.5px] text-white/60">
+                      Travel support
+                    </span>
                   </div>
+
                   <div>
-                    <b className="block font-display text-3xl font-extrabold tracking-tight">4.4★</b>
-                    <span className="text-[11.5px] text-white/60">Avg. rating</span>
+                    <b className="block font-display text-3xl font-extrabold tracking-tight">
+                      4.4★
+                    </b>
+                    <span className="text-[11.5px] text-white/60">
+                      Avg. rating
+                    </span>
                   </div>
                 </div>
               </div>
             </Reveal>
 
-            <Reveal delay={120} className="flex flex-col gap-4 rounded-3xl border border-accent/40 bg-white px-7 py-9 sm:px-8 sm:py-10">
+            <Reveal
+              delay={120}
+              className="flex flex-col gap-4 rounded-3xl border border-accent/40 bg-white px-7 py-9 sm:px-8 sm:py-10"
+            >
               <span className="flex h-14 w-14 items-center justify-center rounded-2xl border border-accent/20 bg-accent/5 text-accent">
                 {(() => {
                   const Icon = CARD_ICON[licensed.icon];
                   return <Icon size={26} strokeWidth={1.7} />;
                 })()}
               </span>
+
               <span className="mt-2 block text-[12px] font-bold tracking-[0.18em] text-accent-ink uppercase">
                 {licensed.stat}
               </span>
+
               <h3 className="text-2xl font-extrabold tracking-tight text-navy">
                 {licensed.title}
               </h3>
-              <p className="text-[14px] leading-[1.75] text-slate">{licensed.description}</p>
+
+              <p className="text-[14px] leading-[1.75] text-slate">
+                {licensed.description}
+              </p>
             </Reveal>
           </div>
 
-          {/* Hairline reason row — deliberately not a card grid */}
+          {/* Trust reason row */}
           <Reveal
             delay={80}
             className="mt-5 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4"
           >
             {trustBadges.map((badge) => {
               const Icon = BADGE_ICON[badge.icon];
+
               return (
                 <div
                   key={badge.title}
@@ -306,10 +450,14 @@ export default function AboutPage() {
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/8 text-accent">
                     <Icon size={20} strokeWidth={1.8} aria-hidden="true" />
                   </span>
+
                   <strong className="text-[15px] leading-5 font-bold text-ink">
                     {badge.title}
                   </strong>
-                  <span className="text-[12.5px] leading-5 text-slate">{badge.description}</span>
+
+                  <span className="text-[12.5px] leading-5 text-slate">
+                    {badge.description}
+                  </span>
                 </div>
               );
             })}
@@ -317,19 +465,21 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* SECTION 05 — ACHIEVEMENTS / STATS */}
+      {/* SECTION 06 — ACHIEVEMENTS / STATS */}
       <section className="bg-ink px-5 py-16 text-white sm:px-10 sm:py-24">
         <div className="mx-auto max-w-(--container-width)">
           <Reveal className="max-w-2xl">
             <span className="mb-3 block text-[11px] font-bold tracking-[0.22em] text-sky uppercase">
               By the Numbers
             </span>
+
             <h2 className="text-[clamp(30px,3.4vw,44px)] leading-[1.06] font-extrabold tracking-tight">
               Achievements built on trust.
             </h2>
+
             <p className="mt-4 max-w-[48ch] text-[15px] leading-[1.8] text-white/65">
-              Numbers we are proud of — earned one journey at a time, not advertised into
-              existence.
+              Every number represents travellers, journeys and experiences
+              built over years of serving our guests.
             </p>
           </Reveal>
 
@@ -339,12 +489,15 @@ export default function AboutPage() {
                 key={stat.label}
                 delay={i * 90}
                 className={`flex flex-col gap-2.5 sm:px-8 ${
-                  i > 0 ? "sm:border-l sm:border-white/12" : "sm:pl-0"
+                  i > 0
+                    ? "sm:border-l sm:border-white/12"
+                    : "sm:pl-0"
                 }`}
               >
                 <span className="font-display text-[clamp(38px,5vw,60px)] leading-none font-extrabold tracking-tight text-white tabular-nums">
                   <AnimatedStat to={stat.to} suffix={stat.suffix} />
                 </span>
+
                 <span className="whitespace-pre-line text-[13.5px] leading-[1.5] text-white/60">
                   {stat.label}
                 </span>
@@ -354,7 +507,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* SECTION 06 — VISUAL CONTENT */}
+      {/* SECTION 07 — VISUAL CONTENT */}
       <section className="px-5 py-16 sm:px-10 sm:py-26">
         <div className="mx-auto max-w-(--container-width)">
           <Reveal className="mb-10 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
@@ -362,12 +515,14 @@ export default function AboutPage() {
               <span className="mb-3 block text-[11px] font-bold tracking-[0.22em] text-accent-ink uppercase">
                 Moments From The Road
               </span>
+
               <h2 className="max-w-[18ch] text-[clamp(30px,3.4vw,44px)] leading-[1.06] font-extrabold tracking-tight text-ink">
                 The places our travellers remember.
               </h2>
             </div>
+
             <p className="max-w-[38ch] text-[15px] leading-[1.8] text-slate">
-              A few frames from the journeys we run every week across the South.
+              A few frames from the journeys we run across South India.
             </p>
           </Reveal>
 
@@ -380,14 +535,18 @@ export default function AboutPage() {
                 sizes="(min-width: 1024px) 58vw, 100vw"
                 className="object-cover"
               />
+
               <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-black/60 to-transparent" />
+
               <div className="absolute right-5 bottom-5 left-5">
                 <span className="text-[11px] font-bold tracking-[0.2em] text-sky uppercase">
                   Featured Journey
                 </span>
+
                 <p className="mt-1.5 max-w-2xl text-[15px] leading-[1.6] text-white/90">
-                  Every Mayura itinerary is planned in-house — comfortable stays, smooth
-                  transport and the places that make a journey feel like yours.
+                  From comfortable transportation to carefully arranged stays,
+                  every Mayura itinerary is planned to make the journey as
+                  enjoyable as the destination.
                 </p>
               </div>
             </Reveal>
@@ -413,27 +572,33 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* SECTION 07 — FINAL CTA */}
+      {/* SECTION 08 — FINAL CTA */}
       <section className="px-5 pb-16 sm:px-10 sm:pb-26">
         <div className="mx-auto max-w-(--container-width)">
           <Reveal className="relative overflow-hidden rounded-3xl bg-linear-140 from-navy to-ink to-62% px-6 py-12 text-white sm:px-12 sm:py-16">
             <div
               aria-hidden="true"
               className="pointer-events-none absolute -top-40 -right-32 h-96 w-96 rounded-full"
-              style={{ background: "radial-gradient(circle, rgba(229,0,126,.42), transparent 68%)" }}
+              style={{
+                background:
+                  "radial-gradient(circle, rgba(229,0,126,.42), transparent 68%)",
+              }}
             />
+
             <div className="relative flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
               <div className="max-w-2xl">
                 <span className="mb-3 block text-[11px] font-bold tracking-[0.22em] text-sky uppercase">
                   Start Planning
                 </span>
+
                 <h2 className="text-[clamp(30px,3.8vw,48px)] leading-[1.06] font-extrabold tracking-tight">
                   Ready to plan your next journey?
                 </h2>
+
                 <p className="mt-4 max-w-[46ch] leading-[1.75] font-light text-white/78">
-                  Browse our current collection of tours, or speak to our team for a
-                  personalised itinerary — with hotel names, coach details and all-inclusive
-                  pricing.
+                  Browse our current collection of tours, or speak to our team
+                  for a personalised itinerary and travel arrangements tailored
+                  to your needs.
                 </p>
               </div>
 
@@ -445,6 +610,7 @@ export default function AboutPage() {
                   Explore Packages
                   <ArrowRight size={17} aria-hidden="true" />
                 </Link>
+
                 <a
                   href={telHref(business.phone)}
                   className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-6 py-3.5 text-sm font-bold text-white transition-[background-color,border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-white/50 hover:bg-white/10"
