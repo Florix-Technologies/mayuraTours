@@ -10,14 +10,28 @@ import { packages } from "@/lib/data/packages";
 
 const OTP_LENGTH = 6;
 const RESEND_SECONDS = 30;
+const PENDING_SIGNUP_KEY = "mayura-pending-signup";
 
 const panelImage = packages.find((pkg) => pkg.slug === "goa") ?? packages[0];
+
+type PendingSignup = {
+  name?: string;
+  email?: string;
+  age?: string;
+  gender?: string;
+  favoritePlaces?: string[];
+  travelWith?: string;
+  experiences?: string[];
+  duration?: string;
+  budget?: string;
+};
 
 export default function VerifyEmailForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = safeNextPath(searchParams.get("next"));
   const email = (searchParams.get("email") ?? "").trim();
+
   const { signIn, isAuthenticated, isReady } = useAuth();
 
   const [digits, setDigits] = useState<string[]>(() =>
@@ -38,20 +52,25 @@ export default function VerifyEmailForm() {
 
   useEffect(() => {
     if (secondsLeft <= 0) return;
+
     const timer = window.setTimeout(() => {
       setSecondsLeft((value) => value - 1);
     }, 1000);
+
     return () => window.clearTimeout(timer);
   }, [secondsLeft]);
 
   function updateDigit(index: number, value: string) {
     const digit = value.replace(/\D/g, "").slice(-1);
+
     setDigits((current) => {
       const next = [...current];
       next[index] = digit;
       return next;
     });
+
     setError("");
+
     if (digit && index < OTP_LENGTH - 1) {
       inputsRef.current[index + 1]?.focus();
     }
@@ -61,44 +80,100 @@ export default function VerifyEmailForm() {
     index: number,
     event: React.KeyboardEvent<HTMLInputElement>,
   ) {
-    if (event.key === "Backspace" && !digits[index] && index > 0) {
+    if (
+      event.key === "Backspace" &&
+      !digits[index] &&
+      index > 0
+    ) {
       inputsRef.current[index - 1]?.focus();
     }
   }
 
   function handlePaste(event: React.ClipboardEvent<HTMLInputElement>) {
     event.preventDefault();
+
     const pasted = event.clipboardData
       .getData("text")
       .replace(/\D/g, "")
       .slice(0, OTP_LENGTH);
+
     if (!pasted) return;
-    const next = Array.from({ length: OTP_LENGTH }, (_, index) => pasted[index] ?? "");
+
+    const next = Array.from(
+      { length: OTP_LENGTH },
+      (_, index) => pasted[index] ?? "",
+    );
+
     setDigits(next);
     setError("");
-    const focusIndex = Math.min(pasted.length, OTP_LENGTH - 1);
+
+    const focusIndex = Math.min(
+      pasted.length,
+      OTP_LENGTH - 1,
+    );
+
     inputsRef.current[focusIndex]?.focus();
   }
 
   function handleResend() {
     if (secondsLeft > 0) return;
+
     setDigits(Array.from({ length: OTP_LENGTH }, () => ""));
     setError("");
     setSecondsLeft(RESEND_SECONDS);
     inputsRef.current[0]?.focus();
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(
+    event: React.FormEvent<HTMLFormElement>,
+  ) {
     event.preventDefault();
+
     if (!canVerify) {
       setError("Enter the 6-digit code to continue.");
       return;
     }
+
     if (!email) {
       router.push(signupHref(searchParams.get("next")));
       return;
     }
-    signIn(email, true);
+
+    /*
+     * Retrieve the profile collected during signup.
+     */
+    let pendingSignup: PendingSignup | null = null;
+
+    try {
+      const rawProfile = sessionStorage.getItem(
+        PENDING_SIGNUP_KEY,
+      );
+
+      if (rawProfile) {
+        pendingSignup = JSON.parse(rawProfile) as PendingSignup;
+      }
+    } catch {
+      pendingSignup = null;
+    }
+
+    /*
+     * The account becomes authenticated only after verification.
+     *
+     * The profile details are now saved into the auth session,
+     * so Traveller Details can autofill Traveller 1.
+     */
+    signIn(email, true, {
+      name: pendingSignup?.name,
+      age: pendingSignup?.age,
+      gender: pendingSignup?.gender,
+    });
+
+    /*
+     * The pending signup data is no longer needed after
+     * the authenticated session has been created.
+     */
+    sessionStorage.removeItem(PENDING_SIGNUP_KEY);
+
     router.push(nextPath);
   }
 
@@ -113,6 +188,7 @@ export default function VerifyEmailForm() {
       <h1 className="font-display text-4xl font-bold tracking-tight text-navy sm:text-[2.6rem]">
         Verify Your Email
       </h1>
+
       <p className="mt-3 text-sm leading-6 text-slate">
         We sent a 6-digit code to{" "}
         <span className="font-semibold text-navy">
@@ -126,6 +202,7 @@ export default function VerifyEmailForm() {
           <span className="mb-2 block text-sm font-semibold text-navy">
             Verification code
           </span>
+
           <div className="flex justify-between gap-2">
             {digits.map((digit, index) => (
               <input
@@ -135,19 +212,29 @@ export default function VerifyEmailForm() {
                 }}
                 type="text"
                 inputMode="numeric"
-                autoComplete={index === 0 ? "one-time-code" : "off"}
+                autoComplete={
+                  index === 0 ? "one-time-code" : "off"
+                }
                 aria-label={`Digit ${index + 1} of ${OTP_LENGTH}`}
                 maxLength={1}
                 value={digit}
-                onChange={(event) => updateDigit(index, event.target.value)}
-                onKeyDown={(event) => handleKeyDown(index, event)}
+                onChange={(event) =>
+                  updateDigit(index, event.target.value)
+                }
+                onKeyDown={(event) =>
+                  handleKeyDown(index, event)
+                }
                 onPaste={handlePaste}
                 className="h-12 w-10 rounded-2xl border border-[#E4EAF2] bg-[#F7FAFE] text-center text-lg font-semibold text-navy outline-none transition-colors focus:border-blue sm:h-14 sm:w-12"
               />
             ))}
           </div>
+
           {error ? (
-            <p className="mt-2 text-sm text-accent-ink" role="alert">
+            <p
+              className="mt-2 text-sm text-accent-ink"
+              role="alert"
+            >
               {error}
             </p>
           ) : null}

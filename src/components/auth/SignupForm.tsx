@@ -38,6 +38,8 @@ import { packages } from "@/lib/data/packages";
 const panelImage =
   packages.find((pkg) => pkg.slug === "coorg") ?? packages[0];
 
+const PENDING_SIGNUP_KEY = "mayura-pending-signup";
+
 const placeOptions = [
   { label: "Beaches", icon: Waves },
   { label: "Mountains", icon: Mountain },
@@ -89,9 +91,12 @@ export default function SignupForm() {
   const [step, setStep] = useState(1);
 
   const [name, setName] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -109,19 +114,38 @@ export default function SignupForm() {
 
   function toggleMultiple(
     value: string,
-    setter: React.Dispatch<React.SetStateAction<string[]>>
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
   ) {
     setter((current) =>
       current.includes(value)
         ? current.filter((item) => item !== value)
-        : [...current, value]
+        : [...current, value],
     );
   }
 
   function handleContinue(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!name.trim() || !email.trim() || !password) return;
+    if (
+      !name.trim() ||
+      !email.trim() ||
+      !password ||
+      !confirmPassword ||
+      !age ||
+      !gender
+    ) {
+      return;
+    }
+
+    const numericAge = Number(age);
+
+    if (
+      !Number.isInteger(numericAge) ||
+      numericAge < 1 ||
+      numericAge > 120
+    ) {
+      return;
+    }
 
     if (password.length < 6) {
       return;
@@ -137,22 +161,42 @@ export default function SignupForm() {
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!email.trim() || !password) return;
+    if (
+      !name.trim() ||
+      !email.trim() ||
+      !password ||
+      !age ||
+      !gender
+    ) {
+      return;
+    }
 
-    // Preferences are intentionally kept in local state for now.
-    // They can be connected to the backend/recommendation system later.
-    console.log({
-      name,
-      email,
-      favoritePlaces,
-      travelWith,
-      experiences,
-      duration,
-      budget,
-    });
+    /*
+     * Keep the profile temporarily until email verification.
+     *
+     * We intentionally do NOT call signIn() here.
+     * The user becomes authenticated only after verification.
+     */
+    sessionStorage.setItem(
+      PENDING_SIGNUP_KEY,
+      JSON.stringify({
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        age,
+        gender,
+        favoritePlaces,
+        travelWith,
+        experiences,
+        duration,
+        budget,
+      }),
+    );
 
     router.push(
-      verifyEmailHref(email, searchParams.get("next") ?? nextPath)
+      verifyEmailHref(
+        email,
+        searchParams.get("next") ?? nextPath,
+      ),
     );
   }
 
@@ -179,6 +223,7 @@ export default function SignupForm() {
           >
             {step > 1 ? <Check size={14} /> : "01"}
           </span>
+
           <span
             className={`text-xs font-semibold ${
               step === 1 ? "text-navy" : "text-slate"
@@ -200,6 +245,7 @@ export default function SignupForm() {
           >
             02
           </span>
+
           <span
             className={`text-xs font-semibold ${
               step === 2 ? "text-navy" : "text-slate"
@@ -222,10 +268,12 @@ export default function SignupForm() {
           </p>
 
           <form onSubmit={handleContinue} className="mt-8 space-y-4">
+            {/* Name */}
             <label className="block">
               <span className="mb-2 block text-sm font-semibold text-navy">
                 Full name
               </span>
+
               <input
                 type="text"
                 name="name"
@@ -238,10 +286,12 @@ export default function SignupForm() {
               />
             </label>
 
+            {/* Email */}
             <label className="block">
               <span className="mb-2 block text-sm font-semibold text-navy">
                 Email
               </span>
+
               <input
                 type="email"
                 name="email"
@@ -254,6 +304,47 @@ export default function SignupForm() {
               />
             </label>
 
+            {/* Age + Gender */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-navy">
+                  Age
+                </span>
+
+                <input
+                  type="number"
+                  name="age"
+                  min="1"
+                  max="120"
+                  required
+                  value={age}
+                  onChange={(event) => setAge(event.target.value)}
+                  placeholder="Enter your age"
+                  className={inputClass}
+                />
+              </label>
+
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-navy">
+                  Gender
+                </span>
+
+                <select
+                  name="gender"
+                  required
+                  value={gender}
+                  onChange={(event) => setGender(event.target.value)}
+                  className={`${inputClass} cursor-pointer`}
+                >
+                  <option value="">Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </label>
+            </div>
+
+            {/* Password */}
             <label className="block">
               <span className="mb-2 block text-sm font-semibold text-navy">
                 Password
@@ -289,6 +380,7 @@ export default function SignupForm() {
               </span>
             </label>
 
+            {/* Confirm password */}
             <label className="block">
               <span className="mb-2 block text-sm font-semibold text-navy">
                 Confirm password
@@ -330,12 +422,11 @@ export default function SignupForm() {
               </span>
             </label>
 
-            {confirmPassword &&
-              password !== confirmPassword && (
-                <p className="text-xs font-medium text-accent">
-                  Passwords do not match.
-                </p>
-              )}
+            {confirmPassword && password !== confirmPassword && (
+              <p className="text-xs font-medium text-accent">
+                Passwords do not match.
+              </p>
+            )}
 
             <button
               type="submit"
@@ -355,8 +446,8 @@ export default function SignupForm() {
               </h1>
 
               <p className="mt-2 text-sm leading-6 text-slate">
-                Tell us what you love. We&apos;ll use this to make your Mayura
-                experience more personal.
+                Tell us what you love. We&apos;ll use this to make your
+                Mayura experience more personal.
               </p>
             </div>
 
@@ -389,7 +480,10 @@ export default function SignupForm() {
                       icon={<Icon size={18} />}
                       selected={selected}
                       onClick={() =>
-                        toggleMultiple(option.label, setFavoritePlaces)
+                        toggleMultiple(
+                          option.label,
+                          setFavoritePlaces,
+                        )
                       }
                     />
                   );
@@ -439,7 +533,10 @@ export default function SignupForm() {
                       icon={<Icon size={18} />}
                       selected={selected}
                       onClick={() =>
-                        toggleMultiple(option.label, setExperiences)
+                        toggleMultiple(
+                          option.label,
+                          setExperiences,
+                        )
                       }
                     />
                   );
@@ -539,8 +636,13 @@ function PreferenceSection({
           </span>
 
           <div>
-            <h2 className="text-sm font-bold text-navy">{title}</h2>
-            <p className="mt-0.5 text-[11px] text-slate">{subtitle}</p>
+            <h2 className="text-sm font-bold text-navy">
+              {title}
+            </h2>
+
+            <p className="mt-0.5 text-[11px] text-slate">
+              {subtitle}
+            </p>
           </div>
         </div>
       </div>
@@ -581,7 +683,9 @@ function PreferenceCard({
       {icon && (
         <span
           className={`transition-colors ${
-            selected ? "text-accent" : "text-slate group-hover:text-blue"
+            selected
+              ? "text-accent"
+              : "text-slate group-hover:text-blue"
           }`}
         >
           {icon}
