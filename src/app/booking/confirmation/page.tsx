@@ -66,34 +66,141 @@ export default function BookingConfirmationPage() {
 
   return (
     <main className="min-h-screen bg-[#F5F8FC]">
-      {/* =========================
-          CONFIRMATION HERO
-      ========================== */}
-      <section className="relative overflow-hidden bg-linear-to-br from-navy via-[#0D4C91] to-blue px-5 pb-28 pt-24 sm:px-8 sm:pt-28">
-        <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-accent/20 blur-3xl" />
+{/* =========================
+    CONFIRMATION HERO
+========================== */}
+<section className="relative isolate min-h-[470px] overflow-hidden sm:min-h-[540px]">
 
-        <div className="absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
+  {/* =====================================================
+      VIDEO BACKGROUND
+  ===================================================== */}
+  <div className="absolute inset-0 -z-30 overflow-hidden">
 
-        <div className="relative mx-auto max-w-4xl text-center">
-          {/* Green Confirmation Icon */}
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#22C55E] text-white shadow-[0_15px_45px_-12px_rgba(34,197,94,0.65)]">
-            <Check size={42} strokeWidth={3} />
-          </div>
+    <video
+      className="absolute inset-0 h-full w-full object-cover"
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="auto"
+      aria-hidden="true"
+    >
+      <source
+        src="/video/confirmationhero.mp4"
+        type="video/mp4"
+      />
+    </video>
 
-          <p className="mt-7 text-[10px] font-bold tracking-[0.22em] text-white/65 uppercase">
-            Booking Confirmed
+  </div>
+
+  {/* =====================================================
+      CINEMATIC OVERLAY
+  ===================================================== */}
+  <div className="absolute inset-0 -z-20 bg-gradient-to-r from-[#031C3B]/95 via-[#06386D]/70 to-[#06386D]/30" />
+
+  {/* Soft atmospheric blue glow */}
+  <div className="pointer-events-none absolute -right-32 top-[-10rem] -z-10 h-[30rem] w-[30rem] rounded-full bg-blue/20 blur-3xl" />
+
+  {/* Subtle bottom fade */}
+  <div className="absolute inset-x-0 bottom-0 -z-10 h-48 bg-gradient-to-t from-[#F5F8FC]/40 via-[#F5F8FC]/10 to-transparent" />
+
+  {/* =====================================================
+      HERO CONTENT
+  ===================================================== */}
+  <div className="relative mx-auto flex min-h-[470px] max-w-7xl items-center px-5 pb-20 pt-28 sm:min-h-[540px] sm:px-8 sm:pb-24">
+
+    <div className="max-w-2xl">
+
+      {/* MAYURA BRAND */}
+      <div className="mb-10 flex items-center gap-3">
+
+        <div className="flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-white/10 backdrop-blur-sm">
+          <span className="text-[12px] font-bold text-white">
+            M
+          </span>
+        </div>
+
+        <div>
+          <p className="text-[12px] font-semibold tracking-[0.32em] text-white">
+            MAYURA
           </p>
 
-          <h1 className="mt-3 text-4xl font-extrabold tracking-[-0.04em] text-white sm:text-5xl">
-            Your trip is all set!
-          </h1>
-
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-white/75 sm:text-base">
-            Thank you for booking with Mayura. Your booking has
-            been successfully confirmed.
+          <p className="mt-0.5 text-[7px] font-semibold tracking-[0.22em] text-white/45">
+            HOLIDAYS
           </p>
         </div>
-      </section>
+
+      </div>
+
+      {/* CONFIRMATION */}
+      <div className="flex items-center gap-4">
+
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#22C55E] text-white shadow-[0_12px_40px_-8px_rgba(34,197,94,0.7)] sm:h-16 sm:w-16">
+          <Check
+            size={30}
+            strokeWidth={3}
+            className="sm:h-9 sm:w-9"
+          />
+        </div>
+
+        <div className="h-px w-10 bg-white/35" />
+
+        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/75">
+          Booking Confirmed
+        </p>
+
+      </div>
+
+      {/* HEADING */}
+      <h1 className="mt-7 max-w-2xl text-5xl font-extrabold leading-[0.98] tracking-[-0.055em] text-white sm:text-6xl lg:text-[72px]">
+        Your trip is
+        <br />
+        <span className="text-white/95">
+          all set!
+        </span>
+      </h1>
+
+      {/* DESCRIPTION */}
+      <p className="mt-6 max-w-xl text-sm leading-7 text-white/75 sm:text-base">
+        Thank you for booking with Mayura. Your journey has
+        been successfully confirmed, and your travel details
+        are safely recorded with us.
+      </p>
+
+      {/* CONFIRMATION DETAILS */}
+      <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+
+        <div className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
+
+          <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/65">
+            Reservation secured
+          </span>
+        </div>
+
+        <div className="hidden h-3 w-px bg-white/20 sm:block" />
+
+        <div className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+
+          <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/65">
+            Travel with Mayura
+          </span>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  {/* =====================================================
+      SOFT CURVED TRANSITION
+  ===================================================== 
+  <div className="pointer-events-none absolute bottom-[-1px] left-0 right-0 h-12 overflow-hidden sm:h-16">
+    <div className="absolute left-[-5%] top-4 h-24 w-[110%] rounded-[50%_50%_0_0] bg-[#F5F8FC]" />
+  </div> */}
+
+</section>
 
       {/* =========================
           MAIN CONTENT

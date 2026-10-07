@@ -13,10 +13,10 @@ import {
 import {
   ArrowLeft,
   ArrowRight,
+  CalendarDays,
   Check,
-  User,
-  Users,
-  ShieldCheck,
+  Mail,
+  Phone,
 } from "lucide-react";
 
 type Traveller = {
@@ -42,9 +42,7 @@ export default function TravelerDetailsPage() {
 
   const [travellers, setTravellers] = useState<Traveller[]>([]);
 
-  const [travellingSelf, setTravellingSelf] = useState<boolean | null>(
-    null,
-  );
+  const [travellingSelf, setTravellingSelf] = useState<boolean | null>(null);
 
   const [error, setError] = useState("");
 
@@ -68,7 +66,6 @@ export default function TravelerDetailsPage() {
       Array.from({ length: count }, () => emptyTraveller()),
     );
 
-    // Use the authenticated user's email from AuthProvider.
     if (user?.email) {
       setLeadEmail(user.email);
     }
@@ -117,7 +114,6 @@ export default function TravelerDetailsPage() {
 
     if (travellers.length === 0) return;
 
-    // Booking for someone else → clear Traveller 1.
     if (!isSelf) {
       setTravellers((current) =>
         current.map((traveller, index) =>
@@ -128,7 +124,6 @@ export default function TravelerDetailsPage() {
       return;
     }
 
-    // Travelling yourself → use the logged-in user's profile.
     if (!user) {
       setError(
         "We couldn't find your saved profile details. Please enter them manually.",
@@ -193,14 +188,14 @@ export default function TravelerDetailsPage() {
   }
 
   if (!isReady || !isAuthenticated) {
-    return <main className="min-h-screen bg-[#F7F9FC]" />;
+    return <main className="min-h-screen bg-[#F8FAFD]" />;
   }
 
   if (!intent) {
     return (
-      <main className="min-h-screen bg-[#F7F9FC] pt-28 pb-16 sm:pt-32">
+      <main className="min-h-screen bg-[#F8FAFD] pt-28 pb-16 sm:pt-32">
         <div className="mx-auto max-w-3xl px-5 sm:px-8">
-          <div className="rounded-3xl border border-[#E4EAF2] bg-white p-8 text-center">
+          <div className="rounded-[28px] border border-[#E5EAF1] bg-white p-8 text-center shadow-[0_20px_60px_-40px_rgba(8,45,92,0.25)]">
             <p className="text-sm text-slate">
               No package is selected yet. Choose a tour to start booking.
             </p>
@@ -218,337 +213,394 @@ export default function TravelerDetailsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_12%_18%,rgba(54,113,202,0.08),transparent_28%),radial-gradient(circle_at_88%_72%,rgba(235,91,145,0.06),transparent_25%),#F7F9FC] pb-16">
+    <main className="min-h-screen bg-[#F8FAFD] pb-20">
+
       {/* HERO */}
-      <section className="relative overflow-hidden bg-linear-to-br from-navy via-[#0D4C91] to-blue pt-24 pb-12 sm:pt-28">
-        <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
+      <section className="relative isolate min-h-[390px] overflow-hidden bg-navy pt-24 pb-16 sm:min-h-[430px] sm:pt-28 sm:pb-20">
 
-        <div className="absolute -bottom-32 -left-20 h-72 w-72 rounded-full bg-accent/20 blur-3xl" />
+        {/* Background image */}
+        <div
+          className="absolute inset-0 -z-20 bg-cover bg-center"
+          style={{
+            backgroundImage: "url('/images/traveller-details-hero.jpeg')",
+          }}
+        />
 
-        <div className="relative mx-auto max-w-6xl px-5 sm:px-8 lg:-translate-x-20">
+        {/* Cinematic dark overlay */}
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#031B3B]/95 via-[#062F61]/65 to-[#062F61]/20" />
+
+        {/* Subtle bottom fade */}
+        <div className="absolute inset-x-0 bottom-0 -z-10 h-24 bg-gradient-to-t from-[#0b2d52]/45 to-transparent" />
+
+        <div className="relative mx-auto max-w-6xl px-5 sm:px-8">
+
+          {/* Back button */}
           <button
             type="button"
             onClick={() => router.back()}
-            className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20"
+            className="mb-10 inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/10 px-4 py-2 text-xs font-semibold text-white backdrop-blur-md transition-all hover:bg-white/15"
           >
             <ArrowLeft size={15} />
             Back to Booking
           </button>
 
+          {/* Hero content */}
           <div className="max-w-2xl">
-            <p className="text-[10px] font-bold tracking-[0.2em] text-white/70 uppercase">
-              Step 2 · Traveller Details
-            </p>
 
-            <h1 className="mt-3 text-4xl font-extrabold tracking-[-0.035em] text-white sm:text-5xl">
-              Traveller Details
+            {/* Step label */}
+            <div className="flex items-center gap-3">
+              <span className="h-px w-9 bg-accent" />
+
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/75">
+                Step 2 · Traveller Details
+              </p>
+            </div>
+
+            {/* Heading */}
+            <h1 className="mt-4 text-4xl font-extrabold leading-[1.05] tracking-[-0.04em] text-white sm:text-5xl lg:text-[54px]">
+              Who&apos;s joining
+              <br />
+              the journey?
             </h1>
 
-            <p className="mt-4 text-sm leading-7 text-white/75 sm:text-base">
-              Enter the details of everyone travelling with you to complete
-              your booking.
+            {/* Description */}
+            <p className="mt-5 max-w-xl text-sm leading-7 text-white/75 sm:text-base">
+              Tell us who&apos;s travelling so we can prepare your booking
+              details correctly.
             </p>
+
           </div>
         </div>
       </section>
 
       {/* CONTENT */}
-      <section className="relative -mt-5 pb-16 sm:pb-20">
+      <section className="relative -mt-5">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <form
             onSubmit={handleSubmit}
-            className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]"
+            className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_330px]"
           >
-            {/* LEFT */}
+
+            {/* MAIN FORM */}
             <div className="space-y-6">
-              {/* Contact */}
-              <section className="rounded-3xl border border-[#DCE7F5] bg-white p-6 shadow-[0_16px_50px_-35px_rgba(35,92,160,0.35)] sm:p-8">
-                <p className="text-[11px] font-bold tracking-[0.16em] text-accent uppercase">
-                  Contact details
-                </p>
 
-                <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-navy">
-                  Lead traveller
-                </h2>
+              {/* CONTACT */}
+              <section className="rounded-[28px] border border-[#E4E9F0] bg-white p-6 shadow-[0_20px_60px_-45px_rgba(8,45,92,0.3)] sm:p-8">
+                <div>
+                  <p className="text-[10px] font-bold tracking-[0.18em] text-accent uppercase">
+                    Your contact
+                  </p>
 
-                <p className="mt-2 text-sm leading-6 text-slate">
-                  We&apos;ll use these details for booking updates and
-                  confirmations.
-                </p>
+                  <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-navy">
+                    How can we reach you?
+                  </h2>
+
+                  <p className="mt-2 max-w-xl text-sm leading-6 text-slate">
+                    We&apos;ll send booking updates and important travel
+                    information to these details.
+                  </p>
+                </div>
 
                 <div className="mt-7 grid gap-5 sm:grid-cols-2">
-                  <label className="block sm:col-span-2">
-                    <span className="mb-2 block text-sm font-semibold text-navy">
+
+                  <label className="block">
+                    <span className="mb-2 block text-xs font-bold text-navy">
                       Email address
                     </span>
 
-                    <input
-                      type="email"
-                      value={leadEmail}
-                      onChange={(event) => {
-                        setLeadEmail(event.target.value);
-                        setError("");
-                      }}
-                      placeholder="you@example.com"
-                      className="w-full rounded-2xl border border-[#E4EAF2] bg-[#F7FAFE] px-4 py-3.5 text-sm text-navy outline-none transition-colors placeholder:text-[#93A4BE] focus:border-blue"
-                    />
+                    <div className="relative">
+                      <Mail
+                        size={16}
+                        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#8EA0B8]"
+                      />
+
+                      <input
+                        type="email"
+                        value={leadEmail}
+                        onChange={(event) => {
+                          setLeadEmail(event.target.value);
+                          setError("");
+                        }}
+                        placeholder="you@example.com"
+                        className="w-full rounded-2xl border border-[#DDE5EF] bg-[#FBFCFE] py-3.5 pl-11 pr-4 text-sm text-navy outline-none transition-all placeholder:text-[#9AA9BC] focus:border-blue focus:bg-white focus:ring-4 focus:ring-blue/5"
+                      />
+                    </div>
                   </label>
 
-                  <label className="block sm:col-span-2">
-                    <span className="mb-2 block text-sm font-semibold text-navy">
+                  <label className="block">
+                    <span className="mb-2 block text-xs font-bold text-navy">
                       Mobile number
                     </span>
 
-                    <input
-                      type="tel"
-                      value={leadPhone}
-                      onChange={(event) => {
-                        setLeadPhone(event.target.value);
-                        setError("");
-                      }}
-                      placeholder="+91 98765 43210"
-                      className="w-full rounded-2xl border border-[#E4EAF2] bg-[#F7FAFE] px-4 py-3.5 text-sm text-navy outline-none transition-colors placeholder:text-[#93A4BE] focus:border-blue"
-                    />
+                    <div className="relative">
+                      <Phone
+                        size={16}
+                        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#8EA0B8]"
+                      />
+
+                      <input
+                        type="tel"
+                        value={leadPhone}
+                        onChange={(event) => {
+                          setLeadPhone(event.target.value);
+                          setError("");
+                        }}
+                        placeholder="+91 98765 43210"
+                        className="w-full rounded-2xl border border-[#DDE5EF] bg-[#FBFCFE] py-3.5 pl-11 pr-4 text-sm text-navy outline-none transition-all placeholder:text-[#9AA9BC] focus:border-blue focus:bg-white focus:ring-4 focus:ring-blue/5"
+                      />
+                    </div>
                   </label>
+
                 </div>
               </section>
 
-              {/* SELF CHOICE */}
-              <section className="rounded-3xl border border-[#DCE7F5] bg-white p-6 shadow-[0_16px_50px_-35px_rgba(35,92,160,0.35)] sm:p-8">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#EEF5FF] text-blue">
-                    <User size={21} />
-                  </div>
+              {/* WHO IS TRAVELLING */}
+              <section className="rounded-[28px] border border-[#E4E9F0] bg-white p-6 shadow-[0_20px_60px_-45px_rgba(8,45,92,0.3)] sm:p-8">
 
-                  <div>
-                    <p className="text-[11px] font-bold tracking-[0.16em] text-accent uppercase">
-                      Before we fill this in
-                    </p>
+                <div>
+                  <p className="text-[10px] font-bold tracking-[0.18em] text-accent uppercase">
+                    Traveller 01
+                  </p>
 
-                    <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-navy">
-                      Are you travelling yourself?
-                    </h2>
+                  <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-navy">
+                    Who is the booking for?
+                  </h2>
 
-                    <p className="mt-2 text-sm leading-6 text-slate">
-                      If you&apos;re travelling, we can use your saved account
-                      details for Traveller 1.
-                    </p>
-                  </div>
+                  <p className="mt-2 text-sm leading-6 text-slate">
+                    Choose an option and we&apos;ll prepare the first
+                    traveller&apos;s details accordingly.
+                  </p>
                 </div>
 
-                <div className="mt-7 grid gap-4 sm:grid-cols-2">
-                  {/* YES */}
+                <div className="mt-6 grid gap-3 sm:grid-cols-2">
+
+                  {/* SELF */}
                   <button
                     type="button"
                     onClick={() => handleSelfChoice(true)}
-                    className={`group relative rounded-2xl border p-5 text-left transition-all duration-200 ${
+                    className={`group flex items-center gap-4 rounded-2xl border p-4 text-left transition-all ${
                       travellingSelf === true
-                        ? "border-blue bg-[#EEF5FF] shadow-[0_10px_30px_-20px_rgba(37,99,180,0.6)]"
-                        : "border-[#E4EAF2] bg-[#FBFCFE] hover:border-[#B9CDE7] hover:bg-white"
+                        ? "border-blue bg-[#F2F7FF] ring-2 ring-blue/10"
+                        : "border-[#E1E7EF] bg-[#FCFDFE] hover:border-[#B9CBE2] hover:bg-white"
                     }`}
                   >
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors ${
-                            travellingSelf === true
-                              ? "bg-blue text-white"
-                              : "bg-[#EAF1FA] text-blue"
-                          }`}
-                        >
-                          <User size={19} />
-                        </div>
+                    <span
+                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[11px] font-extrabold transition-colors ${
+                        travellingSelf === true
+                          ? "bg-blue text-white"
+                          : "bg-[#EEF4FC] text-blue"
+                      }`}
+                    >
+                      01
+                    </span>
 
-                        <div>
-                          <p className="text-sm font-bold text-navy">
-                            Yes, this is me
-                          </p>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-bold text-navy">
+                        I&apos;m travelling
+                      </span>
 
-                          <p className="mt-1 text-xs text-slate">
-                            Autofill my details
-                          </p>
-                        </div>
-                      </div>
+                      <span className="mt-1 block text-xs text-slate">
+                        Use my profile details
+                      </span>
+                    </span>
 
-                      {travellingSelf === true && (
-                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-blue text-white">
-                          <Check size={15} strokeWidth={3} />
-                        </span>
-                      )}
-                    </div>
+                    {travellingSelf === true && (
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue text-white">
+                        <Check size={13} strokeWidth={3} />
+                      </span>
+                    )}
                   </button>
 
-                  {/* NO */}
+                  {/* SOMEONE ELSE */}
                   <button
                     type="button"
                     onClick={() => handleSelfChoice(false)}
-                    className={`group relative rounded-2xl border p-5 text-left transition-all duration-200 ${
+                    className={`group flex items-center gap-4 rounded-2xl border p-4 text-left transition-all ${
                       travellingSelf === false
-                        ? "border-accent bg-[#FFF4F8] shadow-[0_10px_30px_-20px_rgba(235,91,145,0.55)]"
-                        : "border-[#E4EAF2] bg-[#FBFCFE] hover:border-[#E4C3D0] hover:bg-white"
+                        ? "border-accent bg-[#FFF6F9] ring-2 ring-accent/10"
+                        : "border-[#E1E7EF] bg-[#FCFDFE] hover:border-[#D8BBC8] hover:bg-white"
                     }`}
                   >
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors ${
-                            travellingSelf === false
-                              ? "bg-accent text-white"
-                              : "bg-[#F9EDF2] text-accent"
-                          }`}
-                        >
-                          <Users size={19} />
-                        </div>
+                    <span
+                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[11px] font-extrabold transition-colors ${
+                        travellingSelf === false
+                          ? "bg-accent text-white"
+                          : "bg-[#FCF0F4] text-accent"
+                      }`}
+                    >
+                      02
+                    </span>
 
-                        <div>
-                          <p className="text-sm font-bold text-navy">
-                            No, someone else
-                          </p>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-bold text-navy">
+                        I&apos;m booking for someone
+                      </span>
 
-                          <p className="mt-1 text-xs text-slate">
-                            I&apos;m booking for them
-                          </p>
-                        </div>
-                      </div>
+                      <span className="mt-1 block text-xs text-slate">
+                        Enter their details manually
+                      </span>
+                    </span>
 
-                      {travellingSelf === false && (
-                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-white">
-                          <Check size={15} strokeWidth={3} />
-                        </span>
-                      )}
-                    </div>
+                    {travellingSelf === false && (
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent text-white">
+                        <Check size={13} strokeWidth={3} />
+                      </span>
+                    )}
                   </button>
+
                 </div>
 
                 {travellingSelf === true && (
-                  <div className="mt-5 flex items-start gap-3 rounded-2xl border border-[#D7E6FA] bg-[#F5F9FF] px-4 py-3.5">
-                    <ShieldCheck
-                      size={17}
-                      className="mt-0.5 shrink-0 text-blue"
-                    />
-
+                  <div className="mt-4 rounded-2xl border border-[#D7E6FA] bg-[#F5F9FF] px-4 py-3.5">
                     <p className="text-xs leading-5 text-[#45607F]">
-                      Your saved profile details have been filled into
-                      Traveller 1. You can edit them if anything needs to be
-                      changed.
+                      Your saved profile details have been applied to
+                      Traveller 1. You can still edit anything here.
                     </p>
                   </div>
                 )}
+
               </section>
 
               {/* TRAVELLERS */}
-              <section className="rounded-3xl border border-[#DCE7F5] bg-white p-6 shadow-[0_16px_50px_-35px_rgba(35,92,160,0.35)] sm:p-8">
-                <div className="flex items-end justify-between gap-4">
+              <section className="rounded-[28px] border border-[#E4E9F0] bg-white p-6 shadow-[0_20px_60px_-45px_rgba(8,45,92,0.3)] sm:p-8">
+
+                <div className="flex items-end justify-between gap-5">
                   <div>
-                    <p className="text-[11px] font-bold tracking-[0.16em] text-accent uppercase">
-                      Travellers
+                    <p className="text-[10px] font-bold tracking-[0.18em] text-accent uppercase">
+                      Travel party
                     </p>
 
                     <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-navy">
-                      Who&apos;s travelling?
+                      Traveller information
                     </h2>
+
+                    <p className="mt-2 text-sm leading-6 text-slate">
+                      Enter the details exactly as they should appear on the
+                      booking.
+                    </p>
                   </div>
 
-                  <span className="rounded-full bg-[#EAF3FF] px-3 py-1.5 text-xs font-bold text-blue">
+                  <span className="shrink-0 rounded-full bg-[#EEF5FF] px-3.5 py-2 text-xs font-bold text-blue">
                     {travellerCount}{" "}
                     {travellerCount === 1 ? "Traveller" : "Travellers"}
                   </span>
                 </div>
 
-                <div className="mt-7 space-y-6">
+                <div className="mt-7 space-y-4">
+
                   {travellers.map((traveller, index) => (
                     <div
                       key={index}
-                      className="rounded-2xl border border-[#DCE8F7] bg-[#F5F9FF] p-5 sm:p-6"
+                      className="overflow-hidden rounded-[24px] border border-[#E1E7EF] bg-[#FCFDFE]"
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue to-accent text-xs font-bold text-white shadow-sm">
-                          {index + 1}
-                        </span>
 
-                        <div>
-                          <h3 className="text-base font-bold text-navy">
-                            {index === 0
-                              ? "Lead traveller"
-                              : `Traveller ${index + 1}`}
-                          </h3>
+                      <div className="flex items-center justify-between border-b border-[#E8EDF3] px-5 py-4 sm:px-6">
 
-                          {index === 0 && travellingSelf === true ? (
-                            <p className="mt-0.5 text-xs font-medium text-blue">
-                              Your profile details were autofilled
-                            </p>
-                          ) : null}
+                        <div className="flex items-center gap-3">
+
+                          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-navy text-[11px] font-extrabold text-white">
+                            {String(index + 1).padStart(2, "0")}
+                          </span>
+
+                          <div>
+                            <h3 className="text-sm font-extrabold text-navy">
+                              {index === 0
+                                ? "Lead traveller"
+                                : `Traveller ${index + 1}`}
+                            </h3>
+
+                            {index === 0 && travellingSelf === true && (
+                              <p className="mt-0.5 text-[11px] font-semibold text-blue">
+                                Profile details applied
+                              </p>
+                            )}
+                          </div>
+
                         </div>
+
+                        {index === 0 && (
+                          <span className="hidden rounded-full border border-[#DCE7F5] bg-white px-3 py-1 text-[10px] font-bold tracking-wide text-slate uppercase sm:inline-flex">
+                            Lead
+                          </span>
+                        )}
+
                       </div>
 
-                      <div className="mt-5 grid gap-5 sm:grid-cols-2">
-                        <label className="block sm:col-span-2">
-                          <span className="mb-2 block text-sm font-semibold text-navy">
-                            Full name
-                          </span>
+                      <div className="p-5 sm:p-6">
 
-                          <input
-                            type="text"
-                            value={traveller.fullName}
-                            onChange={(event) =>
-                              updateTraveller(
-                                index,
-                                "fullName",
-                                event.target.value,
-                              )
-                            }
-                            placeholder="Full name"
-                            className="w-full rounded-2xl border border-[#E4EAF2] bg-white px-4 py-3.5 text-sm text-navy outline-none transition-colors placeholder:text-[#93A4BE] focus:border-blue"
-                          />
-                        </label>
+                        <div className="grid gap-5 sm:grid-cols-2">
 
-                        <label className="block">
-                          <span className="mb-2 block text-sm font-semibold text-navy">
-                            Age
-                          </span>
+                          <label className="block sm:col-span-2">
+                            <span className="mb-2 block text-xs font-bold text-navy">
+                              Full name
+                            </span>
 
-                          <input
-                            type="number"
-                            min="1"
-                            max="120"
-                            value={traveller.age}
-                            onChange={(event) =>
-                              updateTraveller(
-                                index,
-                                "age",
-                                event.target.value,
-                              )
-                            }
-                            placeholder="Age"
-                            className="w-full rounded-2xl border border-[#E4EAF2] bg-white px-4 py-3.5 text-sm text-navy outline-none transition-colors placeholder:text-[#93A4BE] focus:border-blue"
-                          />
-                        </label>
+                            <input
+                              type="text"
+                              value={traveller.fullName}
+                              onChange={(event) =>
+                                updateTraveller(
+                                  index,
+                                  "fullName",
+                                  event.target.value,
+                                )
+                              }
+                              placeholder="Enter full name"
+                              className="w-full rounded-2xl border border-[#DDE5EF] bg-white px-4 py-3.5 text-sm text-navy outline-none transition-all placeholder:text-[#9AA9BC] focus:border-blue focus:ring-4 focus:ring-blue/5"
+                            />
+                          </label>
 
-                        <label className="block">
-                          <span className="mb-2 block text-sm font-semibold text-navy">
-                            Gender
-                          </span>
+                          <label className="block">
+                            <span className="mb-2 block text-xs font-bold text-navy">
+                              Age
+                            </span>
 
-                          <select
-                            value={traveller.gender}
-                            onChange={(event) =>
-                              updateTraveller(
-                                index,
-                                "gender",
-                                event.target.value,
-                              )
-                            }
-                            className="w-full cursor-pointer rounded-2xl border border-[#E4EAF2] bg-white px-4 py-3.5 text-sm font-medium text-navy outline-none focus:border-blue"
-                          >
-                            <option value="">Select gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                          </select>
-                        </label>
+                            <input
+                              type="number"
+                              min="1"
+                              max="120"
+                              value={traveller.age}
+                              onChange={(event) =>
+                                updateTraveller(
+                                  index,
+                                  "age",
+                                  event.target.value,
+                                )
+                              }
+                              placeholder="Enter age"
+                              className="w-full rounded-2xl border border-[#DDE5EF] bg-white px-4 py-3.5 text-sm text-navy outline-none transition-all placeholder:text-[#9AA9BC] focus:border-blue focus:ring-4 focus:ring-blue/5"
+                            />
+                          </label>
+
+                          <label className="block">
+                            <span className="mb-2 block text-xs font-bold text-navy">
+                              Gender
+                            </span>
+
+                            <select
+                              value={traveller.gender}
+                              onChange={(event) =>
+                                updateTraveller(
+                                  index,
+                                  "gender",
+                                  event.target.value,
+                                )
+                              }
+                              className="w-full cursor-pointer rounded-2xl border border-[#DDE5EF] bg-white px-4 py-3.5 text-sm font-medium text-navy outline-none transition-all focus:border-blue focus:ring-4 focus:ring-blue/5"
+                            >
+                              <option value="">Select gender</option>
+                              <option value="male">Male</option>
+                              <option value="female">Female</option>
+                              <option value="other">Other</option>
+                            </select>
+                          </label>
+
+                        </div>
+
                       </div>
                     </div>
                   ))}
+
                 </div>
               </section>
 
@@ -563,11 +615,12 @@ export default function TravelerDetailsPage() {
               ) : null}
 
               {/* ACTIONS */}
-              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col-reverse gap-3 border-t border-[#E1E7EF] pt-6 sm:flex-row sm:items-center sm:justify-between">
+
                 <button
                   type="button"
                   onClick={() => router.back()}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-[#DCE7F5] bg-white px-6 py-3.5 text-sm font-bold text-navy transition-colors hover:bg-[#F7FAFE]"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-[#DCE4ED] bg-white px-6 py-3.5 text-sm font-bold text-navy transition-all hover:border-[#C6D3E2] hover:bg-[#FBFCFE]"
                 >
                   <ArrowLeft size={16} />
                   Back
@@ -575,177 +628,119 @@ export default function TravelerDetailsPage() {
 
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-navy px-7 py-3.5 text-sm font-extrabold text-white shadow-[0_12px_30px_-10px_rgba(7,53,112,0.35)] transition-all hover:-translate-y-0.5 hover:bg-accent"
+                  className="group inline-flex items-center justify-center gap-3 rounded-full bg-navy px-7 py-3.5 text-sm font-extrabold text-white shadow-[0_15px_35px_-15px_rgba(7,53,112,0.45)] transition-all hover:-translate-y-0.5 hover:bg-accent"
                 >
                   Continue to Payment
-                  <ArrowRight size={17} />
+
+                  <ArrowRight
+                    size={17}
+                    className="transition-transform duration-200 group-hover:translate-x-1"
+                  />
                 </button>
+
               </div>
+
             </div>
 
-            {/* RIGHT SUMMARY */}
+            {/* TRIP SUMMARY */}
             <aside className="lg:sticky lg:top-28 lg:self-start">
-              <div className="relative min-h-[560px] overflow-hidden rounded-[32px] bg-gradient-to-br from-[#06285F] via-[#0B4F9D] to-[#1676C8] p-7 text-white shadow-[0_30px_80px_-30px_rgba(7,53,112,0.55)] sm:p-8">
-                <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#F06B9A]/25 blur-3xl" />
 
-                <div className="pointer-events-none absolute -bottom-28 -left-24 h-72 w-72 rounded-full bg-[#5FB4FF]/20 blur-3xl" />
+              <div className="overflow-hidden rounded-[28px] border border-[#DDE5EF] bg-white shadow-[0_24px_70px_-45px_rgba(8,45,92,0.35)]">
 
-                <div className="pointer-events-none absolute right-7 top-7 h-24 w-24 rounded-full border border-white/10" />
+                <div className="bg-navy px-6 py-6 text-white sm:px-7">
 
-                <div className="pointer-events-none absolute right-12 top-12 h-14 w-14 rounded-full border border-white/10" />
+                  <p className="text-[10px] font-bold tracking-[0.18em] text-white/55 uppercase">
+                    Your journey
+                  </p>
 
-                <div className="relative flex min-h-[500px] flex-col">
+                  <h2 className="mt-3 text-2xl font-extrabold leading-tight tracking-tight">
+                    {intent.packageName}
+                  </h2>
+
+                </div>
+
+                <div className="p-6 sm:p-7">
+
+                  <div className="space-y-5">
+
+                    {/* DATE */}
+                    <div className="flex items-start gap-4">
+
+                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-blue" />
+
+                      <div>
+                        <p className="text-[10px] font-bold tracking-[0.12em] text-[#91A0B4] uppercase">
+                          Travel date
+                        </p>
+
+                        <p className="mt-1 text-sm font-bold text-navy">
+                          {formattedDate}
+                        </p>
+                      </div>
+
+                    </div>
+
+                    {/* TRAVELLERS */}
+                    <div className="flex items-start gap-4">
+
+                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-blue" />
+
+                      <div>
+                        <p className="text-[10px] font-bold tracking-[0.12em] text-[#91A0B4] uppercase">
+                          Travellers
+                        </p>
+
+                        <p className="mt-1 text-sm font-bold text-navy">
+                          {intent.travellers}{" "}
+                          {intent.travellers === "1" ? "Adult" : "Adults"}
+                        </p>
+                      </div>
+
+                    </div>
+
+                    {/* ACCOMMODATION */}
+                    <div className="flex items-start gap-4">
+
+                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+
+                      <div>
+                        <p className="text-[10px] font-bold tracking-[0.12em] text-[#91A0B4] uppercase">
+                          Accommodation
+                        </p>
+
+                        <p className="mt-1 text-sm font-bold capitalize text-navy">
+                          {intent.accommodation || "To be confirmed"}
+                        </p>
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                  <div className="my-6 border-t border-dashed border-[#DCE4ED]" />
+
                   <div>
-                    <div className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[#F58BAF]" />
+                    <p className="text-[10px] font-bold tracking-[0.14em] text-[#91A0B4] uppercase">
+                      Package price
+                    </p>
 
-                      <p className="text-[10px] font-bold tracking-[0.2em] text-white/65 uppercase">
-                        Your booking
-                      </p>
-                    </div>
-
-                    <h2 className="mt-4 max-w-[280px] text-3xl font-extrabold leading-tight tracking-tight text-white">
-                      {intent.packageName}
-                    </h2>
-
-                    <p className="mt-3 text-sm leading-6 text-white/65">
-                      Your journey starts here. Review your trip details before
-                      continuing.
+                    <p className="mt-1 text-xl font-extrabold text-navy">
+                      To be confirmed
                     </p>
                   </div>
 
-                  <div className="mt-8 rounded-[24px] border border-white/10 bg-white/[0.08] p-5 backdrop-blur-sm">
-                    <div className="space-y-5">
-                      {/* Date */}
-                      <div className="flex items-start gap-4">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
-                          <svg
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                          >
-                            <rect
-                              x="3"
-                              y="4"
-                              width="18"
-                              height="17"
-                              rx="2"
-                            />
-                            <path d="M16 2v4M8 2v4M3 10h18" />
-                          </svg>
-                        </div>
-
-                        <div>
-                          <p className="text-[10px] font-semibold tracking-[0.12em] text-white/45 uppercase">
-                            Travel date
-                          </p>
-
-                          <p className="mt-1 text-sm font-semibold text-white">
-                            {formattedDate}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Travellers */}
-                      <div className="flex items-start gap-4">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
-                          <svg
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                          >
-                            <circle cx="9" cy="8" r="3" />
-                            <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" />
-                            <path d="M16 5.5a3 3 0 0 1 0 5.8M18 14c1.7.8 3 2.4 3 4.5" />
-                          </svg>
-                        </div>
-
-                        <div>
-                          <p className="text-[10px] font-semibold tracking-[0.12em] text-white/45 uppercase">
-                            Travellers
-                          </p>
-
-                          <p className="mt-1 text-sm font-semibold text-white">
-                            {intent.travellers}{" "}
-                            {intent.travellers === "1"
-                              ? "Adult"
-                              : "Adults"}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Accommodation */}
-                      <div className="flex items-start gap-4">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
-                          <svg
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                          >
-                            <path d="M3 21V9l9-6 9 6v12" />
-                            <path d="M7 21v-6h10v6M9 11h6" />
-                          </svg>
-                        </div>
-
-                        <div>
-                          <p className="text-[10px] font-semibold tracking-[0.12em] text-white/45 uppercase">
-                            Accommodation
-                          </p>
-
-                          <p className="mt-1 text-sm font-semibold capitalize text-white">
-                            {intent.accommodation || "To be confirmed"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-7 flex items-end justify-between border-t border-white/10 pt-6">
-                    <div>
-                      <p className="text-[10px] font-semibold tracking-[0.15em] text-white/45 uppercase">
-                        Package price
-                      </p>
-
-                      <p className="mt-1 text-2xl font-extrabold text-white">
-                        To be confirmed
-                      </p>
-                    </div>
-
-                    <div className="rounded-full bg-[#F58BAF]/15 px-3 py-1.5">
-                      <span className="text-[10px] font-bold text-[#FFC2D3]">
-                        MAYURA
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="mt-auto pt-7">
-                    <button
-                      type="submit"
-                      className="group flex w-full items-center justify-center gap-3 rounded-full bg-white px-5 py-4 text-sm font-extrabold text-navy shadow-[0_12px_30px_-10px_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent hover:text-white"
-                    >
-                      Continue to Payment
-
-                      <span className="transition-transform duration-300 group-hover:translate-x-1">
-                        →
-                      </span>
-                    </button>
-
-                    <p className="mt-4 text-center text-[11px] leading-5 text-white/50">
-                      Your booking details will be reviewed before payment.
+                  <div className="mt-6 rounded-2xl bg-[#F7F9FC] px-4 py-3.5">
+                    <p className="text-[11px] leading-5 text-slate">
+                      Your details are saved securely and will be carried
+                      forward to the payment step.
                     </p>
                   </div>
+
                 </div>
               </div>
+
             </aside>
+
           </form>
         </div>
       </section>
