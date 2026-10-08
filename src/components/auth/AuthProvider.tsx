@@ -34,17 +34,30 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+function getInitialUser(): AuthUser | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return readStoredUser();
+}
+
 export function AuthProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(getInitialUser);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    setUser(readStoredUser());
-    setIsReady(true);
+    const frame = window.requestAnimationFrame(() => {
+      setIsReady(true);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
   }, []);
 
   const signIn = useCallback(

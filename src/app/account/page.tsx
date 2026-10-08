@@ -113,6 +113,69 @@ const navigationItems = [
   },
 ];
 
+type TravelPreferences = {
+  places: string[];
+  travelWith: string;
+  experiences: string[];
+  duration: string;
+  budget: string;
+};
+
+const DEFAULT_TRAVEL_PREFERENCES: TravelPreferences = {
+  places: ["Beaches", "Mountains", "Nature"],
+  travelWith: "Family",
+  experiences: ["Food", "Sightseeing", "Photography"],
+  duration: "3–4 Days",
+  budget: "₹5–10k",
+};
+
+function readTravelPreferences(): TravelPreferences {
+  if (typeof window === "undefined") {
+    return DEFAULT_TRAVEL_PREFERENCES;
+  }
+
+  const stored = localStorage.getItem("mayura-travel-preferences");
+
+  if (!stored) {
+    return DEFAULT_TRAVEL_PREFERENCES;
+  }
+
+  try {
+    const parsed = JSON.parse(stored);
+
+    return {
+      places: Array.isArray(parsed.places)
+        ? parsed.places
+        : DEFAULT_TRAVEL_PREFERENCES.places,
+      travelWith:
+        typeof parsed.travelWith === "string"
+          ? parsed.travelWith
+          : DEFAULT_TRAVEL_PREFERENCES.travelWith,
+      experiences: Array.isArray(parsed.experiences)
+        ? parsed.experiences
+        : DEFAULT_TRAVEL_PREFERENCES.experiences,
+      duration:
+        typeof parsed.duration === "string"
+          ? parsed.duration
+          : DEFAULT_TRAVEL_PREFERENCES.duration,
+      budget:
+        typeof parsed.budget === "string"
+          ? parsed.budget
+          : DEFAULT_TRAVEL_PREFERENCES.budget,
+    };
+  } catch {
+    return DEFAULT_TRAVEL_PREFERENCES;
+  }
+}
+
+function readInitialBookingIntent(): BookingIntent | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return readBookingIntent();
+}
+
 function getFirstName(name?: string) {
   if (!name) return "Traveller";
 
@@ -190,6 +253,7 @@ function SectionHeading({
     </div>
   );
 }
+
 function PreferenceGroup({
   title,
   children,
@@ -203,9 +267,7 @@ function PreferenceGroup({
         {title}
       </p>
 
-      <div className="mt-3 flex flex-wrap gap-2">
-        {children}
-      </div>
+      <div className="mt-3 flex flex-wrap gap-2">{children}</div>
     </div>
   );
 }
@@ -221,54 +283,14 @@ function TravelPreferencesEditor({
     budget: string[];
   };
 }) {
-  const defaultPreferences = {
-    places: ["Beaches", "Mountains", "Nature"],
-    travelWith: "Family",
-    experiences: ["Food", "Sightseeing", "Photography"],
-    duration: "3–4 Days",
-    budget: "₹5–10k",
-  };
-
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [preferences, setPreferences] = useState(defaultPreferences);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("mayura-travel-preferences");
-
-    if (!stored) return;
-
-    try {
-      const parsed = JSON.parse(stored);
-
-      setPreferences({
-        places: Array.isArray(parsed.places)
-          ? parsed.places
-          : defaultPreferences.places,
-        travelWith:
-          typeof parsed.travelWith === "string"
-            ? parsed.travelWith
-            : defaultPreferences.travelWith,
-        experiences: Array.isArray(parsed.experiences)
-          ? parsed.experiences
-          : defaultPreferences.experiences,
-        duration:
-          typeof parsed.duration === "string"
-            ? parsed.duration
-            : defaultPreferences.duration,
-        budget:
-          typeof parsed.budget === "string"
-            ? parsed.budget
-            : defaultPreferences.budget,
-      });
-    } catch {
-      setPreferences(defaultPreferences);
-    }
-  }, []);
+  const [preferences, setPreferences] =
+    useState<TravelPreferences>(readTravelPreferences);
 
   const toggleMultiple = (
     field: "places" | "experiences",
-    value: string
+    value: string,
   ) => {
     setPreferences((current) => {
       const values = current[field];
@@ -284,7 +306,7 @@ function TravelPreferencesEditor({
 
   const selectSingle = (
     field: "travelWith" | "duration" | "budget",
-    value: string
+    value: string,
   ) => {
     setPreferences((current) => ({
       ...current,
@@ -295,7 +317,7 @@ function TravelPreferencesEditor({
   const savePreferences = () => {
     localStorage.setItem(
       "mayura-travel-preferences",
-      JSON.stringify(preferences)
+      JSON.stringify(preferences),
     );
 
     setSaved(true);
@@ -307,39 +329,7 @@ function TravelPreferencesEditor({
   };
 
   const cancelEditing = () => {
-    const stored = localStorage.getItem("mayura-travel-preferences");
-
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-
-        setPreferences({
-          places: Array.isArray(parsed.places)
-            ? parsed.places
-            : defaultPreferences.places,
-          travelWith:
-            typeof parsed.travelWith === "string"
-              ? parsed.travelWith
-              : defaultPreferences.travelWith,
-          experiences: Array.isArray(parsed.experiences)
-            ? parsed.experiences
-            : defaultPreferences.experiences,
-          duration:
-            typeof parsed.duration === "string"
-              ? parsed.duration
-              : defaultPreferences.duration,
-          budget:
-            typeof parsed.budget === "string"
-              ? parsed.budget
-              : defaultPreferences.budget,
-        });
-      } catch {
-        setPreferences(defaultPreferences);
-      }
-    } else {
-      setPreferences(defaultPreferences);
-    }
-
+    setPreferences(readTravelPreferences());
     setEditing(false);
   };
 
@@ -560,11 +550,14 @@ function TravelPreferencesEditor({
     </div>
   );
 }
+
 export default function AccountPage() {
   const router = useRouter();
   const { user, isAuthenticated, isReady, signOut } = useAuth();
 
-  const [intent, setIntent] = useState<BookingIntent | null>(null);
+  const [intent] = useState<BookingIntent | null>(
+    readInitialBookingIntent,
+  );
   const [activeSection, setActiveSection] = useState("overview");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -573,10 +566,7 @@ export default function AccountPage() {
 
     if (!isAuthenticated) {
       router.replace("/login?next=/account");
-      return;
     }
-
-    setIntent(readBookingIntent());
   }, [isAuthenticated, isReady, router]);
 
   const currentPackage = useMemo(() => {
@@ -611,11 +601,11 @@ export default function AccountPage() {
     : null;
 
   const completedBookings = mockBookings.filter(
-    (booking) => booking.status === "Completed"
+    (booking) => booking.status === "Completed",
   ).length;
 
   const pendingPayments = mockBookings.filter(
-    (booking) => booking.status === "Payment Pending"
+    (booking) => booking.status === "Payment Pending",
   ).length;
 
   const totalBookings = mockBookings.length;
@@ -1187,7 +1177,10 @@ export default function AccountPage() {
 
                           <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[11px] text-slate">
                             <span className="inline-flex items-center gap-1.5">
-                              <CalendarDays size={13} className="text-blue" />
+                              <CalendarDays
+                                size={13}
+                                className="text-blue"
+                              />
                               {booking.travelDate}
                             </span>
 
@@ -1328,43 +1321,43 @@ export default function AccountPage() {
             {/* =================================================
                 TRAVEL PREFERENCES
             ================================================== */}
-  <section
-  id="preferences"
-  className="scroll-mt-28 rounded-[1.75rem] border border-[#DDE5EF] bg-white p-6 shadow-[0_25px_80px_rgba(20,40,70,0.08)] sm:p-8"
->
-  <SectionHeading
-    eyebrow="Personalise Your Trips"
-    title="Travel Preferences"
-    description="These preferences can later be used to personalise Mayura recommendations and package discovery."
-  />
+            <section
+              id="preferences"
+              className="scroll-mt-28 rounded-[1.75rem] border border-[#DDE5EF] bg-white p-6 shadow-[0_25px_80px_rgba(20,40,70,0.08)] sm:p-8"
+            >
+              <SectionHeading
+                eyebrow="Personalise Your Trips"
+                title="Travel Preferences"
+                description="These preferences can later be used to personalise Mayura recommendations and package discovery."
+              />
 
-  <TravelPreferencesEditor
-    options={{
-      places: [
-        "Beaches",
-        "Mountains",
-        "Nature",
-        "Wildlife",
-        "History & Culture",
-        "Adventure",
-        "Cities",
-        "Spiritual",
-      ],
-      travelWith: ["Solo", "Couple", "Family", "Friends"],
-      experiences: [
-        "Relaxation",
-        "Adventure",
-        "Food",
-        "Photography",
-        "Sightseeing",
-        "Local Experiences",
-        "Luxury",
-      ],
-      duration: ["Weekend", "3–4 Days", "5–7 Days", "1+ Week"],
-      budget: ["Under ₹5k", "₹5–10k", "₹10–20k", "₹20k+"],
-    }}
-  />
-</section>
+              <TravelPreferencesEditor
+                options={{
+                  places: [
+                    "Beaches",
+                    "Mountains",
+                    "Nature",
+                    "Wildlife",
+                    "History & Culture",
+                    "Adventure",
+                    "Cities",
+                    "Spiritual",
+                  ],
+                  travelWith: ["Solo", "Couple", "Family", "Friends"],
+                  experiences: [
+                    "Relaxation",
+                    "Adventure",
+                    "Food",
+                    "Photography",
+                    "Sightseeing",
+                    "Local Experiences",
+                    "Luxury",
+                  ],
+                  duration: ["Weekend", "3–4 Days", "5–7 Days", "1+ Week"],
+                  budget: ["Under ₹5k", "₹5–10k", "₹10–20k", "₹20k+"],
+                }}
+              />
+            </section>
 
             {/* =================================================
                 SETTINGS
@@ -1454,7 +1447,7 @@ export default function AccountPage() {
                   </p>
 
                   <h2 className="mt-2 text-2xl font-extrabold tracking-[-0.025em] sm:text-3xl">
-                    We're here to help.
+                    We&apos;re here to help.
                   </h2>
 
                   <p className="mt-3 max-w-lg text-sm leading-6 text-white/70">
