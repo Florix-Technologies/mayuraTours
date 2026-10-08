@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -10,7 +10,6 @@ import {
   ChevronRight,
   CircleUserRound,
   Clock3,
-  Download,
   Headphones,
   Heart,
   LogOut,
@@ -120,6 +119,12 @@ function getFirstName(name?: string) {
   return name.trim().split(" ")[0] || "Traveller";
 }
 
+function getDisplayName(name?: string) {
+  if (!name) return "Traveller";
+
+  return name.trim() || "Traveller";
+}
+
 function formatTravelDate(date: string) {
   if (!date) return "Date to confirm";
 
@@ -158,6 +163,403 @@ function StatusBadge({ status }: { status: BookingStatus }) {
   );
 }
 
+function SectionHeading({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow: string;
+  title: string;
+  description?: string;
+}) {
+  return (
+    <div>
+      <p className="text-[10px] font-bold tracking-[0.2em] text-accent uppercase">
+        {eyebrow}
+      </p>
+
+      <h2 className="mt-2 text-2xl font-extrabold tracking-[-0.025em] text-navy sm:text-3xl">
+        {title}
+      </h2>
+
+      {description && (
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate">
+          {description}
+        </p>
+      )}
+    </div>
+  );
+}
+function PreferenceGroup({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="border-b border-[#E1E8F0] py-5 first:pt-0 last:border-b-0 last:pb-0">
+      <p className="text-[9px] font-bold tracking-[0.12em] text-[#94A3B8] uppercase">
+        {title}
+      </p>
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function TravelPreferencesEditor({
+  options,
+}: {
+  options: {
+    places: string[];
+    travelWith: string[];
+    experiences: string[];
+    duration: string[];
+    budget: string[];
+  };
+}) {
+  const defaultPreferences = {
+    places: ["Beaches", "Mountains", "Nature"],
+    travelWith: "Family",
+    experiences: ["Food", "Sightseeing", "Photography"],
+    duration: "3–4 Days",
+    budget: "₹5–10k",
+  };
+
+  const [editing, setEditing] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [preferences, setPreferences] = useState(defaultPreferences);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("mayura-travel-preferences");
+
+    if (!stored) return;
+
+    try {
+      const parsed = JSON.parse(stored);
+
+      setPreferences({
+        places: Array.isArray(parsed.places)
+          ? parsed.places
+          : defaultPreferences.places,
+        travelWith:
+          typeof parsed.travelWith === "string"
+            ? parsed.travelWith
+            : defaultPreferences.travelWith,
+        experiences: Array.isArray(parsed.experiences)
+          ? parsed.experiences
+          : defaultPreferences.experiences,
+        duration:
+          typeof parsed.duration === "string"
+            ? parsed.duration
+            : defaultPreferences.duration,
+        budget:
+          typeof parsed.budget === "string"
+            ? parsed.budget
+            : defaultPreferences.budget,
+      });
+    } catch {
+      setPreferences(defaultPreferences);
+    }
+  }, []);
+
+  const toggleMultiple = (
+    field: "places" | "experiences",
+    value: string
+  ) => {
+    setPreferences((current) => {
+      const values = current[field];
+
+      return {
+        ...current,
+        [field]: values.includes(value)
+          ? values.filter((item) => item !== value)
+          : [...values, value],
+      };
+    });
+  };
+
+  const selectSingle = (
+    field: "travelWith" | "duration" | "budget",
+    value: string
+  ) => {
+    setPreferences((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  };
+
+  const savePreferences = () => {
+    localStorage.setItem(
+      "mayura-travel-preferences",
+      JSON.stringify(preferences)
+    );
+
+    setSaved(true);
+    setEditing(false);
+
+    window.setTimeout(() => {
+      setSaved(false);
+    }, 2200);
+  };
+
+  const cancelEditing = () => {
+    const stored = localStorage.getItem("mayura-travel-preferences");
+
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+
+        setPreferences({
+          places: Array.isArray(parsed.places)
+            ? parsed.places
+            : defaultPreferences.places,
+          travelWith:
+            typeof parsed.travelWith === "string"
+              ? parsed.travelWith
+              : defaultPreferences.travelWith,
+          experiences: Array.isArray(parsed.experiences)
+            ? parsed.experiences
+            : defaultPreferences.experiences,
+          duration:
+            typeof parsed.duration === "string"
+              ? parsed.duration
+              : defaultPreferences.duration,
+          budget:
+            typeof parsed.budget === "string"
+              ? parsed.budget
+              : defaultPreferences.budget,
+        });
+      } catch {
+        setPreferences(defaultPreferences);
+      }
+    } else {
+      setPreferences(defaultPreferences);
+    }
+
+    setEditing(false);
+  };
+
+  const optionClass = (selected: boolean) =>
+    `rounded-full border px-3.5 py-2 text-[10px] font-bold transition-all ${
+      selected
+        ? "border-blue bg-blue text-white shadow-[0_8px_20px_-12px_rgba(8,33,76,0.7)]"
+        : "border-[#DCE5EF] bg-white text-slate hover:border-blue/40 hover:text-blue"
+    }`;
+
+  if (!editing) {
+    return (
+      <>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-2xl bg-[#F7F9FC] p-5 ring-1 ring-[#E2EAF4]">
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-[9px] font-bold tracking-[0.12em] text-[#94A3B8] uppercase">
+                Favourite Places
+              </p>
+
+              <Heart size={15} className="text-accent" />
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {preferences.places.map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full bg-blue/10 px-3 py-1.5 text-[10px] font-bold text-blue"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-[#F7F9FC] p-5 ring-1 ring-[#E2EAF4]">
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-[9px] font-bold tracking-[0.12em] text-[#94A3B8] uppercase">
+                Usually Travel With
+              </p>
+
+              <Users size={15} className="text-blue" />
+            </div>
+
+            <p className="mt-4 text-sm font-bold text-navy">
+              {preferences.travelWith}
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-[#F7F9FC] p-5 ring-1 ring-[#E2EAF4]">
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-[9px] font-bold tracking-[0.12em] text-[#94A3B8] uppercase">
+                Preferred Experiences
+              </p>
+
+              <MapPin size={15} className="text-blue" />
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {preferences.experiences.map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full bg-accent/10 px-3 py-1.5 text-[10px] font-bold text-accent"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-[#F7F9FC] p-5 ring-1 ring-[#E2EAF4]">
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-[9px] font-bold tracking-[0.12em] text-[#94A3B8] uppercase">
+                Typical Trip
+              </p>
+
+              <CalendarDays size={15} className="text-blue" />
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="rounded-full bg-blue/10 px-3 py-1.5 text-[10px] font-bold text-blue">
+                {preferences.duration}
+              </span>
+
+              <span className="rounded-full bg-accent/10 px-3 py-1.5 text-[10px] font-bold text-accent">
+                {preferences.budget}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-7 flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue to-navy px-5 py-3 text-xs font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-none hover:bg-accent"
+          >
+            Edit Travel Preferences
+            <ArrowRight size={14} />
+          </button>
+
+          {saved && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#ECFDF3] px-4 py-2.5 text-[10px] font-bold text-[#15803D]">
+              <CheckCircle2 size={14} />
+              Preferences saved
+            </span>
+          )}
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <div className="mt-8 rounded-[1.5rem] border border-[#DDE5EF] bg-[#F7F9FC] p-5 sm:p-7">
+      <PreferenceGroup title="Favourite Places">
+        {options.places.map((item) => {
+          const selected = preferences.places.includes(item);
+
+          return (
+            <button
+              key={item}
+              type="button"
+              onClick={() => toggleMultiple("places", item)}
+              className={optionClass(selected)}
+            >
+              {item}
+            </button>
+          );
+        })}
+      </PreferenceGroup>
+
+      <PreferenceGroup title="Usually Travel With">
+        {options.travelWith.map((item) => {
+          const selected = preferences.travelWith === item;
+
+          return (
+            <button
+              key={item}
+              type="button"
+              onClick={() => selectSingle("travelWith", item)}
+              className={optionClass(selected)}
+            >
+              {item}
+            </button>
+          );
+        })}
+      </PreferenceGroup>
+
+      <PreferenceGroup title="Preferred Experiences">
+        {options.experiences.map((item) => {
+          const selected = preferences.experiences.includes(item);
+
+          return (
+            <button
+              key={item}
+              type="button"
+              onClick={() => toggleMultiple("experiences", item)}
+              className={optionClass(selected)}
+            >
+              {item}
+            </button>
+          );
+        })}
+      </PreferenceGroup>
+
+      <PreferenceGroup title="Typical Trip Duration">
+        {options.duration.map((item) => {
+          const selected = preferences.duration === item;
+
+          return (
+            <button
+              key={item}
+              type="button"
+              onClick={() => selectSingle("duration", item)}
+              className={optionClass(selected)}
+            >
+              {item}
+            </button>
+          );
+        })}
+      </PreferenceGroup>
+
+      <PreferenceGroup title="Typical Budget">
+        {options.budget.map((item) => {
+          const selected = preferences.budget === item;
+
+          return (
+            <button
+              key={item}
+              type="button"
+              onClick={() => selectSingle("budget", item)}
+              className={optionClass(selected)}
+            >
+              {item}
+            </button>
+          );
+        })}
+      </PreferenceGroup>
+
+      <div className="mt-6 flex flex-wrap gap-3 border-t border-[#E1E8F0] pt-6">
+        <button
+          type="button"
+          onClick={savePreferences}
+          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue to-navy px-5 py-3 text-xs font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-none hover:bg-accent"
+        >
+          <CheckCircle2 size={14} />
+          Save Preferences
+        </button>
+
+        <button
+          type="button"
+          onClick={cancelEditing}
+          className="inline-flex items-center gap-2 rounded-full border border-[#DCE5EF] bg-white px-5 py-3 text-xs font-bold text-slate transition-colors hover:border-blue hover:text-blue"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
 export default function AccountPage() {
   const router = useRouter();
   const { user, isAuthenticated, isReady, signOut } = useAuth();
@@ -184,10 +586,12 @@ export default function AccountPage() {
   }, [intent]);
 
   if (!isReady || !isAuthenticated) {
-    return <main className="min-h-screen bg-paper" />;
+    return <main className="min-h-screen bg-[#F7F9FC]" />;
   }
 
-  const firstName = "Traveller";
+  const displayName = getDisplayName(user?.name);
+  const firstName = getFirstName(user?.name);
+  const initials = displayName.charAt(0).toUpperCase();
 
   const upcomingBooking = intent
     ? {
@@ -205,6 +609,16 @@ export default function AccountPage() {
             : "On request",
       }
     : null;
+
+  const completedBookings = mockBookings.filter(
+    (booking) => booking.status === "Completed"
+  ).length;
+
+  const pendingPayments = mockBookings.filter(
+    (booking) => booking.status === "Payment Pending"
+  ).length;
+
+  const totalBookings = mockBookings.length;
 
   const scrollToSection = (id: string) => {
     setActiveSection(id);
@@ -226,20 +640,20 @@ export default function AccountPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F5F8FC] pb-16 pt-24 sm:pt-28">
-      {/* =========================
-          MOBILE MENU
-      ========================== */}
+    <main className="min-h-screen bg-[#F7F9FC] pb-20 pt-20 sm:pt-24">
+      {/* =====================================================
+          MOBILE ACCOUNT MENU
+      ====================================================== */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 bg-navy/35 backdrop-blur-sm lg:hidden">
-          <div className="absolute left-0 top-0 h-full w-[82%] max-w-sm bg-white p-6 shadow-2xl">
+          <div className="absolute left-0 top-0 flex h-full w-[84%] max-w-sm flex-col bg-white p-6 shadow-[20px_0_60px_rgba(7,28,53,0.18)]">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-lg font-extrabold tracking-tight text-navy">
+                <p className="text-lg font-extrabold tracking-[-0.03em] text-navy">
                   MAYURA
                 </p>
 
-                <p className="text-[9px] font-bold tracking-[0.18em] text-accent uppercase">
+                <p className="mt-0.5 text-[9px] font-bold tracking-[0.2em] text-accent uppercase">
                   My Account
                 </p>
               </div>
@@ -247,13 +661,14 @@ export default function AccountPage() {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F4F7FB] text-navy"
+                aria-label="Close account menu"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F3F6FA] text-navy transition-colors hover:bg-[#EAF0F7]"
               >
-                <X size={19} />
+                <X size={18} />
               </button>
             </div>
 
-            <div className="mt-8 space-y-1.5">
+            <div className="mt-9 space-y-1.5">
               {navigationItems.map((item) => {
                 const Icon = item.icon;
                 const active = activeSection === item.id;
@@ -265,7 +680,7 @@ export default function AccountPage() {
                     onClick={() => scrollToSection(item.id)}
                     className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3.5 text-left text-sm font-bold transition-all ${
                       active
-                        ? "bg-blue text-white shadow-[0_12px_30px_-15px_rgba(20,92,168,0.8)]"
+                        ? "bg-navy text-white shadow-[0_14px_30px_-18px_rgba(7,28,53,0.9)]"
                         : "text-slate hover:bg-[#F5F8FC] hover:text-navy"
                     }`}
                   >
@@ -276,7 +691,7 @@ export default function AccountPage() {
               })}
             </div>
 
-            <div className="mt-8 border-t border-[#E5EBF3] pt-6">
+            <div className="mt-auto border-t border-[#E4EAF1] pt-5">
               <button
                 type="button"
                 onClick={handleSignOut}
@@ -290,73 +705,95 @@ export default function AccountPage() {
         </div>
       )}
 
-      {/* =========================
-          PAGE HEADER
-      ========================== */}
-      <section className="relative overflow-hidden bg-linear-to-br from-navy via-[#0D4C91] to-blue px-5 pb-24 pt-10 sm:px-8 sm:pb-28">
-        <div className="absolute -right-28 -top-32 h-96 w-96 rounded-full bg-accent/20 blur-3xl" />
-        <div className="absolute -bottom-40 -left-20 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
+      {/* =====================================================
+          ACCOUNT HERO
+      ====================================================== */}
+      <section className="relative overflow-hidden bg-white">
+        {/* Soft editorial background */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#E9EEF4_1px,transparent_1px),linear-gradient(to_bottom,#E9EEF4_1px,transparent_1px)] bg-[size:72px_72px] opacity-60" />
 
-        <div className="relative mx-auto max-w-7xl">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-bold tracking-[0.2em] text-white/65 uppercase">
+          <div className="absolute -right-28 -top-36 h-96 w-96 rounded-full bg-blue/10 blur-3xl" />
+
+          <div className="absolute -bottom-40 left-[18%] h-80 w-80 rounded-full bg-accent/8 blur-3xl" />
+        </div>
+
+        <div className="relative mx-auto max-w-7xl px-5 pb-28 pt-12 sm:px-8 sm:pb-32 sm:pt-16">
+          <div className="flex items-start justify-between gap-6">
+            <div className="max-w-3xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#DDE5EF] bg-white/85 px-3.5 py-2 text-[10px] font-bold tracking-[0.14em] text-blue uppercase shadow-sm backdrop-blur">
+                <span className="h-1.5 w-1.5 rounded-full bg-accent" />
                 My Account
-              </p>
+              </div>
 
-              <h1 className="mt-2 text-3xl font-extrabold tracking-[-0.03em] text-white sm:text-4xl">
-                Welcome back, {firstName}
+              <h1 className="mt-6 text-4xl font-extrabold tracking-[-0.045em] text-navy sm:text-5xl lg:text-6xl">
+                Welcome back,
+                <span className="block text-blue">{firstName}.</span>
               </h1>
 
-              <p className="mt-3 max-w-xl text-sm leading-6 text-white/70">
-                Manage your trips, bookings and travel preferences
-                from one place.
+              <p className="mt-5 max-w-xl text-sm leading-7 text-slate sm:text-base">
+                Everything you need for your Mayura journeys, from upcoming
+                trips to your travel preferences, in one place.
               </p>
             </div>
 
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/15 lg:hidden"
+              aria-label="Open account menu"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#DDE5EF] bg-white text-navy shadow-sm lg:hidden"
             >
               <Menu size={20} />
+            </button>
+          </div>
+
+          {/* Profile strip */}
+          <div className="mt-10 flex flex-col gap-5 border-t border-[#DDE5EF] pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-blue to-navy text-sm font-extrabold text-white shadow-[0_12px_30px_-15px_rgba(8,33,76,0.65)]">
+                {initials}
+              </div>
+
+              <div className="min-w-0">
+                <p className="truncate text-sm font-extrabold text-navy">
+                  {displayName}
+                </p>
+
+                <p className="mt-0.5 flex items-center gap-1.5 truncate text-xs text-slate">
+                  <Mail size={12} />
+                  {user?.email || "Email not provided"}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => scrollToSection("profile")}
+              className="inline-flex w-fit items-center gap-2 rounded-full border border-[#D6E0EB] bg-white px-5 py-2.5 text-xs font-bold text-navy transition-all hover:-translate-y-0.5 hover:border-blue hover:text-blue"
+            >
+              View Profile
+              <ArrowRight size={14} />
             </button>
           </div>
         </div>
       </section>
 
-      {/* =========================
-          MAIN DASHBOARD
-      ========================== */}
-      <section className="relative -mt-14">
-        <div className="mx-auto grid max-w-7xl gap-6 px-5 sm:px-8 lg:grid-cols-[240px_minmax(0,1fr)]">
-          {/* =========================
-              SIDEBAR
-          ========================== */}
-          <aside className="hidden self-start rounded-3xl border border-[#DCE7F4] bg-white p-3 shadow-[0_24px_70px_-35px_rgba(8,33,76,0.4)] lg:block">
+      {/* =====================================================
+          DASHBOARD
+      ====================================================== */}
+      <section className="relative -mt-12">
+        <div className="mx-auto grid max-w-7xl gap-7 px-5 sm:px-8 lg:grid-cols-[230px_minmax(0,1fr)]">
+          {/* =================================================
+              DESKTOP SIDEBAR
+          ================================================== */}
+          <aside className="hidden self-start rounded-[1.75rem] border border-[#DDE5EF] bg-white p-3 shadow-[0_25px_80px_rgba(20,40,70,0.08)] lg:sticky lg:top-28 lg:block">
             <div className="px-4 py-4">
-              <p className="text-[9px] font-bold tracking-[0.18em] text-[#8B9BB2] uppercase">
-                Account
+              <p className="text-[9px] font-bold tracking-[0.2em] text-[#8B9BB2] uppercase">
+                Account Menu
               </p>
-
-              <div className="mt-3 flex items-center gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-blue to-accent text-sm font-extrabold text-white">
-                  {firstName.charAt(0).toUpperCase()}
-                </div>
-
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-bold text-navy">
-                    {firstName || firstName}
-                  </p>
-
-                  <p className="truncate text-[10px] text-slate">
-                    {user?.email}
-                  </p>
-                </div>
-              </div>
             </div>
 
-            <div className="mt-2 space-y-1">
+            <div className="space-y-1">
               {navigationItems.map((item) => {
                 const Icon = item.icon;
                 const active = activeSection === item.id;
@@ -368,7 +805,7 @@ export default function AccountPage() {
                     onClick={() => scrollToSection(item.id)}
                     className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-xs font-bold transition-all ${
                       active
-                        ? "bg-blue text-white shadow-[0_12px_30px_-15px_rgba(20,92,168,0.8)]"
+                        ? "bg-navy text-white shadow-[0_12px_28px_-18px_rgba(7,28,53,0.9)]"
                         : "text-slate hover:bg-[#F5F8FC] hover:text-navy"
                     }`}
                   >
@@ -391,23 +828,29 @@ export default function AccountPage() {
             </div>
           </aside>
 
-          {/* =========================
+          {/* =================================================
               CONTENT
-          ========================== */}
-          <div className="min-w-0 space-y-6">
-            {/* =========================
+          ================================================== */}
+          <div className="min-w-0 space-y-8">
+            {/* =================================================
                 OVERVIEW
-            ========================== */}
+            ================================================== */}
             <section id="overview" className="scroll-mt-28">
               {/* Stats */}
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <div className="rounded-3xl border border-[#DCE7F4] bg-white p-5 shadow-[0_18px_50px_-35px_rgba(8,33,76,0.3)]">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue/10 text-blue">
-                    <Ticket size={19} />
+              <div className="grid grid-cols-2 overflow-hidden rounded-[1.75rem] border border-[#DDE5EF] bg-white shadow-[0_25px_80px_rgba(20,40,70,0.08)] sm:grid-cols-4">
+                <div className="border-b border-r border-[#E5EBF3] p-5 sm:border-b-0">
+                  <div className="flex items-center justify-between">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue/10 text-blue">
+                      <Ticket size={19} />
+                    </div>
+
+                    <span className="text-[9px] font-bold tracking-[0.12em] text-[#9AA8BA] uppercase">
+                      Trips
+                    </span>
                   </div>
 
                   <p className="mt-5 text-2xl font-extrabold text-navy">
-                    3
+                    {totalBookings}
                   </p>
 
                   <p className="mt-1 text-[11px] font-semibold text-slate">
@@ -415,9 +858,15 @@ export default function AccountPage() {
                   </p>
                 </div>
 
-                <div className="rounded-3xl border border-[#DCE7F4] bg-white p-5 shadow-[0_18px_50px_-35px_rgba(8,33,76,0.3)]">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
-                    <CalendarDays size={19} />
+                <div className="border-b border-[#E5EBF3] p-5 sm:border-r">
+                  <div className="flex items-center justify-between">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                      <CalendarDays size={19} />
+                    </div>
+
+                    <span className="text-[9px] font-bold tracking-[0.12em] text-[#9AA8BA] uppercase">
+                      Next
+                    </span>
                   </div>
 
                   <p className="mt-5 text-2xl font-extrabold text-navy">
@@ -429,13 +878,19 @@ export default function AccountPage() {
                   </p>
                 </div>
 
-                <div className="rounded-3xl border border-[#DCE7F4] bg-white p-5 shadow-[0_18px_50px_-35px_rgba(8,33,76,0.3)]">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ECFDF3] text-[#16A34A]">
-                    <CheckCircle2 size={19} />
+                <div className="border-r border-[#E5EBF3] p-5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ECFDF3] text-[#16A34A]">
+                      <CheckCircle2 size={19} />
+                    </div>
+
+                    <span className="text-[9px] font-bold tracking-[0.12em] text-[#9AA8BA] uppercase">
+                      Done
+                    </span>
                   </div>
 
                   <p className="mt-5 text-2xl font-extrabold text-navy">
-                    2
+                    {completedBookings}
                   </p>
 
                   <p className="mt-1 text-[11px] font-semibold text-slate">
@@ -443,13 +898,19 @@ export default function AccountPage() {
                   </p>
                 </div>
 
-                <div className="rounded-3xl border border-[#DCE7F4] bg-white p-5 shadow-[0_18px_50px_-35px_rgba(8,33,76,0.3)]">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF7ED] text-[#EA580C]">
-                    <WalletCards size={19} />
+                <div className="p-5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF7ED] text-[#EA580C]">
+                      <WalletCards size={19} />
+                    </div>
+
+                    <span className="text-[9px] font-bold tracking-[0.12em] text-[#9AA8BA] uppercase">
+                      Action
+                    </span>
                   </div>
 
                   <p className="mt-5 text-2xl font-extrabold text-navy">
-                    0
+                    {pendingPayments}
                   </p>
 
                   <p className="mt-1 text-[11px] font-semibold text-slate">
@@ -458,23 +919,19 @@ export default function AccountPage() {
                 </div>
               </div>
 
-              {/* Upcoming Trip */}
-              <div className="mt-6 overflow-hidden rounded-3xl border border-[#DCE7F4] bg-white shadow-[0_22px_60px_-35px_rgba(8,33,76,0.35)]">
-                <div className="flex flex-col justify-between gap-3 border-b border-[#E5EBF3] px-6 py-5 sm:flex-row sm:items-center sm:px-8">
-                  <div>
-                    <p className="text-[10px] font-bold tracking-[0.18em] text-accent uppercase">
-                      Your next journey
-                    </p>
-
-                    <h2 className="mt-1 text-xl font-extrabold text-navy">
-                      Upcoming Trip
-                    </h2>
-                  </div>
+              {/* Upcoming journey */}
+              <div className="mt-7 overflow-hidden rounded-[1.75rem] border border-[#DDE5EF] bg-white shadow-[0_25px_80px_rgba(20,40,70,0.08)]">
+                <div className="flex flex-col justify-between gap-4 border-b border-[#E5EBF3] px-6 py-6 sm:flex-row sm:items-center sm:px-8">
+                  <SectionHeading
+                    eyebrow="Your next journey"
+                    title="Upcoming Trip"
+                    description="Your next Mayura experience at a glance."
+                  />
 
                   <button
                     type="button"
                     onClick={() => scrollToSection("bookings")}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-blue hover:text-accent"
+                    className="inline-flex w-fit items-center gap-1.5 text-xs font-bold text-blue transition-colors hover:text-accent"
                   >
                     View all bookings
                     <ChevronRight size={15} />
@@ -482,56 +939,81 @@ export default function AccountPage() {
                 </div>
 
                 {upcomingBooking ? (
-                  <div className="p-6 sm:p-8">
-                    <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                      <div className="flex min-w-0 items-start gap-4">
-                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue/10 text-blue">
-                          <MapPin size={24} />
+                  <div className="relative overflow-hidden p-6 sm:p-8">
+                    {/* Decorative route */}
+                    <div className="pointer-events-none absolute right-0 top-0 h-full w-[48%] opacity-60">
+                      <svg
+                        className="h-full w-full"
+                        viewBox="0 0 500 260"
+                        preserveAspectRatio="none"
+                      >
+                        <path
+                          d="M40 210 C120 80 190 220 280 120 S410 70 490 25"
+                          fill="none"
+                          stroke="#DCE7F4"
+                          strokeWidth="2"
+                          strokeDasharray="7 11"
+                        />
+
+                        <circle
+                          cx="40"
+                          cy="210"
+                          r="5"
+                          fill="#0B5FA5"
+                        />
+
+                        <circle
+                          cx="490"
+                          cy="25"
+                          r="5"
+                          fill="#E84B8A"
+                        />
+                      </svg>
+                    </div>
+
+                    <div className="relative flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="rounded-full bg-[#ECFDF3] px-3 py-1.5 text-[9px] font-bold tracking-[0.08em] text-[#15803D] uppercase">
+                            Confirmed
+                          </span>
+
+                          <span className="text-[10px] font-semibold tracking-[0.08em] text-[#94A3B8] uppercase">
+                            {upcomingBooking.reference}
+                          </span>
                         </div>
 
-                        <div className="min-w-0">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="text-xl font-extrabold text-navy">
-                              {upcomingBooking.packageName}
-                            </h3>
+                        <h3 className="mt-4 max-w-xl text-2xl font-extrabold tracking-[-0.03em] text-navy sm:text-3xl">
+                          {upcomingBooking.packageName}
+                        </h3>
 
-                            <span className="rounded-full bg-[#ECFDF3] px-2.5 py-1 text-[9px] font-bold text-[#15803D]">
-                              CONFIRMED
-                            </span>
-                          </div>
+                        <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3 text-xs text-slate">
+                          <span className="inline-flex items-center gap-2">
+                            <CalendarDays size={15} className="text-blue" />
+                            {upcomingBooking.travelDate}
+                          </span>
 
-                          <p className="mt-1 text-xs font-semibold text-slate">
-                            {upcomingBooking.reference}
-                          </p>
+                          <span className="inline-flex items-center gap-2">
+                            <Users size={15} className="text-blue" />
+                            {upcomingBooking.travellers}{" "}
+                            {upcomingBooking.travellers === 1
+                              ? "Traveller"
+                              : "Travellers"}
+                          </span>
 
-                          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-slate">
-                            <span className="inline-flex items-center gap-1.5">
-                              <CalendarDays size={14} className="text-blue" />
-                              {upcomingBooking.travelDate}
-                            </span>
-
-                            <span className="inline-flex items-center gap-1.5">
-                              <Users size={14} className="text-blue" />
-                              {upcomingBooking.travellers}{" "}
-                              {upcomingBooking.travellers === 1
-                                ? "Traveller"
-                                : "Travellers"}
-                            </span>
-
-                            <span className="inline-flex items-center gap-1.5">
-                              <ShieldCheck
-                                size={14}
-                                className="text-accent"
-                              />
-                              {upcomingBooking.accommodation}
-                            </span>
-                          </div>
+                          <span className="inline-flex items-center gap-2">
+                            <ShieldCheck
+                              size={15}
+                              className="text-accent"
+                            />
+                            {upcomingBooking.accommodation}
+                          </span>
                         </div>
                       </div>
 
-                      <div className="flex shrink-0 flex-col items-start gap-3 lg:items-end">
+                      <div className="relative flex shrink-0 flex-col items-start gap-4 sm:flex-row sm:items-center lg:flex-col lg:items-end">
                         <div>
-                          <p className="text-[9px] font-semibold tracking-[0.12em] text-[#8B9BB2] uppercase lg:text-right">
+                          <p className="text-[9px] font-bold tracking-[0.14em] text-[#94A3B8] uppercase lg:text-right">
                             Booking Amount
                           </p>
 
@@ -542,7 +1024,7 @@ export default function AccountPage() {
 
                         <Link
                           href="/booking/confirmation"
-                          className="group inline-flex items-center gap-2 rounded-full bg-linear-to-r from-blue to-navy px-5 py-3 text-xs font-bold text-white shadow-[0_12px_25px_-12px_rgba(8,33,76,0.7)] transition-all hover:-translate-y-0.5 hover:bg-none hover:bg-accent"
+                          className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue to-navy px-5 py-3 text-xs font-bold text-white shadow-[0_14px_30px_-16px_rgba(8,33,76,0.7)] transition-all hover:-translate-y-0.5 hover:bg-none hover:bg-accent"
                         >
                           View Booking
                           <ArrowRight
@@ -554,132 +1036,139 @@ export default function AccountPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="px-6 py-12 text-center sm:px-8">
-                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#F1F6FC] text-blue">
+                  <div className="px-6 py-14 text-center sm:px-8">
+                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#EEF4FB] text-blue">
                       <CalendarDays size={24} />
                     </div>
 
-                    <h3 className="mt-4 text-lg font-extrabold text-navy">
+                    <h3 className="mt-5 text-lg font-extrabold text-navy">
                       No upcoming trips
                     </h3>
 
                     <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate">
-                      Explore our curated packages and start planning
-                      your next journey.
+                      Explore our curated packages and start planning your
+                      next Mayura journey.
                     </p>
 
                     <Link
                       href="/packages"
-                      className="mt-5 inline-flex rounded-full bg-blue px-5 py-3 text-xs font-bold text-white"
+                      className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue to-navy px-5 py-3 text-xs font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-none hover:bg-accent"
                     >
                       Browse Packages
+                      <ArrowRight size={14} />
                     </Link>
                   </div>
                 )}
               </div>
 
-              {/* Quick Actions */}
-              <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                <Link
-                  href="/packages"
-                  className="group rounded-3xl border border-[#DCE7F4] bg-white p-5 transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_45px_-30px_rgba(8,33,76,0.45)]"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue/10 text-blue">
-                    <MapPin size={18} />
-                  </div>
-
-                  <p className="mt-4 text-sm font-extrabold text-navy">
-                    Explore Packages
-                  </p>
-
-                  <p className="mt-1 text-[11px] leading-5 text-slate">
-                    Find your next Mayura journey.
-                  </p>
-
-                  <span className="mt-4 inline-flex items-center gap-1 text-[11px] font-bold text-blue">
+              {/* Quick actions */}
+              <div className="mt-7">
+                <div className="mb-4">
+                  <p className="text-[10px] font-bold tracking-[0.2em] text-[#94A3B8] uppercase">
                     Explore
-                    <ArrowRight size={13} />
-                  </span>
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={() => scrollToSection("preferences")}
-                  className="group rounded-3xl border border-[#DCE7F4] bg-white p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_45px_-30px_rgba(8,33,76,0.45)]"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
-                    <Heart size={18} />
-                  </div>
-
-                  <p className="mt-4 text-sm font-extrabold text-navy">
-                    Travel Preferences
                   </p>
+                </div>
 
-                  <p className="mt-1 text-[11px] leading-5 text-slate">
-                    Personalise your travel experience.
-                  </p>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <Link
+                    href="/packages"
+                    className="group rounded-[1.5rem] border border-[#DDE5EF] bg-white p-5 transition-all hover:-translate-y-1 hover:border-blue/30 hover:shadow-[0_20px_50px_-35px_rgba(8,33,76,0.45)]"
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue/10 text-blue">
+                      <MapPin size={18} />
+                    </div>
 
-                  <span className="mt-4 inline-flex items-center gap-1 text-[11px] font-bold text-accent">
-                    Update
-                    <ArrowRight size={13} />
-                  </span>
-                </button>
+                    <p className="mt-4 text-sm font-extrabold text-navy">
+                      Explore Packages
+                    </p>
 
-                <button
-                  type="button"
-                  onClick={() => scrollToSection("support")}
-                  className="group rounded-3xl border border-[#DCE7F4] bg-white p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_45px_-30px_rgba(8,33,76,0.45)]"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ECFDF3] text-[#16A34A]">
-                    <Headphones size={18} />
-                  </div>
+                    <p className="mt-1 text-[11px] leading-5 text-slate">
+                      Find your next Mayura journey.
+                    </p>
 
-                  <p className="mt-4 text-sm font-extrabold text-navy">
-                    Need Help?
-                  </p>
+                    <span className="mt-4 inline-flex items-center gap-1 text-[11px] font-bold text-blue">
+                      Explore
+                      <ArrowRight size={13} />
+                    </span>
+                  </Link>
 
-                  <p className="mt-1 text-[11px] leading-5 text-slate">
-                    We're here for your travel questions.
-                  </p>
+                  <button
+                    type="button"
+                    onClick={() => scrollToSection("preferences")}
+                    className="group rounded-[1.5rem] border border-[#DDE5EF] bg-white p-5 text-left transition-all hover:-translate-y-1 hover:border-accent/30 hover:shadow-[0_20px_50px_-35px_rgba(8,33,76,0.45)]"
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                      <Heart size={18} />
+                    </div>
 
-                  <span className="mt-4 inline-flex items-center gap-1 text-[11px] font-bold text-[#16A34A]">
-                    Get Support
-                    <ArrowRight size={13} />
-                  </span>
-                </button>
+                    <p className="mt-4 text-sm font-extrabold text-navy">
+                      Travel Preferences
+                    </p>
+
+                    <p className="mt-1 text-[11px] leading-5 text-slate">
+                      Personalise your travel experience.
+                    </p>
+
+                    <span className="mt-4 inline-flex items-center gap-1 text-[11px] font-bold text-accent">
+                      Update
+                      <ArrowRight size={13} />
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => scrollToSection("support")}
+                    className="group rounded-[1.5rem] border border-[#DDE5EF] bg-white p-5 text-left transition-all hover:-translate-y-1 hover:border-blue/30 hover:shadow-[0_20px_50px_-35px_rgba(8,33,76,0.45)]"
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF4FB] text-blue">
+                      <Headphones size={18} />
+                    </div>
+
+                    <p className="mt-4 text-sm font-extrabold text-navy">
+                      Need Help?
+                    </p>
+
+                    <p className="mt-1 text-[11px] leading-5 text-slate">
+                      Get assistance with your Mayura journey.
+                    </p>
+
+                    <span className="mt-4 inline-flex items-center gap-1 text-[11px] font-bold text-blue">
+                      Get Support
+                      <ArrowRight size={13} />
+                    </span>
+                  </button>
+                </div>
               </div>
             </section>
 
-            {/* =========================
+            {/* =================================================
                 MY BOOKINGS
-            ========================== */}
+            ================================================== */}
             <section
               id="bookings"
-              className="scroll-mt-28 rounded-3xl border border-[#DCE7F4] bg-white shadow-[0_20px_60px_-35px_rgba(8,33,76,0.3)]"
+              className="scroll-mt-28 overflow-hidden rounded-[1.75rem] border border-[#DDE5EF] bg-white shadow-[0_25px_80px_rgba(20,40,70,0.08)]"
             >
-              <div className="border-b border-[#E5EBF3] px-6 py-6 sm:px-8">
-                <p className="text-[10px] font-bold tracking-[0.18em] text-accent uppercase">
-                  Your Trips
-                </p>
-
-                <h2 className="mt-1.5 text-2xl font-extrabold text-navy">
-                  My Bookings
-                </h2>
-
-                <p className="mt-2 text-sm text-slate">
-                  View and manage your Mayura travel bookings.
-                </p>
+              <div className="px-6 py-7 sm:px-8">
+                <SectionHeading
+                  eyebrow="Your Trips"
+                  title="My Bookings"
+                  description="A record of your Mayura journeys. Live booking history will connect here after backend integration."
+                />
               </div>
 
-              <div className="divide-y divide-[#E5EBF3]">
-                {mockBookings.map((booking) => (
+              <div className="border-t border-[#E5EBF3]">
+                {mockBookings.map((booking, index) => (
                   <div
                     key={booking.id}
-                    className="p-6 transition-colors hover:bg-[#FBFCFE] sm:p-7"
+                    className={`p-6 transition-colors hover:bg-[#FBFCFE] sm:p-7 ${
+                      index !== mockBookings.length - 1
+                        ? "border-b border-[#E5EBF3]"
+                        : ""
+                    }`}
                   >
                     <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                       <div className="flex min-w-0 items-start gap-4">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#F1F6FC] text-blue">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#EEF4FB] text-blue">
                           <Ticket size={20} />
                         </div>
 
@@ -692,11 +1181,11 @@ export default function AccountPage() {
                             <StatusBadge status={booking.status} />
                           </div>
 
-                          <p className="mt-1 text-[11px] font-semibold text-slate">
+                          <p className="mt-1 text-[10px] font-bold tracking-[0.08em] text-[#94A3B8] uppercase">
                             {booking.reference}
                           </p>
 
-                          <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-[11px] text-slate">
+                          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[11px] text-slate">
                             <span className="inline-flex items-center gap-1.5">
                               <CalendarDays size={13} className="text-blue" />
                               {booking.travelDate}
@@ -720,7 +1209,7 @@ export default function AccountPage() {
 
                       <div className="flex items-center justify-between gap-5 border-t border-[#E5EBF3] pt-4 sm:justify-end sm:border-t-0 sm:pt-0">
                         <div className="sm:text-right">
-                          <p className="text-[9px] font-semibold tracking-[0.1em] text-[#8B9BB2] uppercase">
+                          <p className="text-[9px] font-semibold tracking-[0.1em] text-[#94A3B8] uppercase">
                             Total
                           </p>
 
@@ -735,10 +1224,10 @@ export default function AccountPage() {
                               ? "/booking/confirmation"
                               : "#"
                           }
-                          className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-[11px] font-bold ${
+                          className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-[11px] font-bold transition-colors ${
                             booking.id === "1"
                               ? "bg-blue text-white hover:bg-accent"
-                              : "bg-[#F1F6FC] text-slate"
+                              : "bg-[#F1F5F9] text-slate"
                           }`}
                         >
                           View Details
@@ -749,38 +1238,29 @@ export default function AccountPage() {
                   </div>
                 ))}
               </div>
-
-              <div className="border-t border-[#E5EBF3] px-6 py-5 sm:px-8">
-                <p className="text-xs text-slate">
-                  Booking history and real-time status will be
-                  connected to your account after backend integration.
-                </p>
-              </div>
             </section>
 
-            {/* =========================
+            {/* =================================================
                 PROFILE
-            ========================== */}
+            ================================================== */}
             <section
               id="profile"
-              className="scroll-mt-28 rounded-3xl border border-[#DCE7F4] bg-white p-6 shadow-[0_20px_60px_-35px_rgba(8,33,76,0.3)] sm:p-8"
+              className="scroll-mt-28 rounded-[1.75rem] border border-[#DDE5EF] bg-white p-6 shadow-[0_25px_80px_rgba(20,40,70,0.08)] sm:p-8"
             >
-              <p className="text-[10px] font-bold tracking-[0.18em] text-accent uppercase">
-                Personal Details
-              </p>
+              <SectionHeading
+                eyebrow="Personal Details"
+                title="Profile"
+                description="Your basic account information."
+              />
 
-              <h2 className="mt-1.5 text-2xl font-extrabold text-navy">
-                Profile
-              </h2>
-
-              <div className="mt-7 flex flex-col gap-6 sm:flex-row sm:items-center">
-                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-blue to-accent text-2xl font-extrabold text-white shadow-[0_15px_35px_-15px_rgba(20,92,168,0.55)]">
-                  {firstName.charAt(0).toUpperCase()}
+              <div className="mt-8 flex flex-col gap-5 border-b border-[#E5EBF3] pb-7 sm:flex-row sm:items-center">
+                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-blue to-navy text-2xl font-extrabold text-white shadow-[0_15px_35px_-18px_rgba(8,33,76,0.65)]">
+                  {initials}
                 </div>
 
                 <div>
                   <h3 className="text-xl font-extrabold text-navy">
-                    {firstName || firstName}
+                    {displayName}
                   </h3>
 
                   <p className="mt-1 text-sm text-slate">
@@ -788,185 +1268,136 @@ export default function AccountPage() {
                   </p>
                 </div>
 
-                <button
-                  type="button"
-                  className="sm:ml-auto inline-flex items-center justify-center rounded-full border border-[#DCE7F4] bg-white px-5 py-3 text-xs font-bold text-navy transition-all hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-white"
-                >
-                  Edit Profile
-                </button>
+                <div className="sm:ml-auto">
+                  <span className="inline-flex items-center gap-2 rounded-full bg-[#ECFDF3] px-3.5 py-2 text-[10px] font-bold text-[#15803D]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
+                    Active Account
+                  </span>
+                </div>
               </div>
 
               <div className="mt-7 grid gap-4 sm:grid-cols-2">
-                <div className="rounded-2xl bg-[#F7FAFE] p-4 ring-1 ring-[#E2EAF4]">
-                  <p className="text-[9px] font-semibold tracking-[0.1em] text-[#8B9BB2] uppercase">
+                <div className="rounded-2xl bg-[#F7F9FC] p-5 ring-1 ring-[#E2EAF4]">
+                  <p className="text-[9px] font-semibold tracking-[0.12em] text-[#94A3B8] uppercase">
                     Full Name
                   </p>
 
-                  <p className="mt-1.5 text-sm font-bold text-navy">
-                    {firstName || "Not provided"}
+                  <p className="mt-2 text-sm font-bold text-navy">
+                    {displayName}
                   </p>
                 </div>
 
-                <div className="rounded-2xl bg-[#F7FAFE] p-4 ring-1 ring-[#E2EAF4]">
-                  <p className="text-[9px] font-semibold tracking-[0.1em] text-[#8B9BB2] uppercase">
+                <div className="rounded-2xl bg-[#F7F9FC] p-5 ring-1 ring-[#E2EAF4]">
+                  <p className="text-[9px] font-semibold tracking-[0.12em] text-[#94A3B8] uppercase">
                     Email Address
                   </p>
 
-                  <p className="mt-1.5 break-all text-sm font-bold text-navy">
+                  <p className="mt-2 break-all text-sm font-bold text-navy">
                     {user?.email || "Not provided"}
                   </p>
                 </div>
 
-                <div className="rounded-2xl bg-[#F7FAFE] p-4 ring-1 ring-[#E2EAF4]">
-                  <p className="text-[9px] font-semibold tracking-[0.1em] text-[#8B9BB2] uppercase">
+                <div className="rounded-2xl bg-[#F7F9FC] p-5 ring-1 ring-[#E2EAF4]">
+                  <p className="text-[9px] font-semibold tracking-[0.12em] text-[#94A3B8] uppercase">
                     Mobile Number
                   </p>
 
-                  <p className="mt-1.5 text-sm font-bold text-navy">
+                  <p className="mt-2 text-sm font-bold text-navy">
                     Not provided
                   </p>
                 </div>
 
-                <div className="rounded-2xl bg-[#F7FAFE] p-4 ring-1 ring-[#E2EAF4]">
-                  <p className="text-[9px] font-semibold tracking-[0.1em] text-[#8B9BB2] uppercase">
+                <div className="rounded-2xl bg-[#F7F9FC] p-5 ring-1 ring-[#E2EAF4]">
+                  <p className="text-[9px] font-semibold tracking-[0.12em] text-[#94A3B8] uppercase">
                     Account Status
                   </p>
 
-                  <p className="mt-1.5 inline-flex items-center gap-1.5 text-sm font-bold text-[#15803D]">
+                  <p className="mt-2 inline-flex items-center gap-2 text-sm font-bold text-[#15803D]">
                     <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
                     Active
                   </p>
                 </div>
               </div>
+
+              <p className="mt-6 text-[11px] leading-5 text-slate">
+                Profile editing will be connected to your account API when
+                backend integration is added.
+              </p>
             </section>
 
-            {/* =========================
+            {/* =================================================
                 TRAVEL PREFERENCES
-            ========================== */}
-            <section
-              id="preferences"
-              className="scroll-mt-28 rounded-3xl border border-[#DCE7F4] bg-white p-6 shadow-[0_20px_60px_-35px_rgba(8,33,76,0.3)] sm:p-8"
-            >
-              <p className="text-[10px] font-bold tracking-[0.18em] text-accent uppercase">
-                Personalise Your Trips
-              </p>
+            ================================================== */}
+  <section
+  id="preferences"
+  className="scroll-mt-28 rounded-[1.75rem] border border-[#DDE5EF] bg-white p-6 shadow-[0_25px_80px_rgba(20,40,70,0.08)] sm:p-8"
+>
+  <SectionHeading
+    eyebrow="Personalise Your Trips"
+    title="Travel Preferences"
+    description="These preferences can later be used to personalise Mayura recommendations and package discovery."
+  />
 
-              <h2 className="mt-1.5 text-2xl font-extrabold text-navy">
-                Travel Preferences
-              </h2>
+  <TravelPreferencesEditor
+    options={{
+      places: [
+        "Beaches",
+        "Mountains",
+        "Nature",
+        "Wildlife",
+        "History & Culture",
+        "Adventure",
+        "Cities",
+        "Spiritual",
+      ],
+      travelWith: ["Solo", "Couple", "Family", "Friends"],
+      experiences: [
+        "Relaxation",
+        "Adventure",
+        "Food",
+        "Photography",
+        "Sightseeing",
+        "Local Experiences",
+        "Luxury",
+      ],
+      duration: ["Weekend", "3–4 Days", "5–7 Days", "1+ Week"],
+      budget: ["Under ₹5k", "₹5–10k", "₹10–20k", "₹20k+"],
+    }}
+  />
+</section>
 
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate">
-                Tell us what kind of travel you enjoy. These
-                preferences can later be used to personalise your
-                Mayura recommendations.
-              </p>
-
-              <div className="mt-7 grid gap-4 sm:grid-cols-2">
-                <div className="rounded-2xl bg-[#F7FAFE] p-5 ring-1 ring-[#E2EAF4]">
-                  <p className="text-[9px] font-bold tracking-[0.1em] text-[#8B9BB2] uppercase">
-                    Favourite Places
-                  </p>
-
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {["Beaches", "Mountains", "Nature"].map((item) => (
-                      <span
-                        key={item}
-                        className="rounded-full bg-blue/10 px-3 py-1.5 text-[10px] font-bold text-blue"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="rounded-2xl bg-[#F7FAFE] p-5 ring-1 ring-[#E2EAF4]">
-                  <p className="text-[9px] font-bold tracking-[0.1em] text-[#8B9BB2] uppercase">
-                    Usually Travel With
-                  </p>
-
-                  <p className="mt-3 text-sm font-bold text-navy">
-                    Family
-                  </p>
-                </div>
-
-                <div className="rounded-2xl bg-[#F7FAFE] p-5 ring-1 ring-[#E2EAF4]">
-                  <p className="text-[9px] font-bold tracking-[0.1em] text-[#8B9BB2] uppercase">
-                    Preferred Experiences
-                  </p>
-
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {["Food", "Sightseeing", "Photography"].map(
-                      (item) => (
-                        <span
-                          key={item}
-                          className="rounded-full bg-accent/10 px-3 py-1.5 text-[10px] font-bold text-accent"
-                        >
-                          {item}
-                        </span>
-                      )
-                    )}
-                  </div>
-                </div>
-
-                <div className="rounded-2xl bg-[#F7FAFE] p-5 ring-1 ring-[#E2EAF4]">
-                  <p className="text-[9px] font-bold tracking-[0.1em] text-[#8B9BB2] uppercase">
-                    Typical Trip
-                  </p>
-
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <span className="rounded-full bg-blue/10 px-3 py-1.5 text-[10px] font-bold text-blue">
-                      3–4 Days
-                    </span>
-
-                    <span className="rounded-full bg-accent/10 px-3 py-1.5 text-[10px] font-bold text-accent">
-                      ₹5k–₹10k
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                className="mt-6 inline-flex items-center gap-2 rounded-full bg-navy px-5 py-3 text-xs font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-accent"
-              >
-                Edit Travel Preferences
-                <ArrowRight size={14} />
-              </button>
-            </section>
-
-            {/* =========================
+            {/* =================================================
                 SETTINGS
-            ========================== */}
+            ================================================== */}
             <section
               id="settings"
-              className="scroll-mt-28 rounded-3xl border border-[#DCE7F4] bg-white p-6 shadow-[0_20px_60px_-35px_rgba(8,33,76,0.3)] sm:p-8"
+              className="scroll-mt-28 rounded-[1.75rem] border border-[#DDE5EF] bg-white p-6 shadow-[0_25px_80px_rgba(20,40,70,0.08)] sm:p-8"
             >
-              <p className="text-[10px] font-bold tracking-[0.18em] text-accent uppercase">
-                Account Controls
-              </p>
+              <SectionHeading
+                eyebrow="Account Controls"
+                title="Settings"
+                description="Manage the basic behaviour of your Mayura account."
+              />
 
-              <h2 className="mt-1.5 text-2xl font-extrabold text-navy">
-                Settings
-              </h2>
-
-              <div className="mt-7 divide-y divide-[#E5EBF3]">
-                <div className="flex items-center justify-between gap-5 py-5 first:pt-0">
+              <div className="mt-8 divide-y divide-[#E5EBF3]">
+                <div className="flex flex-col gap-4 py-5 first:pt-0 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm font-bold text-navy">
                       Change Password
                     </p>
 
-                    <p className="mt-1 text-xs text-slate">
-                      Update your account password.
+                    <p className="mt-1 text-xs leading-5 text-slate">
+                      Update your account password securely.
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    className="shrink-0 rounded-full border border-[#DCE7F4] px-4 py-2 text-[11px] font-bold text-navy hover:border-accent hover:text-accent"
+                  <Link
+                    href="/forgot-password"
+                    className="inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full border border-[#DCE5EF] px-4 py-2.5 text-[11px] font-bold text-navy transition-colors hover:border-blue hover:text-blue"
                   >
                     Change
-                  </button>
+                    <ChevronRight size={14} />
+                  </Link>
                 </div>
 
                 <div className="flex items-center justify-between gap-5 py-5">
@@ -975,79 +1406,86 @@ export default function AccountPage() {
                       Booking Notifications
                     </p>
 
-                    <p className="mt-1 text-xs text-slate">
+                    <p className="mt-1 text-xs leading-5 text-slate">
                       Receive booking and trip updates by email.
                     </p>
                   </div>
 
-                  <div className="h-6 w-11 rounded-full bg-blue p-1">
+                  <div
+                    aria-label="Booking notifications enabled"
+                    className="h-6 w-11 shrink-0 rounded-full bg-blue p-1"
+                  >
                     <div className="h-4 w-4 translate-x-5 rounded-full bg-white shadow-sm" />
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between gap-5 py-5 last:pb-0">
+                <div className="flex flex-col gap-4 py-5 last:pb-0 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm font-bold text-navy">
                       Account Privacy
                     </p>
 
-                    <p className="mt-1 text-xs text-slate">
+                    <p className="mt-1 text-xs leading-5 text-slate">
                       Manage your account and personal information.
                     </p>
                   </div>
 
-                  <ChevronRight
-                    size={18}
-                    className="shrink-0 text-slate"
-                  />
+                  <span className="inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full bg-[#F3F6FA] px-4 py-2.5 text-[11px] font-bold text-slate">
+                    Coming with backend
+                    <ChevronRight size={14} />
+                  </span>
                 </div>
               </div>
             </section>
 
-            {/* =========================
+            {/* =================================================
                 SUPPORT
-            ========================== */}
+            ================================================== */}
             <section
               id="support"
-              className="scroll-mt-28 overflow-hidden rounded-3xl bg-linear-to-br from-navy via-[#0D4C91] to-blue p-6 text-white shadow-[0_25px_70px_-35px_rgba(8,33,76,0.6)] sm:p-8"
+              className="scroll-mt-28 overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-navy via-[#103B6D] to-blue p-7 text-white shadow-[0_30px_80px_-35px_rgba(8,33,76,0.65)] sm:p-9"
             >
-              <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+              <div className="pointer-events-none absolute" />
+
+              <div className="relative flex flex-col gap-7 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-[10px] font-bold tracking-[0.18em] text-white/60 uppercase">
+                  <p className="text-[10px] font-bold tracking-[0.2em] text-white/55 uppercase">
                     Need Assistance?
                   </p>
 
-                  <h2 className="mt-2 text-2xl font-extrabold">
+                  <h2 className="mt-2 text-2xl font-extrabold tracking-[-0.025em] sm:text-3xl">
                     We're here to help.
                   </h2>
 
-                  <p className="mt-2 max-w-lg text-sm leading-6 text-white/70">
-                    Have a question about your booking, payment or
-                    upcoming trip? Get in touch with the Mayura team.
+                  <p className="mt-3 max-w-lg text-sm leading-6 text-white/70">
+                    Have a question about your booking, payment or upcoming
+                    journey? The Mayura team is here to assist.
                   </p>
                 </div>
 
-                <div className="flex shrink-0 flex-col gap-2 sm:items-end">
-                  <Link
-                    href="/contact"
+                <div className="shrink-0">
+                  <a
+                    href="https://wa.me/"
+                    target="_blank"
+                    rel="noreferrer"
                     className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-xs font-bold text-navy transition-all hover:-translate-y-0.5 hover:bg-accent hover:text-white"
                   >
                     <Headphones size={15} />
-                    Contact Support
-                  </Link>
+                    Contact Mayura
+                  </a>
 
-                  <div className="inline-flex items-center gap-2 text-[10px] text-white/65">
-                    <Mail size={13} />
-                    Support available for your travel needs
-                  </div>
+                  <p className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-white/55 sm:justify-end">
+                    <Mail size={12} />
+                    Travel assistance available
+                  </p>
                 </div>
               </div>
             </section>
 
-            {/* =========================
+            {/* =================================================
                 SIGN OUT
-            ========================== */}
-            <div className="flex justify-center pt-2">
+            ================================================== */}
+            <div className="flex justify-center pt-1">
               <button
                 type="button"
                 onClick={handleSignOut}
@@ -1058,13 +1496,13 @@ export default function AccountPage() {
               </button>
             </div>
 
-            {/* =========================
-                BACK TO PACKAGES
-            ========================== */}
-            <div className="text-center">
+            {/* =================================================
+                FOOTER LINK
+            ================================================== */}
+            <div className="border-t border-[#DDE5EF] pt-7 text-center">
               <Link
                 href="/packages"
-                className="inline-flex items-center gap-2 text-xs font-bold text-blue hover:text-accent"
+                className="inline-flex items-center gap-2 text-xs font-bold text-blue transition-colors hover:text-accent"
               >
                 Browse more Mayura packages
                 <ArrowRight size={14} />

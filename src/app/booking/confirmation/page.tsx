@@ -9,6 +9,8 @@ import {
   Download,
   Home,
   Mail,
+  MapPin,
+  Navigation,
   Phone,
   ShieldCheck,
   Users,
@@ -23,6 +25,7 @@ export default function BookingConfirmationPage() {
   const router = useRouter();
 
   const [intent, setIntent] = useState<BookingIntent | null>(null);
+  const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
     const booking = readBookingIntent();
@@ -64,490 +67,889 @@ export default function BookingConfirmationPage() {
     .slice(0, 4)
     .toUpperCase()}-${Date.now().toString().slice(-6)}`;
 
+  const journeySteps = [
+    {
+      number: "01",
+      label: "Confirmed",
+      title: "Your booking is recorded",
+      description:
+        "Your reservation request and travel details have been successfully received by Mayura Holidays.",
+    },
+    {
+      number: "02",
+      label: "Connect",
+      title: "Our team will contact you",
+      description:
+        "A Mayura Holidays representative will get in touch with you to confirm your trip and discuss the next details.",
+    },
+    {
+      number: "03",
+      label: "Prepare",
+      title: "Receive your travel details",
+      description:
+        "Final trip information, timings and other important details will be shared with you before departure.",
+    },
+    {
+      number: "04",
+      label: "Journey",
+      title: "Travel with Mayura",
+      description:
+        "All that's left is to enjoy the journey and make memories along the way.",
+    },
+  ];
+
   return (
-    <main className="min-h-screen bg-[#F5F8FC]">
-{/* =========================
-    CONFIRMATION HERO
-========================== */}
-<section className="relative isolate min-h-[470px] overflow-hidden sm:min-h-[540px]">
+    <main className="min-h-screen bg-white">
+      {/* =========================================================
+          HERO — UNCHANGED
+      ========================================================== */}
+      <section className="relative isolate min-h-[470px] overflow-hidden sm:min-h-[540px]">
+        <video
+          className="absolute inset-0 h-full w-full object-cover"
+          src="/video/confirmationhero.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+        />
 
-  {/* =====================================================
-      VIDEO BACKGROUND
-  ===================================================== */}
-  <div className="absolute inset-0 -z-30 overflow-hidden">
+        <div className="absolute inset-0 bg-[#071C35]/55" />
 
-    <video
-      className="absolute inset-0 h-full w-full object-cover"
-      autoPlay
-      muted
-      loop
-      playsInline
-      preload="auto"
-      aria-hidden="true"
-    >
-      <source
-        src="/video/confirmationhero.mp4"
-        type="video/mp4"
-      />
-    </video>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#071C35]/25 via-transparent to-[#071C35]/65" />
 
-  </div>
+        <div className="relative z-10 mx-auto flex min-h-[470px] max-w-6xl items-center justify-center px-5 py-24 text-center sm:min-h-[540px] sm:px-8">
+          <div className="max-w-3xl">
+            <div className="mb-6 flex items-center justify-center">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-md">
+                <span className="h-2 w-2 rounded-full bg-emerald-400" />
 
-  {/* =====================================================
-      CINEMATIC OVERLAY
-  ===================================================== */}
-  <div className="absolute inset-0 -z-20 bg-gradient-to-r from-[#031C3B]/95 via-[#06386D]/70 to-[#06386D]/30" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-white/90">
+                  Reservation Secured
+                </span>
+              </div>
+            </div>
 
-  {/* Soft atmospheric blue glow */}
-  <div className="pointer-events-none absolute -right-32 top-[-10rem] -z-10 h-[30rem] w-[30rem] rounded-full bg-blue/20 blur-3xl" />
-
-  {/* Subtle bottom fade */}
-  <div className="absolute inset-x-0 bottom-0 -z-10 h-48 bg-gradient-to-t from-[#F5F8FC]/40 via-[#F5F8FC]/10 to-transparent" />
-
-  {/* =====================================================
-      HERO CONTENT
-  ===================================================== */}
-  <div className="relative mx-auto flex min-h-[470px] max-w-7xl items-center px-5 pb-20 pt-28 sm:min-h-[540px] sm:px-8 sm:pb-24">
-
-    <div className="max-w-2xl">
-
-      {/* MAYURA BRAND */}
-      <div className="mb-10 flex items-center gap-3">
-
-        <div className="flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-white/10 backdrop-blur-sm">
-          <span className="text-[12px] font-bold text-white">
-            M
-          </span>
-        </div>
-
-        <div>
-          <p className="text-[12px] font-semibold tracking-[0.32em] text-white">
-            MAYURA
-          </p>
-
-          <p className="mt-0.5 text-[7px] font-semibold tracking-[0.22em] text-white/45">
-            HOLIDAYS
-          </p>
-        </div>
-
-      </div>
-
-      {/* CONFIRMATION */}
-      <div className="flex items-center gap-4">
-
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#22C55E] text-white shadow-[0_12px_40px_-8px_rgba(34,197,94,0.7)] sm:h-16 sm:w-16">
-          <Check
-            size={30}
-            strokeWidth={3}
-            className="sm:h-9 sm:w-9"
-          />
-        </div>
-
-        <div className="h-px w-10 bg-white/35" />
-
-        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/75">
-          Booking Confirmed
-        </p>
-
-      </div>
-
-      {/* HEADING */}
-      <h1 className="mt-7 max-w-2xl text-5xl font-extrabold leading-[0.98] tracking-[-0.055em] text-white sm:text-6xl lg:text-[72px]">
-        Your trip is
-        <br />
-        <span className="text-white/95">
-          all set!
-        </span>
-      </h1>
-
-      {/* DESCRIPTION */}
-      <p className="mt-6 max-w-xl text-sm leading-7 text-white/75 sm:text-base">
-        Thank you for booking with Mayura. Your journey has
-        been successfully confirmed, and your travel details
-        are safely recorded with us.
-      </p>
-
-      {/* CONFIRMATION DETAILS */}
-      <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-
-        <div className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
-
-          <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/65">
-            Reservation secured
-          </span>
-        </div>
-
-        <div className="hidden h-3 w-px bg-white/20 sm:block" />
-
-        <div className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-
-          <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/65">
-            Travel with Mayura
-          </span>
-        </div>
-
-      </div>
-
-    </div>
-  </div>
-
-  {/* =====================================================
-      SOFT CURVED TRANSITION
-  ===================================================== 
-  <div className="pointer-events-none absolute bottom-[-1px] left-0 right-0 h-12 overflow-hidden sm:h-16">
-    <div className="absolute left-[-5%] top-4 h-24 w-[110%] rounded-[50%_50%_0_0] bg-[#F5F8FC]" />
-  </div> */}
-
-</section>
-
-      {/* =========================
-          MAIN CONTENT
-      ========================== */}
-      <section className="relative -mt-14 pb-16 sm:pb-20">
-        <div className="mx-auto max-w-4xl px-5 sm:px-8">
-          {/* =========================
-              BOOKING REFERENCE
-          ========================== */}
-          <section className="rounded-3xl border border-[#DCE7F4] bg-white px-6 py-6 text-center shadow-[0_24px_70px_-35px_rgba(8,33,76,0.4)] sm:px-8 sm:py-7">
-            <p className="text-[10px] font-bold tracking-[0.18em] text-[#8B9BB2] uppercase">
-              Booking Reference
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.38em] text-white/70">
+              Mayura Holidays
             </p>
 
-            <p className="mt-2 text-2xl font-extrabold tracking-[0.08em] text-navy sm:text-3xl">
-              {bookingReference}
+            <h1 className="text-4xl font-black tracking-[-0.03em] text-white sm:text-6xl">
+              Booking Confirmed
+            </h1>
+
+            <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-white/75 sm:text-lg">
+              Your trip is all set. We're looking forward to
+              making your journey with Mayura memorable.
             </p>
-
-            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#ECFDF3] px-3.5 py-1.5">
-              <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
-
-              <span className="text-[11px] font-bold text-[#15803D]">
-                Confirmed
-              </span>
-            </div>
-          </section>
-
-          {/* =========================
-              TRIP DETAILS
-          ========================== */}
-          <section className="mt-6 overflow-hidden rounded-3xl border border-[#DCE7F4] bg-white shadow-[0_18px_50px_-35px_rgba(8,33,76,0.3)]">
-            <div className="border-b border-[#E5EBF3] px-6 py-6 sm:px-8">
-              <p className="text-[10px] font-bold tracking-[0.18em] text-accent uppercase">
-                Your Trip
-              </p>
-
-              <h2 className="mt-1.5 text-2xl font-extrabold tracking-tight text-navy">
-                {intent.packageName}
-              </h2>
-            </div>
-
-            <div className="grid divide-y divide-[#E5EBF3] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-              {/* Travel Date */}
-              <div className="flex items-center gap-4 px-6 py-5 sm:px-7">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue/10 text-blue">
-                  <CalendarDays size={20} />
-                </div>
-
-                <div>
-                  <p className="text-[10px] font-semibold tracking-[0.12em] text-[#8B9BB2] uppercase">
-                    Travel Date
-                  </p>
-
-                  <p className="mt-1 text-sm font-bold text-navy">
-                    {formattedDate}
-                  </p>
-                </div>
-              </div>
-
-              {/* Travellers */}
-              <div className="flex items-center gap-4 px-6 py-5 sm:px-7">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue/10 text-blue">
-                  <Users size={20} />
-                </div>
-
-                <div>
-                  <p className="text-[10px] font-semibold tracking-[0.12em] text-[#8B9BB2] uppercase">
-                    Travellers
-                  </p>
-
-                  <p className="mt-1 text-sm font-bold text-navy">
-                    {travellerCount}{" "}
-                    {travellerCount === 1 ? "Adult" : "Adults"}
-                  </p>
-                </div>
-              </div>
-
-              {/* Accommodation */}
-              <div className="flex items-center gap-4 px-6 py-5 sm:px-7">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
-                  <ShieldCheck size={20} />
-                </div>
-
-                <div>
-                  <p className="text-[10px] font-semibold tracking-[0.12em] text-[#8B9BB2] uppercase">
-                    Accommodation
-                  </p>
-
-                  <p className="mt-1 text-sm font-bold capitalize text-navy">
-                    {intent.accommodation || "To be confirmed"}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* =========================
-              TRAVELLER INFORMATION
-          ========================== */}
-          <section className="mt-6 rounded-3xl border border-[#DCE7F4] bg-white px-6 py-7 shadow-[0_18px_50px_-35px_rgba(8,33,76,0.3)] sm:px-8">
-            <div className="flex items-center gap-3">
-              <div className="h-1 w-8 rounded-full bg-accent" />
-
-              <p className="text-[10px] font-bold tracking-[0.18em] text-accent uppercase">
-                Lead Traveller
-              </p>
-            </div>
-
-            <h2 className="mt-1.5 text-2xl font-extrabold text-navy">
-              Traveller Information
-            </h2>
-
-            {/* Contact Information */}
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <div className="flex items-center gap-3 rounded-2xl bg-[#F7FAFE] px-4 py-3.5 ring-1 ring-[#E2EAF4]">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue/10 text-blue">
-                  <Mail size={17} />
-                </div>
-
-                <div className="min-w-0">
-                  <p className="text-[9px] font-semibold tracking-[0.1em] text-[#8B9BB2] uppercase">
-                    Email
-                  </p>
-
-                  <p className="mt-0.5 break-all text-sm font-semibold text-navy">
-                    {intent.leadEmail || "Not provided"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 rounded-2xl bg-[#F7FAFE] px-4 py-3.5 ring-1 ring-[#E2EAF4]">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue/10 text-blue">
-                  <Phone size={17} />
-                </div>
-
-                <div>
-                  <p className="text-[9px] font-semibold tracking-[0.1em] text-[#8B9BB2] uppercase">
-                    Mobile
-                  </p>
-
-                  <p className="mt-0.5 text-sm font-semibold text-navy">
-                    {intent.leadPhone || "Not provided"}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Traveller Details */}
-            {intent.travellerDetails?.length ? (
-              <div className="mt-7 border-t border-[#E5EBF3] pt-6">
-                <div className="flex items-center justify-between gap-4">
-                  <p className="text-[10px] font-bold tracking-[0.16em] text-blue uppercase">
-                    Travellers
-                  </p>
-
-                  <p className="text-xs font-semibold text-slate">
-                    {intent.travellerDetails.length}{" "}
-                    {intent.travellerDetails.length === 1
-                      ? "Traveller"
-                      : "Travellers"}
-                  </p>
-                </div>
-
-                <div className="mt-4 space-y-2.5">
-                  {intent.travellerDetails.map(
-                    (traveller, index) => (
-                      <div
-                        key={`${traveller.fullName}-${index}`}
-                        className="flex flex-col gap-3 rounded-2xl bg-[#F7FAFE] px-4 py-3.5 ring-1 ring-[#E2EAF4] sm:flex-row sm:items-center sm:justify-between"
-                      >
-                        {/* Name */}
-                        <div className="flex min-w-0 items-center gap-3">
-                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue text-[11px] font-bold text-white">
-                            {index + 1}
-                          </span>
-
-                          <div className="min-w-0">
-                            <p className="truncate text-sm font-bold text-navy">
-                              {traveller.fullName}
-                            </p>
-
-                            <p className="mt-0.5 text-[11px] text-slate">
-                              Traveller {index + 1}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Age + Gender */}
-                        <div className="flex items-center gap-2 pl-12 sm:pl-0">
-                          <span className="rounded-full bg-[#EEF4FB] px-3 py-1.5 text-[10px] font-semibold text-slate">
-                            Age {traveller.age}
-                          </span>
-
-                          <span className="rounded-full bg-accent/10 px-3 py-1.5 text-[10px] font-semibold capitalize text-accent">
-                            {traveller.gender || "Not specified"}
-                          </span>
-                        </div>
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
-            ) : null}
-          </section>
-
-          {/* =========================
-              BOTTOM: NEXT STEPS + PAYMENT
-          ========================== */}
-          <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
-            {/* What's Next */}
-            <section className="rounded-3xl border border-blue/10 bg-[#F1F6FC] px-6 py-7 sm:px-8">
-              <p className="text-[10px] font-bold tracking-[0.18em] text-blue uppercase">
-                What Happens Next
-              </p>
-
-              <h2 className="mt-2 text-xl font-extrabold text-navy">
-                Your travel documents
-              </h2>
-
-              <p className="mt-2 max-w-lg text-sm leading-6 text-slate">
-                Your booking confirmation and e-ticket will be
-                sent to your registered email once the booking
-                system is connected.
-              </p>
-
-              <div className="mt-5 flex items-start gap-3 rounded-2xl bg-white px-4 py-3.5 ring-1 ring-blue/10">
-                <Mail
-                  size={17}
-                  className="mt-0.5 shrink-0 text-blue"
-                />
-
-                <p className="text-xs leading-5 text-slate">
-                  Keep your booking reference handy for any future
-                  enquiries or support.
-                </p>
-              </div>
-            </section>
-
-            {/* Payment Summary */}
-            <section className="overflow-hidden rounded-3xl bg-white shadow-[0_20px_60px_-30px_rgba(8,33,76,0.4)] ring-1 ring-[#DCE7F4]">
-              <div className="bg-linear-to-br from-navy to-[#0C559F] px-6 py-5 text-white">
-                <p className="text-[10px] font-bold tracking-[0.18em] text-white/65 uppercase">
-                  Payment
-                </p>
-
-                <h2 className="mt-1.5 text-xl font-extrabold">
-                  Payment Summary
-                </h2>
-              </div>
-
-              <div className="p-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between gap-4">
-                    <span className="text-sm text-slate">
-                      Price per person
-                    </span>
-
-                    <span className="text-sm font-bold text-navy">
-                      {pricePerPerson !== null
-                        ? `₹${pricePerPerson.toLocaleString(
-                            "en-IN"
-                          )}`
-                        : "On request"}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-4">
-                    <span className="text-sm text-slate">
-                      Travellers
-                    </span>
-
-                    <span className="text-sm font-bold text-navy">
-                      {travellerCount}
-                    </span>
-                  </div>
-
-                  <div className="border-t border-[#E5EBF3] pt-5">
-                    <p className="text-[9px] font-semibold tracking-[0.12em] text-[#8B9BB2] uppercase">
-                      Total Paid
-                    </p>
-
-                    <p className="mt-1 text-3xl font-extrabold text-blue">
-                      {totalAmount !== null
-                        ? `₹${totalAmount.toLocaleString(
-                            "en-IN"
-                          )}`
-                        : "On request"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-5 flex items-center gap-2 rounded-2xl bg-[#ECFDF3] px-4 py-3">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#22C55E] text-white">
-                    <Check size={14} strokeWidth={3} />
-                  </div>
-
-                  <div>
-                    <p className="text-xs font-bold text-[#15803D]">
-                      Payment Successful
-                    </p>
-
-                    <p className="mt-0.5 text-[10px] text-[#4D7C5B]">
-                      Your payment has been recorded.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
           </div>
+        </div>
 
-          {/* =========================
-              ACTIONS
-          ========================== */}
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <button
-              type="button"
-              disabled
-              className="inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full bg-[#CBD4E1] px-7 py-3.5 text-sm font-bold text-white sm:w-auto"
-            >
-              <Download size={17} />
-              Download E-ticket
-            </button>
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white via-white/45 to-transparent" />
+      </section>
 
-            <button
-              type="button"
-              onClick={() => router.push("/account")}
-              className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-linear-to-r from-blue to-navy px-7 py-3.5 text-sm font-bold text-white shadow-[0_12px_30px_-10px_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-none hover:bg-accent sm:w-auto"
-            >
-              View My Booking
+      {/* =========================================================
+          BOOKING REFERENCE — UNCHANGED
+      ========================================================== */}
+      <section className="relative z-20 -mt-24 w-full px-5 sm:-mt-28 sm:px-8">
+        <div className="relative mx-auto max-w-5xl">
+          <div className="relative overflow-hidden rounded-[1.75rem] border border-[#D9E2EA] bg-white shadow-[0_30px_80px_-35px_rgba(8,33,76,0.42)]">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#B8C9D8] to-transparent" />
 
-              <ArrowRight
-                size={17}
-                className="transition-transform duration-300 group-hover:translate-x-0.5"
-              />
-            </button>
+            <div className="relative flex flex-col sm:flex-row">
+              <div className="flex-1 px-6 py-7 sm:px-9 sm:py-8">
+                <div className="flex items-center gap-3">
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
 
-            <button
-              type="button"
-              onClick={() => router.push("/")}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-bold text-navy ring-1 ring-[#DCE7F4] transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent hover:text-white sm:w-auto"
-            >
-              <Home size={17} />
-              Back to Home
-            </button>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-emerald-600">
+                    Confirmed
+                  </span>
+                </div>
+
+                <div className="mt-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#8291A3]">
+                    Booking Reference
+                  </p>
+
+                  <p className="mt-1 text-2xl font-black tracking-[0.12em] text-[#08214C] sm:text-3xl">
+                    {bookingReference}
+                  </p>
+                </div>
+
+                <div className="mt-5 flex flex-wrap items-center gap-x-7 gap-y-2 text-sm text-[#607188]">
+                  <span className="flex items-center gap-2">
+                    <CalendarDays className="h-4 w-4 text-blue" />
+                    {formattedDate}
+                  </span>
+
+                  <span className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-blue" />
+                    {travellerCount} Traveller
+                    {travellerCount !== 1 ? "s" : ""}
+                  </span>
+                </div>
+              </div>
+
+              <div className="relative hidden w-px sm:block">
+                <div className="absolute inset-y-0 left-1/2 border-l border-dashed border-[#D2DDE7]" />
+
+                <span className="absolute -left-3 -top-3 h-6 w-6 rounded-full bg-white" />
+
+                <span className="absolute -bottom-3 -left-3 h-6 w-6 rounded-full bg-white" />
+              </div>
+
+              <div className="mx-6 border-t border-dashed border-[#D2DDE7] sm:hidden" />
+
+              <div className="flex min-h-[120px] w-full items-center justify-center px-6 py-6 sm:w-[195px] sm:px-5">
+                <div className="text-center">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8A98A8]">
+                    Mayura Holidays
+                  </p>
+
+                  <p className="mt-2 text-xs font-medium leading-relaxed text-[#68798C]">
+                    Your journey is
+                    <br />
+                    officially reserved
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* =========================================================
+          MAIN CONTENT
+      ========================================================== */}
+      <section className="relative overflow-hidden bg-[#F7F9FC]">
+
+        {/* =====================================================
+            CONTACT-PAGE STYLE GRID + WAVE
+        ====================================================== */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div
+            className="absolute inset-0 opacity-60"
+            style={{
+              backgroundImage:
+                "linear-gradient(to_right,#E9EEF4_1px,transparent_1px),linear-gradient(to_bottom,#E9EEF4_1px,transparent_1px)",
+              backgroundSize: "72px 72px",
+            }}
+          />
+
+          <svg
+            className="absolute left-0 top-0 h-[420px] w-full opacity-50"
+            viewBox="0 0 1200 420"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M-80 270C100 80 250 70 410 190C550 295 650 300 795 175C930 60 1070 65 1280 205"
+              stroke="currentColor"
+              className="text-blue"
+              strokeWidth="1"
+              strokeDasharray="6 10"
+            />
+
+            <circle
+              cx="410"
+              cy="190"
+              r="4"
+              className="fill-blue"
+            />
+
+            <circle
+              cx="795"
+              cy="175"
+              r="4"
+              className="fill-accent"
+            />
+          </svg>
+        </div>
+
+        <div className="relative mx-auto max-w-7xl px-5 pb-20 pt-16 sm:px-8 sm:pb-28 sm:pt-20 lg:px-12">
+
+          {/* =====================================================
+              INTRO
+          ====================================================== */}
+          <section className="mx-auto max-w-6xl">
+            <div className="grid items-end gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20">
+
+              <div>
+                <div className="mb-6 flex items-center gap-3">
+                  <span className="h-px w-8 bg-accent sm:w-10" />
+
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent sm:text-[11px] sm:tracking-[0.24em]">
+                    Your Mayura Journey
+                  </span>
+                </div>
+
+                <h2 className="max-w-4xl text-[clamp(42px,7vw,78px)] font-extrabold leading-[0.92] tracking-[-0.055em] text-navy">
+                  One step closer
+                  <br />
+                  <span className="text-blue">
+                    to somewhere new.
+                  </span>
+                </h2>
+              </div>
+
+              <div className="max-w-md lg:pb-2">
+                <div className="mb-5 flex items-center gap-4">
+                  <span className="h-px flex-1 bg-[#C9D3E0]" />
+
+                  <span className="text-2xl text-accent">
+                    ↗
+                  </span>
+                </div>
+
+                <p className="text-base leading-7 text-slate sm:text-lg sm:leading-8">
+                  Your reservation has been recorded. Here&apos;s
+                  everything you need to keep your journey moving.
+                </p>
+
+                <p className="mt-4 text-sm leading-6 text-slate/75">
+                  Keep your booking reference handy. Our team will
+                  be in touch with you regarding the next steps.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* =====================================================
+              JOURNEY DETAILS
+          ====================================================== */}
+          <section className="mx-auto mt-16 max-w-6xl">
+
+            <div className="mb-7 flex items-end justify-between gap-6">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent">
+                  Your Trip
+                </p>
+
+                <h3 className="mt-2 text-2xl font-extrabold tracking-tight text-navy sm:text-3xl">
+                  Journey details
+                </h3>
+              </div>
+
+              <div className="hidden items-center gap-2 sm:flex">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+
+                <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate">
+                  Confirmed
+                </span>
+              </div>
+            </div>
+
+            <div className="overflow-hidden rounded-[24px] border border-[#DDE5EF] bg-white shadow-[0_25px_80px_rgba(20,40,70,0.08)] sm:rounded-[28px]">
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4">
+
+                {/* Destination */}
+                <div className="border-b border-[#E5EAF0] p-6 sm:border-r lg:border-b-0">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue/10">
+                    <MapPin className="h-4 w-4 text-blue" />
+                  </div>
+
+                  <p className="mt-6 text-[9px] font-bold uppercase tracking-[0.18em] text-slate">
+                    Destination
+                  </p>
+
+                  <p className="mt-2 text-lg font-extrabold leading-snug text-navy">
+                    {intent.packageName}
+                  </p>
+                </div>
+
+                {/* Date */}
+                <div className="border-b border-[#E5EAF0] p-6 lg:border-r lg:border-b-0">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue/10">
+                    <CalendarDays className="h-4 w-4 text-blue" />
+                  </div>
+
+                  <p className="mt-6 text-[9px] font-bold uppercase tracking-[0.18em] text-slate">
+                    Travel Date
+                  </p>
+
+                  <p className="mt-2 text-lg font-extrabold text-navy">
+                    {formattedDate}
+                  </p>
+                </div>
+
+                {/* Travellers */}
+                <div className="border-b border-[#E5EAF0] p-6 sm:border-r sm:border-b-0">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue/10">
+                    <Users className="h-4 w-4 text-blue" />
+                  </div>
+
+                  <p className="mt-6 text-[9px] font-bold uppercase tracking-[0.18em] text-slate">
+                    Travellers
+                  </p>
+
+                  <p className="mt-2 text-lg font-extrabold text-navy">
+                    {travellerCount} Traveller
+                    {travellerCount !== 1 ? "s" : ""}
+                  </p>
+                </div>
+
+                {/* Accommodation */}
+                <div className="p-6">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10">
+                    <ShieldCheck className="h-4 w-4 text-accent" />
+                  </div>
+
+                  <p className="mt-6 text-[9px] font-bold uppercase tracking-[0.18em] text-slate">
+                    Accommodation
+                  </p>
+
+                  <p className="mt-2 text-lg font-extrabold capitalize text-navy">
+                    {intent.accommodation || "Standard"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* =====================================================
+              CONTACT DETAILS
+          ====================================================== */}
+          <section className="mx-auto mt-20 max-w-6xl">
+
+            <div className="grid items-start gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
+
+              <div>
+                <div className="mb-6 flex items-center gap-3">
+                  <span className="h-px w-8 bg-blue" />
+
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue">
+                    Reservation Contact
+                  </span>
+                </div>
+
+                <h2 className="text-3xl font-extrabold leading-tight tracking-[-0.03em] text-navy sm:text-4xl">
+                  We know where
+                  <br />
+                  to reach you.
+                </h2>
+
+                <p className="mt-5 max-w-sm text-sm leading-7 text-slate">
+                  Your contact information is attached to this
+                  reservation and will be used for important
+                  journey updates.
+                </p>
+              </div>
+
+              <div className="overflow-hidden rounded-[24px] border border-[#DDE5EF] bg-white shadow-[0_25px_80px_rgba(20,40,70,0.08)] sm:rounded-[28px]">
+
+                <div className="grid sm:grid-cols-2">
+
+                  {/* Email */}
+                  <div className="border-b border-[#E5EAF0] p-7 sm:border-r sm:p-9">
+                    <div className="flex items-center justify-between">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue/10">
+                        <Mail className="h-5 w-5 text-blue" />
+                      </div>
+
+                      <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-slate">
+                        Email
+                      </span>
+                    </div>
+
+                    <p className="mt-7 text-[9px] font-bold uppercase tracking-[0.18em] text-slate">
+                      Email address
+                    </p>
+
+                    <p className="mt-2 break-all text-sm font-bold text-navy sm:text-base">
+                      {intent.leadEmail || "Not provided"}
+                    </p>
+
+                    <p className="mt-2 text-xs text-slate/75">
+                      Primary booking contact
+                    </p>
+                  </div>
+
+                  {/* Phone */}
+                  <div className="p-7 sm:p-9">
+                    <div className="flex items-center justify-between">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-accent/10">
+                        <Phone className="h-5 w-5 text-accent" />
+                      </div>
+
+                      <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-slate">
+                        Phone
+                      </span>
+                    </div>
+
+                    <p className="mt-7 text-[9px] font-bold uppercase tracking-[0.18em] text-slate">
+                      Phone number
+                    </p>
+
+                    <p className="mt-2 text-sm font-bold text-navy sm:text-base">
+                      {intent.leadPhone || "Not provided"}
+                    </p>
+
+                    <p className="mt-2 text-xs text-slate/75">
+                      For journey updates
+                    </p>
+                  </div>
+                </div>
+
+                {/* Confirmation */}
+                <div className="border-t border-[#E5EAF0] bg-[#FAFBFD] px-7 py-5 sm:px-9">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#EAF7F0]">
+                      <Check className="h-4 w-4 text-emerald-600" />
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-bold text-navy">
+                        Reservation details recorded
+                      </p>
+
+                      <p className="mt-0.5 text-[11px] text-slate">
+                        Your information is safely saved.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* =====================================================
+              WHAT HAPPENS NEXT
+          ====================================================== */}
+          <section className="mx-auto mt-24 max-w-6xl">
+
+            <div className="grid items-start gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
+
+              <div>
+                <div className="mb-6 flex items-center gap-3">
+                  <span className="h-px w-8 bg-accent" />
+
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent">
+                    The Road Ahead
+                  </span>
+                </div>
+
+                <h2 className="text-3xl font-extrabold leading-tight tracking-[-0.03em] text-navy sm:text-4xl">
+                  What happens
+                  <br />
+                  next?
+                </h2>
+
+                <p className="mt-5 max-w-sm text-sm leading-7 text-slate">
+                  From confirmation to departure, here&apos;s how
+                  your Mayura journey moves forward.
+                </p>
+
+                <div className="mt-8 hidden items-center gap-3 lg:flex">
+                  <Navigation className="h-5 w-5 rotate-45 text-blue" />
+
+                  <span className="h-px w-16 border-t border-dashed border-[#BFCFDD]" />
+
+                  <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-slate">
+                    Your journey
+                  </span>
+                </div>
+              </div>
+
+              <div className="relative">
+
+                <div className="absolute left-5 top-5 bottom-5 hidden border-l border-dashed border-[#C7D8E6] sm:block" />
+
+                <div className="space-y-2">
+
+                  {journeySteps.map((step, index) => {
+                    const active = activeStep === index;
+
+                    return (
+                      <button
+                        key={step.number}
+                        type="button"
+                        onClick={() => setActiveStep(index)}
+                        className={`group relative flex w-full items-start gap-5 rounded-[20px] p-5 text-left transition-all duration-300 sm:gap-7 sm:p-6 ${
+                          active
+                            ? "border border-[#DDE5EF] bg-white shadow-[0_20px_60px_rgba(20,40,70,0.08)]"
+                            : "border border-transparent hover:bg-white/70"
+                        }`}
+                      >
+                        <div
+                          className={`relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-4 border-[#F7F9FC] text-[9px] font-black transition-all duration-300 sm:h-12 sm:w-12 ${
+                            active
+                              ? "bg-blue text-white shadow-[0_8px_20px_rgba(20,40,70,0.15)]"
+                              : "bg-white text-slate ring-1 ring-[#D7E2EB] group-hover:bg-blue/10 group-hover:text-blue"
+                          }`}
+                        >
+                          {index === journeySteps.length - 1
+                            ? "✦"
+                            : step.number}
+                        </div>
+
+                        <div className="min-w-0 flex-1 pt-0.5">
+
+                          <div className="flex flex-wrap items-center gap-3">
+                            <span
+                              className={`text-[9px] font-bold uppercase tracking-[0.18em] ${
+                                active
+                                  ? "text-accent"
+                                  : "text-slate"
+                              }`}
+                            >
+                              {step.label}
+                            </span>
+
+                            {active && (
+                              <span className="h-1 w-1 rounded-full bg-accent" />
+                            )}
+                          </div>
+
+                          <h3 className="mt-2 text-base font-extrabold text-navy sm:text-lg">
+                            {step.title}
+                          </h3>
+
+                          <p
+                            className={`mt-2 text-sm leading-6 transition-colors ${
+                              active
+                                ? "text-slate"
+                                : "text-slate/70"
+                            }`}
+                          >
+                            {step.description}
+                          </p>
+                        </div>
+
+                        <ArrowRight
+                          className={`mt-1 hidden h-4 w-4 shrink-0 transition-all sm:block ${
+                            active
+                              ? "text-blue"
+                              : "text-slate/40 opacity-0 group-hover:translate-x-1 group-hover:opacity-100"
+                          }`}
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* =====================================================
+    PAYMENT SUMMARY
+====================================================== */}
+<section className="mx-auto mt-24 max-w-6xl">
+
+  <div className="mb-8">
+    <div className="mb-5 flex items-center gap-3">
+      <span className="h-px w-8 bg-blue" />
+
+      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue">
+        Reservation Value
+      </span>
+    </div>
+
+    <h2 className="text-3xl font-extrabold tracking-[-0.03em] text-navy sm:text-4xl">
+      Booking summary.
+    </h2>
+  </div>
+
+  {/* =====================================================
+      PAYMENT SUMMARY — ITINERARY MAP STYLE
+  ====================================================== */}
+  <div className="relative overflow-hidden rounded-[2rem] bg-[radial-gradient(circle_at_12%_20%,rgba(235,76,126,0.22),transparent_30%),radial-gradient(circle_at_88%_80%,rgba(75,126,220,0.24),transparent_35%),linear-gradient(135deg,#071D3B_0%,#102F5C_55%,#172C55_100%)] shadow-[0_25px_70px_-35px_rgba(8,33,76,0.55)]">
+
+    {/* =================================================
+        ROUTE LINES
+    ================================================= */}
+    <div className="pointer-events-none absolute inset-0 opacity-[0.12]">
+      <svg
+        className="h-full w-full"
+        viewBox="0 0 1200 650"
+        preserveAspectRatio="none"
+      >
+        <path
+          d="M-80 500 C120 160 300 610 500 310 S850 100 1280 410"
+          fill="none"
+          stroke="white"
+          strokeWidth="2"
+          strokeDasharray="8 13"
+        />
+
+        <path
+          d="M-50 160 C180 420 350 60 590 250 S950 560 1270 170"
+          fill="none"
+          stroke="white"
+          strokeWidth="1.5"
+          strokeDasharray="5 15"
+        />
+
+        <path
+          d="M180 650 C310 430 450 450 610 530 S950 690 1120 460"
+          fill="none"
+          stroke="white"
+          strokeWidth="1"
+          strokeDasharray="4 14"
+        />
+      </svg>
+    </div>
+
+    {/* =================================================
+        SOFT GLOWS
+    ================================================= */}
+    <div className="pointer-events-none absolute -top-32 -right-32 h-80 w-80 rounded-full bg-accent/15 blur-3xl" />
+
+    <div className="pointer-events-none absolute -bottom-40 -left-20 h-80 w-80 rounded-full bg-blue/20 blur-3xl" />
+
+    {/* =================================================
+        DECORATIVE CIRCLES
+    ================================================= */}
+    <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full border border-white/[0.07]" />
+
+    <div className="pointer-events-none absolute right-16 top-16 h-32 w-32 rounded-full border border-white/[0.05]" />
+
+    <div className="pointer-events-none absolute bottom-16 left-[18%] h-2 w-2 rounded-full bg-accent shadow-[0_0_0_7px_rgba(235,76,126,0.10)]" />
+
+    <div className="pointer-events-none absolute left-[38%] top-[30%] h-1.5 w-1.5 rounded-full bg-white/40" />
+
+    {/* =================================================
+        CONTENT
+    ================================================= */}
+    <div className="relative z-10 grid lg:grid-cols-[1fr_0.85fr]">
+
+      {/* =================================================
+          LEFT — RESERVATION MESSAGE
+      ================================================= */}
+      <div className="relative p-7 sm:p-10 lg:p-14">
+
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/10">
+          <ShieldCheck className="h-5 w-5 text-accent" />
+        </div>
+
+        <p className="mt-7 text-[9px] font-bold uppercase tracking-[0.2em] text-accent">
+          Reservation Recorded
+        </p>
+
+        <h3 className="mt-3 max-w-lg text-3xl font-extrabold tracking-[-0.03em] text-white sm:text-4xl">
+          Your journey is reserved.
+        </h3>
+
+        <p className="mt-5 max-w-lg text-sm leading-8 text-white/65">
+          The selected package and traveller count have been
+          successfully recorded as part of this reservation.
+        </p>
+
+        {/* Booking reference */}
+        <div className="mt-10 border-t border-white/10 pt-7">
+          <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-white/35">
+            Booking Reference
+          </p>
+
+          <p className="mt-2 text-xl font-black tracking-[0.12em] text-white sm:text-2xl">
+            {bookingReference}
+          </p>
+        </div>
+      </div>
+
+      {/* =================================================
+          RIGHT — PAYMENT DETAILS
+      ================================================= */}
+      <div className="relative border-t border-white/10 bg-black/10 p-7 sm:p-10 lg:border-l lg:border-t-0 lg:p-14">
+
+        <div className="space-y-6">
+
+          {/* Price */}
+          <div className="flex items-center justify-between gap-6">
+            <div>
+              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/35">
+                Price
+              </p>
+
+              <p className="mt-1 text-sm text-white/65">
+                Per traveller
+              </p>
+            </div>
+
+            <p className="text-base font-bold text-white">
+              {pricePerPerson !== null
+                ? `₹${pricePerPerson.toLocaleString("en-IN")}`
+                : "—"}
+            </p>
+          </div>
+
+          {/* Travellers */}
+          <div className="flex items-center justify-between gap-6">
+            <div>
+              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/35">
+                Travellers
+              </p>
+
+              <p className="mt-1 text-sm text-white/65">
+                Number of guests
+              </p>
+            </div>
+
+            <p className="text-base font-bold text-white">
+              × {travellerCount}
+            </p>
+          </div>
+
+          {/* Accommodation */}
+          <div className="flex items-center justify-between gap-6">
+            <div>
+              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/35">
+                Accommodation
+              </p>
+
+              <p className="mt-1 text-sm capitalize text-white/65">
+                {intent.accommodation || "Standard"}
+              </p>
+            </div>
+
+            <ShieldCheck className="h-4 w-4 text-accent" />
+          </div>
+
+          {/* Total */}
+          <div className="border-t border-dashed border-white/15 pt-7">
+
+            <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-white/40">
+              Total Reservation Value
+            </p>
+
+            <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
+
+              <p className="text-3xl font-black tracking-tight text-white sm:text-4xl">
+                {totalAmount !== null
+                  ? `₹${totalAmount.toLocaleString("en-IN")}`
+                  : "—"}
+              </p>
+
+              <span className="rounded-full bg-accent px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-white shadow-[0_8px_25px_-10px_rgba(235,76,126,0.9)]">
+                Reserved
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Small bottom note */}
+        <div className="mt-10 flex items-center gap-3 border-t border-white/10 pt-6">
+          <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+
+          <span className="text-[10px] text-white/40">
+            Your reservation details are safely recorded.
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+          {/* =====================================================
+              FINAL CTA
+          ====================================================== */}
+          <section className="mx-auto mt-24 max-w-6xl pb-4">
+
+            <div className="relative overflow-hidden rounded-[24px] border border-[#DDE5EF] bg-white px-7 py-12 text-center shadow-[0_25px_80px_rgba(20,40,70,0.08)] sm:rounded-[28px] sm:px-12 sm:py-14">
+
+              <div className="pointer-events-none absolute inset-0 opacity-60">
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(to_right,#E9EEF4_1px,transparent_1px),linear-gradient(to_bottom,#E9EEF4_1px,transparent_1px)",
+                    backgroundSize: "72px 72px",
+                    maskImage:
+                      "linear-gradient(to_bottom, transparent, black 30%, black 70%, transparent)",
+                  }}
+                />
+              </div>
+
+              <div className="relative">
+
+                <div className="mb-7 flex items-center justify-center gap-3">
+
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+
+                  <div className="w-12 border-t border-dashed border-[#CBD8E3]" />
+
+                  <Navigation className="h-5 w-5 rotate-45 text-blue" />
+
+                  <div className="w-12 border-t border-dashed border-[#CBD8E3]" />
+
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue" />
+                </div>
+
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent">
+                  Until the journey begins
+                </p>
+
+                <h2 className="mt-3 text-2xl font-extrabold tracking-[-0.025em] text-navy sm:text-3xl">
+                  Keep this confirmation handy.
+                </h2>
+
+                <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-slate">
+                  Your booking reference is your key to this
+                  reservation. Save this page or keep the reference
+                  somewhere safe.
+                </p>
+
+                <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:justify-center">
+
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="group flex items-center justify-center gap-2 rounded-xl border border-[#D7E1EA] bg-white px-6 py-3.5 text-sm font-bold text-navy transition-all duration-200 hover:-translate-y-0.5 hover:border-blue hover:text-blue"
+                  >
+                    <Download className="h-4 w-4" />
+
+                    Save Confirmation
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => router.push("/packages")}
+                    className="group flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue to-navy px-7 py-3.5 text-sm font-bold text-white shadow-[0_12px_30px_-15px_rgba(20,40,70,0.45)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                  >
+                    Explore More Trips
+
+                    <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => router.push("/")}
+                    className="group flex items-center justify-center gap-2 rounded-xl border border-[#D7E1EA] bg-white px-6 py-3.5 text-sm font-bold text-navy transition-all duration-200 hover:-translate-y-0.5 hover:border-blue hover:text-blue"
+                  >
+                    <Home className="h-4 w-4" />
+
+                    Home
+                  </button>
+                </div>
+
+                <div className="mt-10 flex items-center justify-center gap-3 text-xs text-slate">
+
+                  <span className="h-px w-8 bg-[#D8E2EA]" />
+
+                  <span>
+                    Thank you for choosing Mayura Holidays
+                  </span>
+
+                  <span className="h-px w-8 bg-[#D8E2EA]" />
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </main>
   );
 }
