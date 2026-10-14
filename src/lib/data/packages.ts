@@ -1,4 +1,8 @@
+import { packageDemoContent, type PackageDemoContent } from "./package-demo-content";
+
 export type TourPackage = {
+  /** Optional design preview content; never authoritative booking data. */
+  demoContent?: PackageDemoContent;
   slug: string;
   name: string;
   badge: string;
@@ -10,6 +14,10 @@ export type TourPackage = {
   price: string;
   priceValue?: number;
   priceUnit?: string;
+  highlights?: Array<string | { title: string; description?: string; name?: string }>;
+  itinerary?: Array<string | { title?: string; day?: string; description?: string; details?: string }>;
+  included?: Array<string | { title?: string; name?: string; description?: string }>;
+  excluded?: Array<string | { title?: string; name?: string; description?: string }>;
   image: string;
   imageAlt: string;
   whatsappMessage: string;
@@ -18,6 +26,7 @@ export type TourPackage = {
 export const packages: TourPackage[] = [
   {
     slug: "goa",
+    demoContent: packageDemoContent["goa"],
     name: "Goa Beach Getaway",
     badge: "Monsoon Special",
     badgeVariant: "default",
@@ -36,6 +45,7 @@ export const packages: TourPackage[] = [
   },
   {
     slug: "ooty-coonoor",
+    demoContent: packageDemoContent["ooty-coonoor"],
     name: "Ooty + Coonoor Hills",
     badge: "Cool Season",
     badgeVariant: "default",
@@ -53,6 +63,7 @@ export const packages: TourPackage[] = [
   },
   {
     slug: "mysore-srirangapatna",
+    demoContent: packageDemoContent["mysore-srirangapatna"],
     name: "Mysore & Srirangapatna",
     badge: "Daily Departure",
     badgeVariant: "default",
@@ -69,6 +80,7 @@ export const packages: TourPackage[] = [
   },
   {
     slug: "coorg",
+    demoContent: packageDemoContent["coorg"],
     name: "Coorg Coffee Country",
     badge: "Year-round",
     badgeVariant: "default",
@@ -87,6 +99,7 @@ export const packages: TourPackage[] = [
   },
   {
     slug: "kerala-munnar",
+    demoContent: packageDemoContent["kerala-munnar"],
     name: "Kerala Backwaters & Munnar",
     badge: "God's Own Country",
     badgeVariant: "default",
@@ -106,6 +119,7 @@ export const packages: TourPackage[] = [
   },
   {
     slug: "chikmagalur",
+    demoContent: packageDemoContent["chikmagalur"],
     name: "Chikmagalur & Mullayanagiri",
     badge: "Trek Friendly",
     badgeVariant: "default",
