@@ -172,3 +172,101 @@
   .goaInteractive .goaTravelRoute { display: none; }
 }
 @keyframes goaRouteJourney { to { stroke-dashoffset: -100; } }
+/* Package detail brochure treatment: confined to the surface below the hero. */
+.destinationPaper { position: relative; isolation: isolate; overflow: clip; background: #fdfcf8; }
+.destinationPaper::before { content: ''; position: absolute; z-index: -1; pointer-events: none; width: clamp(160px, 25vw, 420px); height: 640px; top: 30px; background-image: var(--destination-art); background-size: 100% auto; background-repeat: no-repeat; opacity: .16; mask-image: linear-gradient(to right, #000, transparent); }
+.destinationPaper::before { left: 0; }
+.destinationPaper::after { content: none; }
+.destinationPaper[data-destination='goa'] { --destination-art: url('/images/destinations/line-art/goa-coastal-engraving.png'); background: #fdfbf6; }
+/* Goa uses detailed, transparent coastal vignettes rather than tiled symbols.
+   The central mask keeps the reading column clear, independently of the artwork. */
+.destinationPaper[data-destination='goa']::before {
+  width: 100%; height: clamp(460px, 45vw, 800px); bottom: auto;
+  background-size: 100% auto; background-position: center bottom;
+  background-repeat: no-repeat; transform: none; opacity: .2;
+  mask-image: linear-gradient(to right, #000 0%, #0009 12%, transparent 30%, transparent 70%, #0009 88%, #000 100%), linear-gradient(to bottom, transparent, #000 15%, #000 75%, transparent);
+  mask-composite: intersect;
+}
+.destinationPaper[data-destination='goa']::before { left: 0; top: 310px; }
+.destinationPaper[data-destination='mysore-srirangapatna'] { --destination-art: url('/images/destinations/line-art/mysore-srirangapatna.svg'); }
+.destinationPaper[data-destination='ooty-coonoor'] { --destination-art: url('/images/destinations/line-art/ooty-coonoor.svg'); }
+.destinationPaper[data-destination='coorg'] { --destination-art: url('/images/destinations/line-art/coorg.svg'); }
+.destinationPaper[data-destination='kerala-munnar'] { --destination-art: url('/images/destinations/line-art/kerala-munnar.svg'); }
+.destinationPaper[data-destination='chikmagalur'] { --destination-art: url('/images/destinations/line-art/chikmagalur.svg'); }
+.brochureStrip { position: relative; margin: 1.8rem 0; padding: 1.65rem .5rem 2rem; background: #f8f5ed; color: #172d46; }
+.brochureStrip::before { content: ''; position: absolute; inset: 5px; border: 1px solid #b4a88d66; outline: 1px solid #b4a88d33; outline-offset: 4px; pointer-events: none; transition: opacity .35s ease .9s; }
+.brochureStrip::after { content: none; }
+.brochureItems { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; }
+.brochureItem { position: relative; display: flex; align-items: center; flex-direction: column; text-align: center; padding: .5rem .65rem; min-width: 0; }
+.brochureItem svg { margin-bottom: .85rem; color: #46647b; }
+.brochureItem dt { order: 2; font-size: 9px; letter-spacing: .13em; text-transform: uppercase; margin-top: .5rem; }
+.brochureItem dd { margin: 0; font-family: Georgia, serif; font-size: clamp(14px, 1.4vw, 18px); line-height: 1.4; overflow-wrap: anywhere; }
+.brochureItem + .brochureItem::before { content: ''; position: absolute; left: 0; top: 15%; height: 70%; width: 1px; background: linear-gradient(transparent, #b4a88d88, transparent); transition: opacity .3s ease .85s; }
+.brochureRoute { position: absolute; left: 8%; bottom: 11px; width: 84%; height: 14px; color: #50728b; opacity: .4; clip-path: inset(0); transition: clip-path .5s ease .8s; }
+.brochureStrip[data-gather='waiting'] .brochureItem { opacity: 0; transform: translate(var(--gather-x), var(--gather-y)); }
+.brochureItem:nth-child(1) { --gather-x: -20px; --gather-y: -18px; }
+.brochureItem:nth-child(2) { --gather-x: 20px; --gather-y: -18px; }
+.brochureItem:nth-child(3) { --gather-x: -20px; --gather-y: 18px; }
+.brochureItem:nth-child(4) { --gather-x: 20px; --gather-y: 18px; }
+.brochureStrip[data-gather='complete'] .brochureItem { animation: brochureGather .75s cubic-bezier(.2,.8,.3,1) both; }
+.brochureStrip[data-gather='complete'] .brochureItem:nth-child(2) { animation-delay: .12s; }
+.brochureStrip[data-gather='complete'] .brochureItem:nth-child(3) { animation-delay: .24s; }
+.brochureStrip[data-gather='complete'] .brochureItem:nth-child(4) { animation-delay: .36s; }
+.brochureStrip[data-gather='waiting']::before, .brochureStrip[data-gather='waiting'] .brochureItem::before { opacity: 0; }
+.brochureStrip[data-gather='waiting'] .brochureRoute { clip-path: inset(0 100% 0 0); }
+@keyframes brochureGather { 0% { opacity: 0; transform: translate(var(--gather-x), var(--gather-y)); } 80% { opacity: 1; transform: translate(0, -1px); } 100% { opacity: 1; transform: translate(0, 0); } }
+@media (max-width: 639px) {
+  .brochureItems { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 1.3rem; }
+  .brochureItem:nth-child(3)::before { display: none; }
+  .destinationPaper::before { opacity: .1; width: 150px; }
+  .destinationPaper[data-destination='goa']::before {
+    width: 100%; height: 640px; opacity: .13;
+    background-size: auto 500px;
+    mask-image: linear-gradient(to right, #000, transparent 23%, transparent 77%, #000), linear-gradient(to bottom, transparent, #000 20%, #000 75%, transparent);
+  }
+  .destinationPaper[data-destination='goa']::before { top: 420px; background-position: left bottom; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brochureStrip .brochureItem { animation: none !important; transform: none !important; opacity: 1 !important; }
+  .brochureStrip::before, .brochureItem::before { opacity: 1 !important; transition: none; }
+  .brochureStrip .brochureRoute { clip-path: none !important; transition: none; }
+}
+
+/* A single lower composition: script, coastal vignette and travel ephemera.
+   This page-wide layer sits behind content, outside the upper illustration block. */
+.lowerDestinationBackdrop {
+  position: absolute; z-index: -1; top: 2100px; left: 0; right: 0; height: 820px;
+  pointer-events: none; user-select: none;
+}
+.destinationLettering {
+  position: absolute; top: 0; left: -20px;
+  width: 420px; max-width: 38vw; white-space: nowrap;
+  font-size: clamp(120px, 15vw, 220px); font-weight: 400; line-height: 1.2;
+  color: #789fbc; opacity: .13; transform: rotate(-14deg);
+  transform-origin: left center;
+  mask-image: linear-gradient(to right, #000 20%, #0008 60%, transparent 100%);
+}
+.lowerCoastalArtwork, .lowerTravelArtwork {
+  position: absolute; display: block;
+  background-repeat: no-repeat; background-size: contain;
+  opacity: .19;
+  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 80%, transparent), linear-gradient(to right, #000 25%, transparent 100%);
+  mask-composite: intersect;
+}
+.lowerCoastalArtwork {
+  top: 190px; left: -30px; width: clamp(220px, 23vw, 410px); height: 610px;
+  background-image: url('/images/destinations/line-art/goa-lower-coast.png');
+  background-position: left center;
+}
+.lowerTravelArtwork {
+  top: 10px; right: -10px; width: clamp(160px, 16vw, 290px); height: 740px;
+  background-image: url('/images/destinations/line-art/goa-travel-motif.svg');
+  background-position: right top;
+  mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 88%, transparent), linear-gradient(to left, #000 40%, transparent 100%);
+}
+@media (max-width: 639px) {
+  .lowerDestinationBackdrop { top: 2350px; height: 730px; }
+  .destinationLettering { top: 10px; left: -18px; max-width: 65vw; font-size: 115px; opacity: .09; }
+  .lowerCoastalArtwork { top: 145px; left: -20px; width: 155px; height: 480px; opacity: .12; }
+  .lowerTravelArtwork { top: 200px; right: -15px; width: 115px; height: 500px; opacity: .13; }
+}

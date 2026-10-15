@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode, type PointerEvent } from "react";
-import { ArrowRight, MapPin, Play, Compass, ChevronDown } from "lucide-react";
+import { ArrowRight, MapPin, Play, ChevronDown } from "lucide-react";
+import PackageEssentials from "./PackageEssentials";
 import TravelServiceIcon from "./TravelServiceIcon";
 import Reveal from "@/components/ui/Reveal";
 import { packages, type TourPackage } from "@/lib/data/packages";
@@ -191,7 +192,7 @@ export default function PackageExperience({ pkg }: { pkg: TourPackage }) {
       <SectionHeading label="The essentials" title="Your package, at a glance." />
       <p className={styles.body}>{pkg.description}</p>
       {demo?.overview && <p className={styles.body}>{customerCopy(demo.overview)}</p>}
-      <ul className={styles.essentials}>{pkg.tags.map(tag => <li key={tag}><Compass size={18} aria-hidden="true" />{tag}</li>)}</ul>
+      <PackageEssentials key={pkg.slug} pkg={pkg} />
       <p className={styles.price}>{pkg.price} {pkg.priceUnit && <span>{pkg.priceUnit}</span>}</p>
     </section></Reveal>
 

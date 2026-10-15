@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 720" fill="none" stroke="#759ab6" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <g id="palm" stroke-width="1.15">
+      <path d="M0 138Q19 86 8 21M5 138Q25 82 8 21M8 21Q-18-9-45 12Q-15 1 8 21Q-9-16-34-19Q-6-19 8 21Q18-17 49-18Q26-8 8 21Q42-1 65 20Q33 8 8 21Q45 16 51 48Q30 24 8 21Q-21 16-30 47Q-12 27 8 21"/>
+      <path d="M-3 115L8 118M2 99L13 102M6 83L17 86M9 67L19 70M10 51L20 54M-36 12L-25 18M-24 7L-16 15M-20-14L-15-4M34-14L30-4M46 16L38 23M35 29L28 32"/>
+    </g>
+  </defs>
+  <!-- Palm canopy dissolves into the outer page edge. -->
+  <g transform="translate(275 12) rotate(14) scale(1.7)" opacity=".75"><use href="#palm"/></g>
+  <!-- An engraved postage motif, distinct from the architectural vignette. -->
+  <g transform="translate(73 210) rotate(-12 96 110)">
+    <path d="M0 0H192V220H0Z" stroke-width="7" stroke-dasharray="1 10"/>
+    <path d="M7 7H185V213H7Z" stroke-width="1.6"/><path d="M14 14H178V206H14Z"/>
+    <text x="96" y="48" text-anchor="middle" fill="#759ab6" stroke="none" font-family="Georgia,serif" font-size="28" letter-spacing="4">GOA</text>
+    <g transform="translate(65 76) scale(.68)"><use href="#palm"/></g>
+    <g transform="translate(120 68) scale(.8)"><use href="#palm"/></g>
+    <path d="M23 177Q56 162 85 176T166 174M24 187Q66 175 102 187T168 184M34 196Q70 185 116 196"/>
+    <path d="M24 62H168" opacity=".5"/>
+  </g>
+  <!-- One route connects the stamp to the compass, never repeated. -->
+  <path d="M213 416C310 447 320 524 235 552S76 552 110 631S257 690 286 711" stroke-width="1.7" stroke-dasharray="4 9"/>
+  <g transform="translate(154 589) rotate(18)">
+    <circle r="56" stroke-width="1.3"/><circle r="49"/><circle r="43" stroke-dasharray="1 5"/>
+    <path d="M0-70V70M-70 0H70M-40-40L40 40M40-40L-40 40" opacity=".65"/>
+    <path d="M0-43L9-9L43 0L9 9L0 43L-9 9L-43 0L-9-9ZM0-43V43M-43 0H43" stroke-width="1.3"/>
+    <path d="M0-43L9-9L0 0Z" fill="#759ab6" opacity=".35"/><circle r="5"/>
+    <circle cy="-64" r="5"/>
+  </g>
+</svg>

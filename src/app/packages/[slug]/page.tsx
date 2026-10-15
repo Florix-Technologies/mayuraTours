@@ -3,6 +3,7 @@
 
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import DestinationBackdrop from "@/components/packages/DestinationBackdrop";
 import PackageExperience, { DestinationImage } from "@/components/packages/PackageExperience";
 import styles from "@/components/packages/package-experience.module.css";
 import { useMemo, useState } from "react";
@@ -135,6 +136,8 @@ export default function PackageDetailsPage() {
         </div>
       </section>
 
+      <div className={styles.destinationPaper} data-destination={pkg.slug}>
+      <DestinationBackdrop slug={pkg.slug} />
       {/* Journey overview */}
       <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-12 lg:py-20">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-14">
@@ -317,6 +320,7 @@ export default function PackageDetailsPage() {
           </a>
         </div>
       </section>
+      </div>
     </main>
   );
 }
