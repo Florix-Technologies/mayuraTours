@@ -15,11 +15,17 @@ import {
   Clock3,
   ShieldCheck,
   Users,
+  MapPin,
+  Compass,
+  HeartHandshake,
+  Sparkles,
 } from "lucide-react";
 
 import { useAuth } from "@/components/auth/AuthProvider";
 import { loginHref } from "@/lib/auth/paths";
 import { saveBookingIntent } from "@/lib/booking/intent";
+import Reveal from "@/components/ui/Reveal";
+import { business, whatsappHref } from "@/lib/data/business";
 import { packages } from "@/lib/data/packages";
 
 function formatPrice(value: unknown) {
@@ -77,7 +83,17 @@ export default function PackageDetailsPage() {
   const packageData = pkg;
   const packageName = packageData.name;
   const price = formatPrice(packageData.price);
-  const tags = packageData.tags;
+  const duration = pkg.duration || pkg.tags.find(tag => /night|day|same-day/i.test(tag));
+  const destination = pkg.destination || pkg.name;
+  const specialityIcons = [Compass, Sparkles, HeartHandshake, ShieldCheck];
+  const genericSpecialities = [
+    { title: "Discover more", description: "Find inspiration for your journey" },
+    { title: "Your kind of escape", description: "Explore at your own pace" },
+    { title: "Personal travel advice", description: "Talk through your preferences" },
+    { title: "Plan with confidence", description: "Review details before booking" },
+  ];
+  const specialities = [...(pkg.specialities?.length ? pkg.specialities : pkg.tags.map(title => ({ title, description: `Part of ${packageName}` }))).slice(0, 4)];
+  while (specialities.length < 4) specialities.push(genericSpecialities[specialities.length]);
 
   function continueBooking() {
     setBookingError("");
@@ -123,21 +139,28 @@ export default function PackageDetailsPage() {
           <circle cx="555" cy="70" r="10" stroke="currentColor" /><circle cx="555" cy="70" r="3" fill="currentColor" />
         </svg>
         <div className={styles.heroContent}>
-          <Link href="/packages" className={styles.heroBack}><ArrowLeft size={16} aria-hidden="true" />All packages</Link>
           <div className={styles.heroEntrance}>
-            <p className={styles.heroLabel}><span />{packageData.badge}</p>
+
             <h1 id="package-title">{packageName}</h1>
-            <p className={styles.heroTagline}>Your next story starts here.</p>
+            <p className={styles.heroTagline}>{pkg.tagline || packageData.badge}</p>
             <p className={styles.heroDescription}>{packageData.description}</p>
-            <div className={styles.heroTags}>{tags.map(tag => <span key={tag}>{tag}</span>)}</div>
-            <a href="#plan-your-trip" className={styles.heroBook}>Book now<ArrowRight size={17} aria-hidden="true" /></a>
+            <div className={styles.heroInfo}>
+              {duration && <span><Clock3 size={18} aria-hidden="true" />{duration}</span>}
+              <span><Users size={18} aria-hidden="true" />{pkg.travellerInfo || `${travellers} ${travellers === "1" ? "traveller" : "travellers"} selected`}</span>
+              <span><MapPin size={18} aria-hidden="true" />{destination}</span>
+            </div>
+            <div className={styles.heroActions}><a href="#plan-your-trip" className={styles.heroBook}>Book This Package<ArrowRight size={17} aria-hidden="true" /></a><a href="#itinerary" className={styles.heroSecondary}>Explore itinerary<ArrowRight size={16} aria-hidden="true" /></a></div>
           </div>
           <div className={styles.heroFootnote}><span>Mayura Holidays</span><span>Explore the journey below <ArrowRight size={14} aria-hidden="true" /></span></div>
         </div>
       </section>
 
       <div className={styles.destinationPaper} data-destination={pkg.slug}>
-      <DestinationBackdrop slug={pkg.slug} />
+      <DestinationBackdrop slug={pkg.slug} image={pkg.backgroundImage} />
+      <div className={styles.specialities} aria-label="Travel specialities">{specialities.map((item, index) => {
+        const Icon = specialityIcons[index];
+        return <div key={index} className={styles.speciality}><span className={styles.specialityIcon}><Icon size={28} strokeWidth={1.6} aria-hidden="true" /></span><div><h2>{item.title}</h2><p>{item.description}</p></div></div>;
+      })}</div>
       {/* Journey overview */}
       <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-12 lg:py-20">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-14">
@@ -295,30 +318,15 @@ export default function PackageDetailsPage() {
         </div>
       </section>
 
-      {/* Shared footer CTA */}
-      <section className="px-5 pb-14 sm:px-8 lg:px-12 lg:pb-20">
-        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-6 rounded-[2rem] bg-ink p-7 text-white sm:p-10 md:flex-row md:items-center">
-          <div className="max-w-xl">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-sky">
-              Your next chapter
-            </p>
-            <h2 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">
-              Ready to make this journey yours?
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-white/65">
-              Choose your travel date and let Mayura help you take the next
-              step.
-            </p>
-          </div>
-
-          <a
-            href="#plan-your-trip"
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-bold transition-all duration-300 hover:-translate-y-0.5 hover:bg-navy"
-          >
-            Plan your trip
-            <ArrowRight size={17} />
-          </a>
-        </div>
+      <section className={styles.finalCta} aria-labelledby="final-cta-title">
+        <div className={styles.ctaMedia}><DestinationImage src={pkg.ctaImage || (pkg.slug === "goa" ? "/video/posters/beaches.jpg" : pkg.image)} alt="" sizes="100vw" /></div>
+        <div className={styles.ctaOverlay} aria-hidden="true" />
+        <Reveal className={styles.ctaContent}>
+          <p>READY FOR YOUR NEXT ADVENTURE?</p>
+          <h2 id="final-cta-title">Let&apos;s Plan Your Dream Trip</h2>
+          <p>Get in touch with our travel experts for customised packages, great experiences, and unforgettable memories.</p>
+          <a href={whatsappHref(business.whatsapp, pkg.whatsappMessage)} className={styles.heroBook}>Enquire Now<ArrowRight size={17} aria-hidden="true" /></a>
+        </Reveal>
       </section>
       </div>
     </main>

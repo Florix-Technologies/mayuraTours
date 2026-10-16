@@ -6,7 +6,7 @@ export const mysoreScenes = {
 };
 
 export const destinationArtwork: Record<string, { src: string; alt: string }> = {
-  "goa": { src: "/images/destinations/goa-avatar-3d.webp", alt: "3D coastal traveler with Goa palms and a sculpted shoreline" },
+  "goa": { src: "/images/destinations/goa-new-avatar.png", alt: "3D Goa beach illustration with a woman in a yellow floral skirt, palm trees, rocks and turquoise seawater" },
   "ooty-coonoor": { src: "/images/destinations/ooty-coonoor-avatar-3d.webp", alt: "3D Nilgiri traveler with tea hills and a miniature mountain railway" },
   "mysore-srirangapatna": { src: "/images/destinations/mysore-srirangapatna-avatar-3d.webp", alt: "3D heritage traveler beside miniature Mysore Palace architecture" },
   "coorg": { src: "/images/destinations/coorg-avatar-3d.webp", alt: "3D nature traveler with Coorg coffee plants and a waterfall" },

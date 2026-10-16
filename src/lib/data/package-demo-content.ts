@@ -1,3 +1,4 @@
+import { highlightPhotos } from "./highlight-images";
 import type { TourPackage } from "./packages";
 
 /** DESIGN PLACEHOLDERS ONLY. Never use these values for pricing, checkout or promises.
@@ -16,14 +17,23 @@ export const packageDemoContent: Record<string, PackageDemoContent> = {
     "highlights": [
       {
         "title": "Coastal mornings",
+        "illustration": "beach",
+        "image": highlightPhotos.coast.src,
+        "imageAlt": highlightPhotos.coast.alt,
         "description": "Imagine a relaxed beach visit around North Goa, with time to explore the shoreline at your own pace."
       },
       {
         "title": "Goa's heritage",
+        "illustration": "church",
+        "image": highlightPhotos.goaHeritage.src,
+        "imageAlt": highlightPhotos.goaHeritage.alt,
         "description": "A sample cultural stop at Bom Jesus Basilica adds a different perspective to the coastal journey."
       },
       {
         "title": "Fort and sunset views",
+        "illustration": "fortress",
+        "image": highlightPhotos.coastalSunset.src,
+        "imageAlt": highlightPhotos.coastalSunset.alt,
         "description": "A sample Fort Aguada visit pairs coastal history with views over the Arabian Sea."
       }
     ],
@@ -90,14 +100,21 @@ export const packageDemoContent: Record<string, PackageDemoContent> = {
     "highlights": [
       {
         "title": "Tea-country landscapes",
+        "illustration": "tea",
+        "image": highlightPhotos.estates.src,
+        "imageAlt": highlightPhotos.estates.alt,
         "description": "A sample visit through the Nilgiri tea slopes offers gentle walks and views over the green valleys."
       },
       {
         "title": "Ooty's high viewpoints",
+        "illustration": "mountains",
+        "image": highlightPhotos.hills.src,
+        "imageAlt": highlightPhotos.hills.alt,
         "description": "Doddabetta is a proposed stop in this preview, with time to appreciate the hillside landscape."
       },
       {
         "title": "Coonoor at your pace",
+        "illustration": "garden",
         "description": "Sim's Park and a proposed railway experience give the sample journey a relaxed rhythm; rail availability needs confirmation."
       }
     ],
@@ -179,14 +196,21 @@ export const packageDemoContent: Record<string, PackageDemoContent> = {
     "highlights": [
       {
         "title": "Royal Mysore",
+        "illustration": "palace",
+        "image": highlightPhotos.mysorePalace.src,
+        "imageAlt": highlightPhotos.mysorePalace.alt,
         "description": "A proposed palace visit celebrates the architecture and heritage already featured in the package overview."
       },
       {
         "title": "Island-fortress history",
+        "illustration": "fortress",
         "description": "A sample stop in Srirangapatna brings the region's historical landscape into the journey."
       },
       {
         "title": "Gardens and hill views",
+        "illustration": "garden",
+        "image": highlightPhotos.mysoreHills.src,
+        "imageAlt": highlightPhotos.mysoreHills.alt,
         "description": "Chamundi Hills and Brindavan Gardens provide a varied finish to the sample day."
       }
     ],
@@ -243,14 +267,23 @@ export const packageDemoContent: Record<string, PackageDemoContent> = {
     "highlights": [
       {
         "title": "Coffee-estate atmosphere",
+        "illustration": "coffee",
+        "image": highlightPhotos.estates.src,
+        "imageAlt": highlightPhotos.estates.alt,
         "description": "A sample estate walk invites time to appreciate Coorg's greenery and coffee-growing landscape."
       },
       {
         "title": "Abbey Falls scenery",
+        "illustration": "waterfall",
+        "image": highlightPhotos.waterfall.src,
+        "imageAlt": highlightPhotos.waterfall.alt,
         "description": "A proposed waterfall stop gives the sample journey a refreshing outdoor interlude."
       },
       {
         "title": "Raja's Seat and Bhagamandala",
+        "illustration": "temple",
+        "image": highlightPhotos.hills.src,
+        "imageAlt": highlightPhotos.hills.alt,
         "description": "A sample route brings viewpoints and the temple confluence into a balanced travel day."
       }
     ],
@@ -322,14 +355,21 @@ export const packageDemoContent: Record<string, PackageDemoContent> = {
     "highlights": [
       {
         "title": "Munnar tea hills",
+        "illustration": "tea",
+        "image": highlightPhotos.estates.src,
+        "imageAlt": highlightPhotos.estates.alt,
         "description": "A proposed hillside day focuses on tea-estate landscapes and a comfortable pace."
       },
       {
         "title": "Alleppey on the water",
+        "illustration": "boat",
         "description": "A sample houseboat experience introduces the backwaters; boat category and timings need confirmation."
       },
       {
         "title": "Nature and Kochi",
+        "illustration": "mountains",
+        "image": highlightPhotos.hills.src,
+        "imageAlt": highlightPhotos.hills.alt,
         "description": "Proposed Periyar and Kochi visits add wildlife scenery and waterfront time to the sample route."
       }
     ],
@@ -416,14 +456,23 @@ export const packageDemoContent: Record<string, PackageDemoContent> = {
     "highlights": [
       {
         "title": "Mullayanagiri views",
+        "illustration": "adventure",
+        "image": highlightPhotos.hills.src,
+        "imageAlt": highlightPhotos.hills.alt,
         "description": "A proposed visit towards Karnataka's highest peak balances scenic views with weather-dependent walking."
       },
       {
         "title": "Coffee-estate character",
+        "illustration": "coffee",
+        "image": highlightPhotos.estates.src,
+        "imageAlt": highlightPhotos.estates.alt,
         "description": "A sample coffee-country visit creates space for a slower look at the landscape."
       },
       {
         "title": "Nature and Hoysala heritage",
+        "illustration": "temple",
+        "image": highlightPhotos.waterfall.src,
+        "imageAlt": highlightPhotos.waterfall.alt,
         "description": "Proposed Bhadra-area and Belur stops add variety; access and the final route need confirmation."
       }
     ],

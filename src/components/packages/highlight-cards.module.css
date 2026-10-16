@@ -1,0 +1,45 @@
+.grid { display: grid; grid-template-columns: minmax(0,1fr); gap: 20px; padding: 8px 4px 12px; }
+.reveal { min-width: 0; height: 100%; }
+.card { --theme: #1358c4; --art-surface: #d8e5ff; --surface: #f0f5ff; --theme-text: #1358c4; display: flex; flex-direction: column; height: 100%; overflow: hidden; border: 1px solid #dce6f2; border-radius: 17px; background: var(--surface); color: var(--color-ink); box-shadow: 0 4px 14px #04102a06; transition: box-shadow .55s cubic-bezier(.22,1,.36,1), border-color .55s ease; }
+.card[data-theme="pink"] { --theme: #e5007e; --art-surface: #fbd1e6; --surface: #fff0f7; --theme-text: #ad0060; border-color: #f1deea; }
+.card[data-theme="yellow"] { --theme: #c79200; --art-surface: #efd58a; --surface: #fcf6e6; --theme-text: #805a00; border-color: #f0e4c5; }
+.art { position: relative; overflow: hidden; display: grid; place-items: center; aspect-ratio: 1.45; padding: 16px 12px 4px; background: var(--art-surface); border-bottom: 1px solid color-mix(in srgb, var(--theme) 10%, transparent); }
+.number { position: absolute; left: 16px; top: 14px; font-size: 10px; font-weight: 600; letter-spacing: .14em; color: var(--theme-text); }
+.illustration { width: 100%; max-width: 240px; height: auto; overflow: visible; color: var(--theme); transition: transform .55s cubic-bezier(.22,1,.36,1); }
+.vectorBackdrop { fill: var(--theme); opacity: .16; transform-box: fill-box; transform-origin: center;
+  transition: transform .55s cubic-bezier(.22,1,.36,1), d .55s cubic-bezier(.22,1,.36,1);
+}
+.vectorAccent { fill: color-mix(in srgb, var(--theme) 22%, white); stroke: var(--theme); }
+.copy { flex: 1; padding: 20px 18px 23px; }
+.accent { display: block; width: 24px; height: 2px; border-radius: 2px; margin-bottom: 13px; background: var(--theme); transition: width .55s cubic-bezier(.22,1,.36,1); }
+.card .copy h3 { font-family: var(--font-display); font-size: 21px; line-height: 1.25; text-wrap: balance; color: var(--color-navy); transition: color .3s ease; }
+.copy p { margin-top: 12px; font-size: 13px; line-height: 1.8; color: #43566f; }
+@media (min-width:640px) { .grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (min-width:1100px) { .grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }.copy { padding-inline: 16px; }.card .copy h3 { font-size: 20px; } }
+@media (max-width:639px) { .grid { max-width: 380px; margin-inline: auto; }.art { aspect-ratio: 1.65; }.illustration { max-width: 220px; } }
+/* Pointer and keyboard share the same Zoom + reveal treatment. */
+.card:focus-visible { outline: 2px solid var(--theme); outline-offset: 3px; }
+.card:focus-visible { border-color: var(--theme); box-shadow: 0 18px 38px #04102a24; }
+.card:focus-visible .accent { width: 70px; }
+@media (hover:hover) and (pointer:fine) {
+  .card:hover { border-color: var(--theme); box-shadow: 0 18px 38px #04102a24; }
+  .card:hover .accent { width: 70px; }
+}
+@media (prefers-reduced-motion:no-preference) {
+  .card:focus-visible .illustration { transform: scale(1.13) rotate(-4deg); }
+  .card:focus-visible .vectorBackdrop { transform: scale(1.4); d: path("M30 69C18 112 57 136 103 143C159 151 211 135 207 92C203 48 170 29 125 40C83 50 49 20 30 69Z"); }
+}
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference) {
+  .card:hover .illustration { transform: scale(1.13) rotate(-4deg); }
+  .card:hover .vectorBackdrop { transform: scale(1.4); d: path("M30 69C18 112 57 136 103 143C159 151 211 135 207 92C203 48 170 29 125 40C83 50 49 20 30 69Z"); }
+}
+/* Observer state is opt-in: no JS and reduced motion keep all content visible. */
+@media (prefers-reduced-motion:no-preference) {
+  .reveal[data-join="prepared"], .reveal[data-join="waiting"] { opacity: .25; transform: translateY(18px); }
+  .reveal[data-join="waiting"], .reveal[data-join="visible"] { transition: opacity .6s ease, transform .7s cubic-bezier(.22,1,.36,1); }
+  .reveal[data-join="visible"] { opacity: 1; transform: none; }
+  .reveal:nth-child(3n + 2)[data-join="visible"] { transition-delay: 60ms; }
+  .reveal:nth-child(3n)[data-join="visible"] { transition-delay: 120ms; }
+  .reveal[data-join="prepared"] { transition: none; }
+}
+@media (prefers-reduced-motion:reduce) { .card, .illustration, .vectorBackdrop, .accent, .card .copy h3 { transition: none; } }

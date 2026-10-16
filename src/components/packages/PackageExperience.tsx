@@ -2,8 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState, type ReactNode, type PointerEvent } from "react";
-import { ArrowRight, MapPin, Play, ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, MapPin, Play } from "lucide-react";
+import HighlightIllustration from "./HighlightIllustration";
+import { resolveHighlightIllustration, type HighlightTheme } from "@/lib/data/highlight-illustrations";
+import cardStyles from "./highlight-cards.module.css";
+import HighlightsBackdrop from "./HighlightsBackdrop";
+import { JoiningHighlight } from "./JoiningHighlights";
+import AvatarStage from "./AvatarStage";
 import PackageEssentials from "./PackageEssentials";
 import TravelServiceIcon from "./TravelServiceIcon";
 import Reveal from "@/components/ui/Reveal";
@@ -23,66 +29,19 @@ const destinations: Record<string, { name: string; label: string }> = {
 export function DestinationImage({ src, alt, className = "", eager = false, contain = false, sizes = "(max-width: 767px) 90vw, (max-width: 1023px) 70vw, 700px" }: {
   src: string; alt: string; className?: string; eager?: boolean; contain?: boolean; sizes?: string;
 }) {
-  const [failed, setFailed] = useState(false);
-  return failed ? (
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const resolvedSrc = !src || failedSrc === src ? "/video/posters/western-ghats.jpg" : src;
+  const [fallbackFailed, setFallbackFailed] = useState(false);
+  return fallbackFailed ? (
     <div className={`${styles.imageFallback} ${className}`} role="img" aria-label={alt}>
       <MapPin aria-hidden="true" size={32} /><span>{alt}</span>
     </div>
-  ) : <Image src={src} alt={alt} fill sizes={sizes}
-      loading={eager ? "eager" : "lazy"} className={`${contain ? styles.cutout : styles.photo} ${className}`} onError={() => setFailed(true)} />;
+  ) : <Image src={resolvedSrc} alt={alt} fill sizes={sizes}
+      loading={eager ? "eager" : "lazy"} className={`${contain ? styles.cutout : styles.photo} ${className}`} onError={() => resolvedSrc === "/video/posters/western-ghats.jpg" ? setFallbackFailed(true) : setFailedSrc(src)} />;
 }
 
 function SectionHeading({ label, title }: { label: string; title: string }) {
   return <div className={styles.heading}><p className={styles.eyebrow}>{label}</p><h2>{title}</h2></div>;
-}
-
-/** Goa moves as one image; depth comes from separate decoration, never fabricated image layers. */
-function GoaArtworkStage({ children, className = "" }: { children: ReactNode; className?: string }) {
-  const stage = useRef<HTMLDivElement>(null);
-  const frame = useRef<number | null>(null);
-  const enabled = useRef(false);
-  const reset = () => {
-    if (frame.current !== null) cancelAnimationFrame(frame.current);
-    frame.current = null;
-    const element = stage.current;
-    if (!element) return;
-    delete element.dataset.engaged;
-    ["--tilt-x", "--tilt-y", "--travel-x", "--travel-y", "--depth-x", "--depth-y", "--shadow-x", "--shadow-y"].forEach(name => element.style.removeProperty(name));
-  };
-  useEffect(() => {
-    const media = window.matchMedia("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)");
-    const update = () => { enabled.current = media.matches; if (!media.matches) reset(); };
-    update();
-    media.addEventListener("change", update);
-    return () => { media.removeEventListener("change", update); if (frame.current !== null) cancelAnimationFrame(frame.current); };
-  }, []);
-  const move = (event: PointerEvent<HTMLDivElement>) => {
-    if (!enabled.current || event.pointerType !== "mouse") return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = Math.max(-1, Math.min(1, (event.clientX - bounds.left) / bounds.width * 2 - 1));
-    const y = Math.max(-1, Math.min(1, (event.clientY - bounds.top) / bounds.height * 2 - 1));
-    if (frame.current !== null) cancelAnimationFrame(frame.current);
-    frame.current = requestAnimationFrame(() => {
-      frame.current = null;
-      const element = stage.current;
-      if (!element) return;
-      element.dataset.engaged = "true";
-      element.style.setProperty("--tilt-x", `${-y * 14}deg`);
-      element.style.setProperty("--tilt-y", `${x * 14}deg`);
-      element.style.setProperty("--travel-x", `${x * 20}px`);
-      element.style.setProperty("--travel-y", `${y * 20}px`);
-      element.style.setProperty("--depth-x", `${-x * 12}px`);
-      element.style.setProperty("--depth-y", `${-y * 12}px`);
-      element.style.setProperty("--shadow-x", `${-x * 18}px`);
-      element.style.setProperty("--shadow-y", `${28 - y * 12}px`);
-    });
-  };
-  return <div ref={stage} className={`${className} ${styles.goaInteractive}`} onPointerMove={move} onPointerLeave={reset} onPointerCancel={reset}>
-    {children}
-    <svg className={styles.goaTravelRoute} viewBox="0 0 400 400" fill="none" aria-hidden="true">
-      <path d="M48 290C12 242 25 124 92 77S286 24 343 106C374 151 382 266 328 316S123 383 62 322" pathLength="100" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeDasharray=".5 2" />
-    </svg>
-  </div>;
 }
 
 /** Demo provenance stays in data. Presentation uses conditional travel wording rather than prototype banners.
@@ -113,21 +72,22 @@ function DetailList({ items, excluded = false, demo = false }: {
 }
 
 function HighlightExplorer({ pkg, highlights, demo = false }: { pkg: TourPackage; highlights: NonNullable<TourPackage["highlights"]>; demo?: boolean }) {
-  const [active, setActive] = useState(0);
-  return <div className={styles.highlightLayout}>
-    <div className={`${styles.highlightImage} ${pkg.slug === "mysore-srirangapatna" ? styles.mysoreHighlight : ""}`}><DestinationImage src={pkg.slug === "mysore-srirangapatna" ? mysoreScenes.hills.src : pkg.image} alt={pkg.slug === "mysore-srirangapatna" ? mysoreScenes.hills.alt : pkg.imageAlt} />
-      <span className={styles.highlightCaption}>Explore the destination</span>
-    </div>
-    <ol className={styles.highlights}>{highlights.map((item, index) => <li key={index}>
-      <button type="button" aria-expanded={active === index} aria-controls={`highlight-${index}`} onClick={() => setActive(index)}>
-        <span className={styles.number}>{String(index + 1).padStart(2, "0")}</span>
-        <span>{typeof item === "string" ? item : item.title || item.name}</span><ChevronDown size={16} aria-hidden="true" />
-      </button>
-      <div id={`highlight-${index}`} hidden={active !== index} className={styles.highlightDescription}>
-        {typeof item !== "string" && item.description && <p key={index} className={styles.dayTransition}>{demo ? customerCopy(item.description) : item.description}</p>}
-      </div>
-    </li>)}</ol>
-  </div>;
+  if (!highlights.length) return <p className={styles.pending}>Destination highlights will be published soon.</p>;
+  const themes: HighlightTheme[] = ["blue", "pink", "yellow"];
+  return <div className={cardStyles.grid}>{highlights.map((item, index) => {
+    const title = typeof item === "string" ? item : item.title || item.name || "Destination highlight";
+    const description = typeof item === "string" ? "" : item.description || "";
+    const illustration = resolveHighlightIllustration(title, description, typeof item === "string" ? undefined : item.illustration);
+    const theme = themes[index % themes.length];
+    return <JoiningHighlight key={`${pkg.slug}-${index}`} className={cardStyles.reveal}>
+      <article className={cardStyles.card} data-theme={theme} tabIndex={0}>
+        <div className={cardStyles.art}><span className={cardStyles.number}>{String(index + 1).padStart(2, "0")}</span><HighlightIllustration kind={illustration} /></div>
+        <div className={cardStyles.copy}><span className={cardStyles.accent} aria-hidden="true" /><h3>{demo ? customerCopy(title) : title}</h3>
+          {description && <p>{demo ? customerCopy(description) : description}</p>}
+        </div>
+      </article>
+    </JoiningHighlight>;
+  })}</div>;
 }
 
 function Itinerary({ itinerary, demo = false }: { itinerary: NonNullable<TourPackage["itinerary"]>; demo?: boolean }) {
@@ -158,9 +118,8 @@ function Itinerary({ itinerary, demo = false }: { itinerary: NonNullable<TourPac
 
 export default function PackageExperience({ pkg }: { pkg: TourPackage }) {
   const destination = destinations[pkg.slug] ?? { name: pkg.name, label: "Discover your destination" };
-  const art = destinationArtwork[pkg.slug];
+  const art = pkg.avatar || destinationArtwork[pkg.slug];
   const isMysore = pkg.slug === "mysore-srirangapatna";
-  const ArtworkStage = pkg.slug === "goa" ? GoaArtworkStage : "div";
   const demo = pkg.demoContent;
   const highlights = pkg.highlights?.length ? pkg.highlights : demo?.highlights ?? [];
   const itinerary = pkg.itinerary?.length ? pkg.itinerary : demo?.itinerary ?? [];
@@ -171,14 +130,13 @@ export default function PackageExperience({ pkg }: { pkg: TourPackage }) {
   ).slice(0, 3);
   return <div className={styles.experience}>
     <Reveal><section className={styles.introduction} aria-labelledby="destination-heading">
-      <ArtworkStage className={`${styles.artworkStage} ${isMysore ? styles.mysoreStage : ""}`}>
+      <AvatarStage className={`${styles.artworkStage} ${isMysore ? styles.mysoreStage : ""}`}>
         <div className={styles.artworkHalo} aria-hidden="true" />
         {isMysore && <div className={styles.mysorePalace}><DestinationImage src={mysoreScenes.palace.src} alt={mysoreScenes.palace.alt} sizes="(max-width: 639px) 85vw, 420px" /></div>}
         <div className={styles.artwork}><DestinationImage key={pkg.slug} src={art?.src ?? pkg.image} alt={art?.alt ?? pkg.imageAlt} contain={Boolean(art)} /></div>
         <span className={styles.imageCaption}><MapPin size={15} aria-hidden="true" />{destination.name}</span>
         <svg className={styles.route} viewBox="0 0 240 160" fill="none" aria-hidden="true"><path d="M5 140C100 145 40 10 125 25S240 60 225 5" stroke="currentColor" strokeWidth="2" strokeDasharray="4 8" /></svg>
-        <p className={styles.artLabel}>Destination-inspired 3D artwork</p>
-      </ArtworkStage>
+      </AvatarStage>
       <div><p className={styles.eyebrow}>{destination.label}</p><h2 id="destination-heading">{destination.name},<br /><em>with a new perspective.</em></h2>
         <p className={styles.body}>{pkg.description}</p><a className={styles.textLink} href="#itinerary">Explore the journey <ArrowRight size={18} /></a>
       </div>
@@ -196,10 +154,11 @@ export default function PackageExperience({ pkg }: { pkg: TourPackage }) {
       <p className={styles.price}>{pkg.price} {pkg.priceUnit && <span>{pkg.priceUnit}</span>}</p>
     </section></Reveal>
 
-    <Reveal><section id="highlights" className={styles.section}>
+    <section id="highlights" className={`${styles.section} ${styles.highlightsSection}`}>
+      <HighlightsBackdrop key={pkg.slug} slug={pkg.slug} artwork={pkg.backgroundImage} />
       <SectionHeading label="Worth the journey" title="The highlights." />
       <HighlightExplorer key={pkg.slug} pkg={pkg} highlights={highlights} demo={!pkg.highlights?.length} />
-    </section></Reveal>
+    </section>
 
     <Reveal><section id="itinerary" className={styles.section}>
       <SectionHeading label="One moment at a time" title="Your itinerary / information." />
@@ -209,8 +168,8 @@ export default function PackageExperience({ pkg }: { pkg: TourPackage }) {
 
     <Reveal><section id="included" className={`${styles.section} ${styles.inclusions}`}>
       {(!pkg.included?.length || !pkg.excluded?.length) && demo ? <p className={styles.serviceCondition}>Services shown are indicative. Only the inclusions and exclusions listed in your confirmed booking apply.</p> : null}
-      <div><SectionHeading label="Part of your package" title="What's included." /><DetailList items={included} demo={!pkg.included?.length} /></div>
-      <div><SectionHeading label="Plan ahead" title="What's not included." /><DetailList items={excluded} excluded demo={!pkg.excluded?.length} /></div>
+      <div className={styles.includedPanel}><SectionHeading label="Part of your package" title="What's included." /><DetailList items={included} demo={!pkg.included?.length} /></div>
+      <div className={styles.excludedPanel}><SectionHeading label="Plan ahead" title="What's not included." /><DetailList items={excluded} excluded demo={!pkg.excluded?.length} /></div>
     </section></Reveal>
 
     <Reveal><section id="photos" className={styles.section}>
