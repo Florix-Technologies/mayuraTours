@@ -27,21 +27,26 @@
 .highlightImage { position: relative; aspect-ratio: 16/10; border-radius: 1.5rem; overflow: hidden; }
 .highlights li { border-bottom: 1px solid var(--color-line); padding: 1rem 0; }
 .number { color: var(--color-accent-ink); font-size: .8rem; padding-top: .3rem; }
-.dayPicker { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 1.5rem; }
-.dayPicker button { display: flex; align-items: center; gap: .6rem; border-radius: 2rem; padding: .85rem 1.2rem; background: var(--color-paper); font-size: .85rem; cursor: pointer; transition: background .25s, color .25s; }
-.dayPicker button[aria-pressed="true"] { background: var(--color-ink); color: white; }
-.dayPicker button span { opacity: .65; }.dayContent { min-height: 180px; padding: 2rem; background: var(--color-paper); border-radius: 1.5rem; }.dayContent p:not(.eyebrow) { color: var(--color-slate); line-height: 1.9; margin-top: 1rem; white-space: pre-line; }
-.dayTransition { animation: dayIn .35s ease both; }
+
+
+
+
+
 .inclusions { display: grid; gap: 2.5rem; }.detailList { display: grid; gap: 1.2rem; }.detailList li { display: flex; align-items: flex-start; gap: .8rem; font-size: .95rem; line-height: 1.8; }.detailList svg { flex-shrink: 0; margin-top: .3rem; color: var(--color-accent-ink); }
 .gallery { display: grid; gap: 1.5rem; margin-bottom: 2rem; }.galleryMain > div { position: relative; aspect-ratio: 16/10; border-radius: 1.5rem; overflow: hidden; }.gallery figcaption { font-size: .8rem; line-height: 1.7; color: var(--color-slate); margin-top: .8rem; display: flex; align-items: center; gap: .5rem; }.video video { width: 100%; aspect-ratio: 16/10; object-fit: cover; border-radius: 1.5rem; background: var(--color-ink); }
 .illustrations { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .75rem; }.illustrations > div { position: relative; aspect-ratio: 1; border-radius: 1.5rem; overflow: hidden; }
-.policies { display: grid; gap: 2rem; }.policies p { margin-top: .8rem; }
-.related { display: grid; gap: 2rem; }.relatedImage { position: relative; aspect-ratio: 4/3; border-radius: 1.3rem; overflow: hidden; margin-bottom: 1.3rem; }.relatedLink { min-width: 0; }.relatedLink h3 { margin-bottom: .8rem; }.relatedLink > p:not(.eyebrow) { font-size: 1rem; }.relatedLink span { color: var(--color-slate); font-size: .8rem; }
+/* Minimal policy information, stacked at every component width. */
+.policies { min-width: 0; }
+.policyRow + .policyRow { margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e8ec; }
+.policies h3 { margin: 0; color: var(--color-navy); font-family: var(--font-sans); font-size: 18px; font-weight: 600; line-height: 1.5; }
+.policies p { margin: 10px 0 0; color: var(--color-slate); font-size: 14px; font-weight: 400; line-height: 1.85; overflow-wrap: anywhere; }
+
+
 .experience a:focus-visible, .experience button:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 5px; }
-@media (hover:hover) { .galleryMain:hover .photo, .relatedLink:hover .photo, .highlightImage:hover .photo { transform: scale(1.035); } }
-@media (min-width:640px) { .introduction { grid-template-columns: .85fr 1.15fr; gap: 2rem; }.inclusions, .policies { grid-template-columns: 1fr 1fr; }.inclusions > div + div { border-left: 1px solid var(--color-line); padding-left: 2rem; }.related { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1.3rem; }.related h3 { font-size: .95rem; }.highlightLayout { grid-template-columns: .8fr 1fr; }.gallery:has(.video) { grid-template-columns: 1fr 1fr; } }
+@media (hover:hover) { .galleryMain:hover .photo, .highlightImage:hover .photo { transform: scale(1.035); } }
+@media (min-width:640px) { .introduction { grid-template-columns: .85fr 1.15fr; gap: 2rem; }.inclusions { grid-template-columns: 1fr 1fr; }.inclusions > div + div { border-left: 1px solid var(--color-line); padding-left: 2rem; }.highlightLayout { grid-template-columns: .8fr 1fr; }.gallery:has(.video) { grid-template-columns: 1fr 1fr; } }
 @media (max-width:639px) { .section { padding-top: 3rem; }.introduction { max-width: 100%; }.editorialImage { max-width: 380px; width: 100%; margin-inline: auto; }.essentials { grid-template-columns: 1fr; }.illustrations { grid-template-columns: 1fr; }.illustrations > div { aspect-ratio: 4/3; } }
-@keyframes dayIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
 @keyframes routeDrift { 50% { transform: translateY(-6px) rotate(2deg); } }
 @media (prefers-reduced-motion:reduce) { .experience *, .experience *::before, .experience *::after { animation: none !important; transition: none !important; }.experience :global(.reveal) { opacity: 1; transform: none; } }
 
@@ -66,12 +71,12 @@
 .highlightImage { aspect-ratio: 4/5; border-radius: 5rem 1.5rem 1.5rem; }.highlightCaption { position: absolute; bottom: 1rem; left: 1rem; right: 1rem; padding: .7rem; background: var(--color-white); color: var(--color-navy); border-radius: 1rem; font-size: 12px; text-align: center; }
 .inclusions { position: relative; padding-bottom: 2rem; }.inclusions::before { content: ""; position: absolute; top: 2rem; bottom: 0; left: -1rem; right: -1rem; background: var(--color-paper); border-radius: 2rem; z-index: 0; }.inclusions > div { position: relative; }
 .inclusions h2 { font-size: clamp(26px, 2.4vw, 34px); }.inclusions .detailList { gap: .75rem; }.detailList li { display: flex; align-items: flex-start; gap: 1rem; padding: 1.1rem; background: var(--color-white); border-radius: 1rem; transition: transform .3s, box-shadow .3s; }.detailList strong { font-size: 14px; font-weight: 700; color: var(--color-navy); }.detailList li p { font-size: 13px; line-height: 1.8; margin-top: .3rem; }.detailIcon { flex-shrink: 0; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; background: color-mix(in srgb, var(--color-accent) 7%, transparent); }.detailIcon svg { margin: 0; color: var(--color-accent); }
-.supportingArtwork { display: flex; align-items: center; gap: 1.5rem; margin-top: 2rem; padding: 1rem 1.5rem; background: var(--color-paper); border-radius: 2rem; }.supportingArtwork > div { position: relative; width: 150px; aspect-ratio: 1; flex-shrink: 0; margin-top: -2rem; }.supportingArtwork p { font-weight: 700; font-size: 15px; color: var(--color-navy); }.supportingArtwork p span { display: block; font-size: 12px; font-weight: 400; color: var(--color-slate); margin-top: .5rem; }
-.dayContent { border-left: 3px solid var(--color-accent); }.dayPicker button { font-weight: 600; }.dayPicker button[aria-pressed="true"] { background: var(--color-navy); }
-.sectionNav a { font-weight: 600; transition: color .25s; }.relatedLink .textLink { color: var(--color-navy); }.relatedLink h3 { font-weight: 700; }.textLink:hover { color: var(--color-accent-ink); }
+
+
+.sectionNav a { font-weight: 600; transition: color .25s; }.textLink:hover { color: var(--color-accent-ink); }
 @media (hover:hover) { .detailList li:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); }.artworkStage:hover .artwork { filter: drop-shadow(0 22px 20px color-mix(in srgb, var(--color-ink) 16%, transparent)); } }
 @media (min-width:640px) { .introduction { grid-template-columns: 1.05fr 1fr; gap: 2rem; }.highlightLayout { grid-template-columns: .85fr 1fr; }.inclusions > div + div { padding-left: 1.5rem; } }
-@media (max-width:639px) { .artworkStage { max-width: 380px; margin-inline: auto; }.introduction { gap: 3rem; }.highlightImage { aspect-ratio: 4/3; }.supportingArtwork { gap: .7rem; padding: 1rem; }.supportingArtwork > div { width: 100px; }.inclusions::before { left: -.7rem; right: -.7rem; }.dayContent { padding: 1.5rem; }.sectionNav { gap: .7rem 1rem; } }
+@media (max-width:639px) { .artworkStage { max-width: 380px; margin-inline: auto; }.introduction { gap: 3rem; }.highlightImage { aspect-ratio: 4/3; }.inclusions::before { left: -.7rem; right: -.7rem; }.sectionNav { gap: .7rem 1rem; } }
 @keyframes routeFlow { to { stroke-dashoffset: -120; } }
 @media (prefers-reduced-motion:reduce) { .experience *, .experience *::before, .experience *::after { animation: none !important; transition: none !important; }.experience :global(.reveal) { opacity: 1; transform: none; } }
 
@@ -93,24 +98,23 @@
 .heroRoute { position: absolute; right: 1%; bottom: 5%; width: 40%; height: 65%; z-index: -1; color: var(--color-white); opacity: .2; pointer-events: none; }
 .priceHeader { position: relative; isolation: isolate; overflow: hidden; min-height: 220px; display: flex; align-items: flex-end; color: var(--color-white); background: var(--color-ink); }
 .priceMedia { position: absolute; inset: 0; z-index: -2; }.priceMedia img { transition: transform 1.2s ease; object-position: center 60%; }.priceOverlay { position: absolute; inset: 0; z-index: -1; background: linear-gradient(0deg, color-mix(in srgb, var(--color-ink) 92%, transparent), color-mix(in srgb, var(--color-ink) 38%, transparent)); }.priceContent { position: relative; padding: 28px 24px; width: 100%; }.priceContent > p:first-child { color: rgb(255 255 255 / .85); }.priceContent > p:last-child { color: rgb(255 255 255 / .85); font-size: 12px; line-height: 1.7; }.priceContent > div > span:first-child { font-size: 34px; font-weight: 700; }
-/* Fine-line editorial itinerary: route navigation alongside the selected chapter. */
-.itinerary { display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.25fr); gap: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--color-line); }
-.dayPicker { position: relative; display: flex; flex-direction: column; flex-wrap: nowrap; gap: 0; margin: 0; }
-.dayPicker::before { content: ""; position: absolute; left: 20px; top: 20px; bottom: 35px; width: 1px; background: var(--color-line); }
-.dayPicker button { position: relative; display: flex; align-items: flex-start; gap: 1rem; background: transparent; padding: 0 0 1.4rem; border-radius: 0; text-align: left; color: var(--color-slate); line-height: 1.5; }
-.dayPicker button[aria-pressed="true"] { background: transparent; color: var(--color-navy); }
-.dayPicker button span { opacity: 1; }.dayNumber { position: relative; display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; border: 1px solid var(--color-line); background: var(--color-white); border-radius: 50%; color: var(--color-slate); font-size: 12px; font-weight: 600; transition: border-color .3s, color .3s; }
-.dayPicker button[aria-pressed="true"] .dayNumber { border-color: var(--color-accent); color: var(--color-accent-ink); box-shadow: inset 0 0 0 4px var(--color-white); background: var(--color-paper); }
-.dayNavText { padding-top: .1rem; flex: 1; }.dayNavText small { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: .15em; margin-bottom: .4rem; }.dayNavText strong { display: block; font-size: 13px; font-weight: 600; }
-.dayContent { min-height: 260px; background: transparent; border: 0; padding: 0; border-radius: 0; }
-.dayChapter { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }.dayChapter > span { font-family: var(--font-display); font-size: 50px; font-weight: 700; line-height: 1; color: var(--color-navy); }.dayChapter .eyebrow { margin: 0; color: var(--color-slate); font-size: 10px; }.dayContent h3 { font-family: var(--font-display); font-size: clamp(23px,2.3vw,30px); line-height: 1.2; letter-spacing: -.025em; font-weight: 700; }.dayContent p:not(.eyebrow) { font-size: 15px; line-height: 1.85; margin-top: 1rem; }
+
+
+
+
+
+
+
+
+
+
 .bookingCondition, .serviceCondition { color: var(--color-slate); font-size: 12px; line-height: 1.8; }.bookingCondition { margin: -.4rem 0 1rem; }.serviceCondition { grid-column: 1 / -1; margin: 0; max-width: 65ch; }
 /* Illustrated service marks: no decorative tiles; outline and accent belong to the drawing. */
 .detailList { gap: 0; }.detailList li { background: transparent; padding: 1.2rem 0; border-radius: 0; border-bottom: 1px solid var(--color-line); gap: 1rem; }.detailList li:last-child { border: 0; }.detailIcon { width: 56px; height: 56px; background: none; border-radius: 0; }.detailIcon svg { color: var(--color-ink); width: 56px; height: 56px; }.detailList strong { font-size: 15px; }.detailList li p { font-size: 14px; line-height: 1.8; }
 .cinematicHero a:focus-visible { outline: 3px solid var(--color-sky); outline-offset: 5px; }
-@media (hover:hover) { .priceHeader:hover .priceMedia img { transform: scale(1.045); }.detailList li:hover { transform: translateX(3px); box-shadow: none; }.dayPicker button:hover .dayNumber { border-color: var(--color-accent); } }
+@media (hover:hover) { .priceHeader:hover .priceMedia img { transform: scale(1.045); }.detailList li:hover { transform: translateX(3px); box-shadow: none; } }
 @media (max-width:767px) { .heroContent { padding: 115px 24px 28px; }.heroEntrance { padding-top: 32px; }.heroRoute { width: 65%; opacity: .12; }.heroDescription { max-width: 42ch; }.heroOverlay { background: color-mix(in srgb, var(--color-ink) 70%, transparent); }.heroFootnote { margin-top: 35px; }.heroFootnote span:last-child { font-size: 10px; letter-spacing: 0; }.heroContent h1 { font-size: clamp(38px,9vw,60px); } }
-@media (max-width:639px) { .itinerary { grid-template-columns: 1fr; gap: 1.5rem; }.dayPicker { flex-direction: row; flex-wrap: wrap; gap: 1rem; }.dayPicker::before { display: none; }.dayPicker button { padding: 0; gap: .5rem; flex: 1 1 44%; }.dayNavText strong { display: none; }.dayNavText small { margin-top: .65rem; }.dayContent { border-top: 1px solid var(--color-line); padding-top: 1.5rem; min-height: 240px; }.dayChapter > span { font-size: 42px; }.heroContent { padding-inline: 20px; }.heroTags span { padding: .5rem .7rem; }.heroFootnote span:last-child { display: none; }.detailList li { gap: .7rem; }.detailIcon { width: 48px; height: 48px; }.detailIcon svg { width: 48px; height: 48px; } }
+@media (max-width:639px) { .heroContent { padding-inline: 20px; }.heroTags span { padding: .5rem .7rem; }.heroFootnote span:last-child { display: none; }.detailList li { gap: .7rem; }.detailIcon { width: 48px; height: 48px; }.detailIcon svg { width: 48px; height: 48px; } }
 @keyframes cinemaZoom { from { transform: scale(1); } to { transform: scale(1.04); } }
 .serviceCondition { position: relative; z-index: 1; }
 /* Float and hover use separate layers so pointer exit never resets the idle animation. */
@@ -129,9 +133,9 @@
   .priceHeader:hover .priceMedia img { transform: none; }
 }
 .inclusions { row-gap: 1.2rem; }
-.dayPicker { align-self: start; }
-.dayPicker::before { bottom: 20px; }
-.dayPicker button:last-child { padding-bottom: 0; }
+
+
+
 @keyframes cinemaEnter { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 /* Mysore-only layers: opaque scene artwork sits behind the existing transparent traveler. */
 .mysoreStage { overflow: visible; }
@@ -419,4 +423,166 @@
   background: rgb(229 0 126 / .14);
   border-color: #e5007e;
   color: #fff;
+}
+
+/* Itinerary journal: one source of truth, sized to its column beside booking. */
+.itinerarySection { container: journey / inline-size; }
+.itineraryDisclaimer { max-width: 66ch; margin: -.5rem 0 1.5rem; color: #68727e; font-size: 12px; line-height: 1.8; }
+.itinerary { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.25fr); gap: 24px; padding-top: 24px; border-top: 1px solid #e5e7eb; align-items: start; }
+.dayPicker { position: relative; isolation: isolate; display: grid; grid-auto-rows: 1fr; gap: 8px; min-width: 0; }
+.dayPicker::before { content: ""; position: absolute; top: 34px; bottom: 34px; left: 30px; border-left: 1px dashed #c9c5cd; z-index: -1; }
+.dayIndicator { position: absolute; inset: 0 0 auto; height: calc((100% - (var(--day-count) - 1) * 8px) / var(--day-count)); border-left: 3px solid #e5007e; border-radius: 3px; background: #fceef5; z-index: -1; transform: translateY(calc(var(--active-day) * (100% + 8px))); transition: transform 480ms cubic-bezier(.22,1,.36,1); }
+.dayPicker button { position: relative; display: flex; align-items: center; gap: 12px; min-width: 0; min-height: 92px; padding: 16px 12px; border: 1px solid #e5e7eb; border-radius: 3px; text-align: left; color: #68727e; background: transparent; cursor: pointer; transition: transform 300ms ease, background 300ms ease, border-color 300ms ease, color 300ms ease; }
+.dayPicker button::after { content: ""; position: absolute; left: 0; top: 24%; bottom: 24%; width: 3px; background: #e5007e; transform: scaleY(0); transform-origin: center; transition: transform 300ms ease; }
+.dayPicker button[aria-pressed="true"] { color: #152b49; border-color: #f1ccdf; }
+.dayNumber { position: relative; display: grid; place-items: center; flex-shrink: 0; width: 36px; height: 36px; border: 1px solid #dfe2e7; border-radius: 50%; background: #fff; font-size: 11px; font-weight: 600; transition: background 350ms, color 350ms, border-color 350ms, box-shadow 350ms; }
+.dayPicker button[aria-pressed="true"] .dayNumber { background: #e5007e; border-color: #e5007e; color: #fff; box-shadow: 0 0 0 4px #fceef5; }
+.dayNavText { min-width: 0; }
+.dayNavText small { display: block; margin-bottom: 5px; font-size: 13px; letter-spacing: .12em; font-weight: 750; }
+.dayNavText strong { display: block; font-size: 15px; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
+.dayContent { position: relative; isolation: isolate; overflow: hidden; min-width: 0; padding: 30px 26px 18px; border: 1px solid #e6e3df; border-radius: 4px; background: #fdfbf7; box-shadow: 0 14px 36px #172d4608, 0 2px 5px #172d4604; }
+.dayContent::before { content: ""; position: absolute; top: -1px; left: 26px; width: 42px; height: 3px; background: #e5007e; }
+.dayRoute { position: absolute; right: -75px; bottom: 20px; width: 280px; height: 270px; color: #837b82; opacity: .12; pointer-events: none; z-index: -1; }
+.dayTransition { position: relative; min-height: 260px; padding-bottom: 28px; animation: itineraryChapterIn 520ms cubic-bezier(.22,1,.36,1) both; }
+.dayWatermark { position: absolute; top: -25px; right: -8px; z-index: -1; font-family: var(--font-display); font-size: 136px; line-height: 1; color: #172d4609; pointer-events: none; }
+.panelDayLabel { margin-bottom: 12px; color: #e5007e; font-size: 13px; font-weight: 600; line-height: 1.5; letter-spacing: .12em; text-transform: uppercase; }
+.dayContent h3 { position: relative; max-width: 22ch; font-family: var(--font-display); font-size: clamp(25px, 3.6cqi, 34px); font-weight: 500; line-height: 1.22; letter-spacing: -.025em; color: #152b49; overflow-wrap: anywhere; text-wrap: pretty; }
+.dayContent p { margin-top: 18px; color: #53606d; font-size: 14px; line-height: 1.9; white-space: pre-line; overflow-wrap: anywhere; }
+.dayControls { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 20px; border-top: 1px solid #e6e3df; padding-top: 16px; }
+.dayControls button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; box-sizing: border-box; min-height: 46px; padding: 12px 20px; font-size: 13px; font-weight: 500; line-height: 1.5; border: 1px solid #e1e5ea; border-radius: 10px; background: #fff; color: #152b49; cursor: pointer; transition: transform 300ms cubic-bezier(.22,1,.36,1), box-shadow 300ms cubic-bezier(.22,1,.36,1); }
+.dayControls button svg { flex-shrink: 0; transition: transform 300ms cubic-bezier(.22,1,.36,1); }
+.dayControls button:disabled { opacity: .35; cursor: default; }
+@media (hover: hover) and (pointer: fine) {
+  .dayPicker button:hover { transform: translateX(3px); background: #e5007e06; border-color: #e6afcc; color: #152b49; }
+  .dayPicker button:hover::after { transform: scaleY(1); }
+  .dayPicker button:hover .dayNumber { border-color: #e5007e; }
+  .dayControls button:first-child:hover:not(:disabled) svg { transform: translateX(-5px); }
+  .dayControls button:last-child:hover:not(:disabled) svg { transform: translateX(5px); }
+  .dayControls button:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 6px 14px #152b4912; }
+}
+@container journey (max-width: 610px) {
+  .itinerary { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .dayPicker { display: flex; overflow-x: auto; padding: 5px 4px 12px; scroll-snap-type: x proximity; scrollbar-width: thin; scrollbar-color: #d9b2c7 transparent; }
+  .dayPicker::before, .dayIndicator { display: none; }
+  .dayPicker button { flex: 0 0 180px; min-height: 88px; scroll-snap-align: center; }
+  .dayPicker button[aria-pressed="true"] { background: #fceef5; }
+  .dayPicker button[aria-pressed="true"]::after { transform: scaleY(1); }
+  .dayContent { padding: 28px 22px 16px; }
+  .dayTransition { min-height: 220px; }
+  .dayContent h3 { font-size: 29px; }
+}
+@container journey (max-width: 360px) {
+  .dayControls { gap: 12px; }
+  .dayControls button { gap: 7px; padding-inline: 12px; }
+}
+@keyframes itineraryChapterIn { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .dayTransition { animation: none; }
+  .dayPicker button:hover { transform: none; }
+  .dayControls button:first-child:hover:not(:disabled) svg,
+  .dayControls button:last-child:hover:not(:disabled) svg,
+  .dayControls button:hover:not(:disabled) { transform: none; box-shadow: none; }
+}
+
+/* Related journeys: a contained listing carousel beside the booking column. */
+.relatedSection { container: related-listing / inline-size; min-width: 0; }
+.relatedSurface { padding: 22px 18px 8px; border-radius: 12px; background: #f5f7fa; }
+.relatedHeader { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
+.relatedEyebrow { margin-bottom: 5px; color: #152b49; font-size: 13px; font-weight: 600; }
+.relatedHeader h2 { color: #152b49; font-size: 32px; line-height: 1.1; font-weight: 800; }
+.relatedAll { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 12px; border: 1px solid #cfd6e0; border-radius: 5px; color: #152b49; font-size: 11px; font-weight: 600; background: white; margin-left: auto; transition: background-color 300ms cubic-bezier(.22,1,.36,1), border-color 300ms cubic-bezier(.22,1,.36,1), color 300ms cubic-bezier(.22,1,.36,1), transform 300ms cubic-bezier(.22,1,.36,1); }
+.relatedAll svg { transition: transform 300ms cubic-bezier(.22,1,.36,1); }
+.relatedCarousel { --card-slots: 1; --visible-cards: min(var(--card-slots), var(--package-count)); --peek: calc((clamp(60px, 12cqw, 100px) + 16px) * clamp(0, var(--package-count) - var(--visible-cards), 1)); position: relative; container-type: inline-size; }
+.related { display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - var(--peek) - (var(--visible-cards) - 1) * 16px) / var(--visible-cards)); gap: 16px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: 0; margin-top: -8px; padding: 14px 0 16px; scrollbar-width: none; }
+.related:focus-visible { outline: 2px solid #e5007e; outline-offset: 3px; }
+.relatedLink { position: relative; overflow: hidden; display: flex; flex-direction: column; min-width: 0; border: 1px solid #e2e6ec; border-radius: 10px; background: #fff; box-shadow: 0 2px 5px #152b4905; scroll-snap-align: start; }
+.relatedImage { position: relative; aspect-ratio: 16/10; overflow: hidden; border-radius: 9px 9px 0 0; flex-shrink: 0; }
+.relatedCopy { position: relative; z-index: 1; display: flex; flex-direction: column; flex: 1; padding: 16px 13px 0; background: #fff; transition: transform 600ms cubic-bezier(.22,1,.36,1); }
+.relatedCopy::before { content: ""; position: absolute; top: 0; left: 13px; width: 48px; height: 1px; background: #e5007e; transform: scaleX(0); transform-origin: left; transition: transform 600ms cubic-bezier(.22,1,.36,1); }
+/* Fill the translated panel's trailing area without changing the card footprint. */
+.relatedCopy::after { content: ""; position: absolute; inset: auto 0 -44px; height: 44px; background: #fff; border-radius: 0 0 9px 9px; pointer-events: none; }
+.relatedTitle { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.relatedTitle h3 { position: relative; transition: transform 600ms cubic-bezier(.22,1,.36,1) 60ms; color: #152b49; font-size: 16px; font-weight: 700; line-height: 1.4; overflow-wrap: anywhere; }
+.relatedDestination { display: flex; align-items: baseline; gap: 5px; margin-top: 7px; color: #68788a; font-size: 11px; line-height: 1.6; }
+.relatedDestination svg { flex-shrink: 0; align-self: center; }
+.relatedPrice { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px; margin: 16px 0; color: #152b49; font-size: 19px; font-weight: 700; }
+.relatedPrice span { color: #68788a; font-size: 11px; font-weight: 400; }
+.relatedMeta { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: auto; padding-block: 12px; border-top: 1px solid #e9ecf1; color: #5d6c7e; font-size: 10px; line-height: 1.6; }
+
+@container related-listing (min-width: 480px) { .relatedCarousel { --card-slots: 2; } }
+@container related-listing (min-width: 700px) {
+  .relatedCarousel { --card-slots: 3; }
+  .relatedHeader { flex-wrap: nowrap; }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .relatedAll:hover { background: var(--color-accent); border-color: var(--color-accent); color: #fff; transform: translateY(-2px); }
+  .relatedAll:hover svg { transform: translateX(4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .relatedAll, .relatedAll svg { transition: none; }
+  .relatedAll:hover, .relatedAll:hover svg { transform: none; }
+}
+
+/* Editorial panel motion leaves the image and card footprint stationary. */
+@media (prefers-reduced-motion: no-preference) {
+  .related[data-dragging="false"] .relatedLink:focus-within .relatedCopy { transform: translateY(-44px); }
+  .related[data-dragging="false"] .relatedLink:focus-within .relatedCopy::before { transform: scaleX(1); }
+  .related[data-dragging="false"] .relatedLink:focus-within .relatedTitle h3 { transform: translateY(-2px); }
+  .related[data-dragging="false"] .relatedLink:focus-within .relatedExplore { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; transition-delay: 150ms, 150ms, 0s, 0s, 0s, 0s; }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .related[data-dragging="false"] .relatedLink:hover .relatedCopy { transform: translateY(-44px); }
+  .related[data-dragging="false"] .relatedLink:hover .relatedCopy::before { transform: scaleX(1); }
+  .related[data-dragging="false"] .relatedLink:hover .relatedTitle h3 { transform: translateY(-2px); }
+  .related[data-dragging="false"] .relatedLink:hover .relatedExplore { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; transition-delay: 150ms, 150ms, 0s, 0s, 0s, 0s; }
+}
+.related[data-dragging="true"] .relatedCopy,
+.related[data-dragging="true"] .relatedCopy::before,
+.related[data-dragging="true"] .relatedTitle h3,
+.related[data-dragging="true"] .relatedExplore { transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  .relatedCopy, .relatedCopy::before, .relatedTitle h3, .relatedExplore { transition: none; }
+}
+
+/* Native touch/trackpad scrolling, with mouse drag and a true scroll-position cue. */
+.related::-webkit-scrollbar { display: none; }
+.related[data-scrollable="true"] { cursor: grab; }
+.related .relatedLink { cursor: default; }
+.related[data-dragging="true"], .related[data-dragging="true"] .relatedLink { cursor: grabbing; }
+.related[data-dragging="true"] { scroll-snap-type: none; user-select: none; }
+.relatedScrollCue { display: flex; align-items: center; gap: 16px; padding: 4px 0 12px; }
+.relatedProgress { position: relative; flex: 1; height: 3px; overflow: hidden; border-radius: 3px; background: #dce1e8; }
+.relatedProgress span { position: absolute; top: 0; height: 100%; border-radius: inherit; background: #e5007e; transition: left 100ms linear; }
+.relatedDragHint, .relatedSwipeHint { flex-shrink: 0; color: #68788a; font-size: 11px; }
+.relatedSwipeHint { display: none; }
+@media (hover: none), (pointer: coarse) {
+  .relatedDragHint { display: none; }
+  .relatedSwipeHint { display: inline; }
+}
+@media (prefers-reduced-motion: reduce) { .relatedProgress span { transition: none; } }
+
+/* Only the revealed action navigates; focusing the article exposes the link. */
+.relatedExplore { cursor: pointer; position: absolute; z-index: 1; left: 13px; right: 13px; bottom: -40px; height: 36px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 8px; border: 1px solid #dce1e8; border-radius: 6px; background: #fff; color: #152b49; font-size: 12px; font-weight: 600; opacity: 0; visibility: hidden; transform: translateY(12px); pointer-events: none; transition: opacity 600ms cubic-bezier(.22,1,.36,1), transform 600ms cubic-bezier(.22,1,.36,1), visibility 0s 600ms, background-color 300ms ease, border-color 300ms ease, color 300ms ease; }
+.relatedExplore svg { flex-shrink: 0; transition: transform 600ms cubic-bezier(.22,1,.36,1); }
+@media (hover: hover) and (pointer: fine) {
+  .relatedExplore:hover { background: #e5007e; border-color: #e5007e; color: #fff; }
+  .relatedExplore:hover svg { transform: translateX(3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .relatedExplore, .relatedExplore svg { transition: none; }
+  .related[data-dragging="false"] .relatedLink:focus-within .relatedCopy { transform: translateY(-44px); }
+  .related[data-dragging="false"] .relatedLink:focus-within .relatedExplore { opacity: 1; visibility: visible; transform: none; pointer-events: auto; }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: reduce) {
+  .related[data-dragging="false"] .relatedLink:hover .relatedCopy { transform: translateY(-44px); }
+  .related[data-dragging="false"] .relatedLink:hover .relatedExplore { opacity: 1; visibility: visible; transform: none; pointer-events: auto; }
+}
+@media (prefers-reduced-motion: reduce) { .relatedExplore:hover svg { transform: none; } }
+
+.relatedLink:focus-visible { outline: 3px solid var(--color-accent); outline-offset: -3px; }
+@media (hover: none), (pointer: coarse) {
+  .related .relatedLink .relatedCopy { transform: translateY(-44px); }
+  .related .relatedLink .relatedExplore { opacity: 1; visibility: visible; transform: none; pointer-events: auto; transition: none; }
 }

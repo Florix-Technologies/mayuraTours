@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { ArrowRight, MapPin, Play } from "lucide-react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, MapPin, Play } from "lucide-react";
 import HighlightIllustration from "./HighlightIllustration";
 import { resolveHighlightIllustration, type HighlightTheme } from "@/lib/data/highlight-illustrations";
 import cardStyles from "./highlight-cards.module.css";
@@ -92,28 +92,162 @@ function HighlightExplorer({ pkg, highlights, demo = false }: { pkg: TourPackage
 
 function Itinerary({ itinerary, demo = false }: { itinerary: NonNullable<TourPackage["itinerary"]>; demo?: boolean }) {
   const [active, setActive] = useState(0);
+  const dayButtons = useRef<(HTMLButtonElement | null)[]>([]);
+  const selectDay = (index: number) => {
+    setActive(index);
+    // Keep the selected stop visible in the compact, horizontally scrolling route.
+    const button = dayButtons.current[index];
+    const picker = button?.parentElement;
+    if (button && picker && picker.scrollWidth > picker.clientWidth) {
+      picker.scrollTo({ left: button.offsetLeft - (picker.clientWidth - button.offsetWidth) / 2,
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+    }
+  };
   const selected = itinerary[active];
   if (!selected) return <p className={styles.pending}>The day-by-day itinerary has not been published yet. See the package overview for the currently available travel information.</p>;
   const title = typeof selected === "string" ? selected : selected.title || selected.day || `Day ${active + 1}`;
   const copy = (text: string) => demo ? customerCopy(text) : text;
   return <div className={styles.itinerary}>
-    <div className={styles.dayPicker} aria-label="Choose itinerary day">
+    <div className={styles.dayPicker} role="group" aria-label="Choose itinerary day"
+      style={{ "--day-count": itinerary.length, "--active-day": active } as CSSProperties}>
+      <span className={styles.dayIndicator} aria-hidden="true" />
       {itinerary.map((day, index) => <button key={index} type="button" aria-pressed={active === index}
-        aria-controls="itinerary-content" onClick={() => setActive(index)}>
+        ref={element => { dayButtons.current[index] = element; }}
+        aria-controls="itinerary-content" onClick={() => selectDay(index)}>
         <span className={styles.dayNumber}>{String(index + 1).padStart(2, "0")}</span>
-        <span className={styles.dayNavText}><small>{typeof day === "string" ? `Stop ${index + 1}` : day.day || `Day ${index + 1}`}</small><strong>{typeof day === "string" ? day : day.title || day.day}</strong></span>
+        <span className={styles.dayNavText}><small>Day {String(index + 1).padStart(2, "0")}</small><strong>{copy(typeof day === "string" ? day : day.title || day.day || `Day ${index + 1}`)}</strong></span>
       </button>)}
     </div>
-    <div id="itinerary-content" aria-live="polite" className={styles.dayContent}>
-      <div key={active} className={styles.dayTransition}><div className={styles.dayChapter}><span>{String(active + 1).padStart(2, "0")}</span><p className={styles.eyebrow}>Your journey / {itinerary.length} {itinerary.length === 1 ? "day" : "days"}</p></div>
-        <h3>{title}</h3>{typeof selected !== "string" && <>
-          {selected.day && selected.day !== title && <p>{selected.day}</p>}
-          {selected.description && <p>{copy(selected.description)}</p>}
-          {selected.details && selected.details !== selected.description && <p>{copy(selected.details)}</p>}
-        </>}
+    <div className={styles.dayContent}>
+      <svg className={styles.dayRoute} viewBox="0 0 320 300" fill="none" aria-hidden="true">
+        <path d="M300 20C180 5 310 130 210 115S50 90 100 190 250 210 180 290" stroke="currentColor" strokeWidth="1" strokeDasharray="3 7" />
+        <circle cx="300" cy="20" r="5" stroke="currentColor" /><circle cx="180" cy="290" r="5" stroke="currentColor" />
+      </svg>
+      <div id="itinerary-content" role="region" aria-label="Selected itinerary day" aria-live="polite" aria-atomic="true">
+        <div key={active} className={styles.dayTransition}>
+          <span className={styles.dayWatermark} aria-hidden="true">{String(active + 1).padStart(2, "0")}</span>
+          <div className={styles.panelDayLabel}>Day {String(active + 1).padStart(2, "0")}</div>
+          <h3>{copy(title)}</h3>{typeof selected !== "string" && <>
+            {selected.day && selected.day !== title && !/^\s*day\s*\d+\s*$/i.test(selected.day) && <p>{copy(selected.day)}</p>}
+            {selected.description && <p>{copy(selected.description)}</p>}
+            {selected.details && selected.details !== selected.description && <p>{copy(selected.details)}</p>}
+          </>}
+        </div>
       </div>
+      {itinerary.length > 1 && <div className={styles.dayControls} aria-label="Journey navigation">
+        <button type="button" disabled={active === 0} onClick={() => selectDay(active - 1)} aria-controls="itinerary-content" aria-label="Previous day"><ArrowLeft size={18} strokeWidth={1.5} aria-hidden="true" /><span>Previous</span></button>
+        <button type="button" disabled={active === itinerary.length - 1} onClick={() => selectDay(active + 1)} aria-controls="itinerary-content" aria-label="Next day"><span>Next</span><ArrowRight size={18} strokeWidth={1.5} aria-hidden="true" /></button>
+      </div>}
     </div>
   </div>;
+}
+
+function RelatedPackages({ items }: { items: TourPackage[] }) {
+  const track = useRef<HTMLDivElement>(null);
+  const drag = useRef({ pointerId: -1, x: 0, scrollLeft: 0, moved: false });
+  const [dragging, setDragging] = useState(false);
+  const [scroll, setScroll] = useState({ progress: 0, visible: 1, overflow: false });
+  const syncScroll = () => {
+    const node = track.current;
+    if (!node) return;
+    const max = node.scrollWidth - node.clientWidth;
+    const next = { progress: max > 1 ? Math.max(0, Math.min(1, node.scrollLeft / max)) : 0,
+      visible: node.scrollWidth ? Math.min(1, node.clientWidth / node.scrollWidth) : 1, overflow: max > 1 };
+    setScroll(previous => previous.progress === next.progress && previous.visible === next.visible && previous.overflow === next.overflow ? previous : next);
+  };
+  useEffect(() => {
+    const node = track.current;
+    if (!node) return;
+    const observer = new ResizeObserver(syncScroll);
+    observer.observe(node);
+    const frame = requestAnimationFrame(syncScroll);
+    return () => { observer.disconnect(); cancelAnimationFrame(frame); };
+  }, []);
+  const move = (direction: number) => {
+    const node = track.current;
+    const card = node?.firstElementChild as HTMLElement | null;
+    if (!node || !card) return;
+    const step = card.offsetWidth + parseFloat(getComputedStyle(node).columnGap);
+    node.scrollTo({ left: Math.round(node.scrollLeft / step) * step + direction * step,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+  };
+  return <section id="related" className={`${styles.section} ${styles.relatedSection}`} aria-labelledby="related-heading">
+    <div className={styles.relatedSurface}>
+      <div className={styles.relatedHeader}>
+        <div><p className={styles.relatedEyebrow}>Handpicked journeys</p><h2 id="related-heading">Just For You</h2></div>
+        <Link href="/packages" className={styles.relatedAll}>View All Packages<ArrowRight size={15} aria-hidden="true" /></Link>
+      </div>
+      <div className={styles.relatedCarousel} style={{ "--package-count": Math.max(1, items.length) } as CSSProperties}>
+        <div id="related-packages-track" ref={track} className={styles.related} onScroll={syncScroll} data-dragging={dragging} data-scrollable={scroll.overflow}
+          onDragStart={event => event.preventDefault()}
+          onPointerDown={event => {
+            drag.current.moved = false;
+            if (event.pointerType !== "mouse" || event.button !== 0 || !scroll.overflow) return;
+            drag.current = { pointerId: event.pointerId, x: event.clientX, scrollLeft: event.currentTarget.scrollLeft, moved: false };
+          }}
+          onPointerMove={event => {
+            const gesture = drag.current;
+            if (gesture.pointerId !== event.pointerId) return;
+            if ((event.buttons & 1) === 0) { gesture.pointerId = -1; setDragging(false); return; }
+            const distance = event.clientX - gesture.x;
+            if (!gesture.moved && Math.abs(distance) < 6) return;
+            if (!gesture.moved) {
+              gesture.moved = true;
+              event.currentTarget.setPointerCapture(event.pointerId);
+              setDragging(true);
+            }
+            event.preventDefault();
+            event.currentTarget.scrollLeft = gesture.scrollLeft - distance;
+          }}
+          onPointerUp={event => {
+            if (drag.current.pointerId !== event.pointerId) return;
+            drag.current.pointerId = -1;
+            setDragging(false);
+          }}
+          onPointerCancel={() => { drag.current.pointerId = -1; setDragging(false); }}
+          onLostPointerCapture={() => { drag.current.pointerId = -1; setDragging(false); }}
+          onClickCapture={event => {
+            if (drag.current.moved && event.detail !== 0) {
+              event.preventDefault(); event.stopPropagation(); drag.current.moved = false;
+            }
+          }}
+          role="region" aria-label="Handpicked travel packages" tabIndex={0}
+          onKeyDown={event => {
+            if (event.target !== event.currentTarget) return;
+            if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+              event.preventDefault(); move(event.key === "ArrowLeft" ? -1 : 1);
+            }
+          }}>
+          {items.map(item => {
+            const duration = item.duration || item.tags.find(tag => /night|day|same-day/i.test(tag));
+            const destination = item.destination || destinations[item.slug]?.name;
+            return <article key={item.slug} className={styles.relatedLink} tabIndex={0} aria-labelledby={`related-title-${item.slug}`}>
+              <div className={styles.relatedImage}>
+                <DestinationImage src={item.image} alt={item.imageAlt} sizes="(max-width: 639px) 85vw, (max-width: 1023px) 40vw, 260px" />
+              </div>
+              <div className={styles.relatedCopy}>
+                <div className={styles.relatedTitle}><h3 id={`related-title-${item.slug}`}>{item.name}</h3></div>
+                {destination && <p className={styles.relatedDestination}><MapPin size={13} aria-hidden="true" />{destination}</p>}
+                <p className={styles.relatedPrice}>{item.price}{item.priceUnit && <span>{item.priceUnit}</span>}</p>
+                {(duration || item.travellerInfo) && <div className={styles.relatedMeta}>
+                  {duration && <span>{duration}</span>}{item.travellerInfo && <span>{item.travellerInfo}</span>}
+                </div>}
+                <Link href={`/packages/${item.slug}`} className={styles.relatedExplore} aria-label={`Explore ${item.name}`}>Explore Now<ArrowUpRight size={15} strokeWidth={1.5} aria-hidden="true" /></Link>
+              </div>
+            </article>;
+          })}
+        </div>
+        {scroll.overflow && <div className={styles.relatedScrollCue}>
+          <div className={styles.relatedProgress} role="progressbar" aria-label="Related packages scroll position"
+            aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(scroll.progress * 100)}>
+            <span style={{ width: `${scroll.visible * 100}%`, left: `${scroll.progress * (1 - scroll.visible) * 100}%` }} />
+          </div>
+          <span className={styles.relatedDragHint}>Drag to explore</span>
+          <span className={styles.relatedSwipeHint}>Swipe to explore</span>
+        </div>}
+      </div>
+    </div>
+  </section>;
 }
 
 export default function PackageExperience({ pkg }: { pkg: TourPackage }) {
@@ -127,7 +261,7 @@ export default function PackageExperience({ pkg }: { pkg: TourPackage }) {
   const excluded = pkg.excluded?.length ? pkg.excluded : demo?.excluded ?? [];
   const related = packages.filter(item => item.slug !== pkg.slug).sort((a, b) =>
     b.tags.filter(tag => pkg.tags.includes(tag)).length - a.tags.filter(tag => pkg.tags.includes(tag)).length
-  ).slice(0, 3);
+  );
   return <div className={styles.experience}>
     <Reveal><section className={styles.introduction} aria-labelledby="destination-heading">
       <AvatarStage className={`${styles.artworkStage} ${isMysore ? styles.mysoreStage : ""}`}>
@@ -160,9 +294,9 @@ export default function PackageExperience({ pkg }: { pkg: TourPackage }) {
       <HighlightExplorer key={pkg.slug} pkg={pkg} highlights={highlights} demo={!pkg.highlights?.length} />
     </section>
 
-    <Reveal><section id="itinerary" className={styles.section}>
-      <SectionHeading label="One moment at a time" title="Your itinerary / information." />
-      {!pkg.itinerary?.length && demo?.itinerary.length ? <p className={styles.bookingCondition}>Suggested itinerary. The final route, order of visits and timings are subject to confirmation and local availability.</p> : null}
+    <Reveal><section id="itinerary" className={`${styles.section} ${styles.itinerarySection}`} aria-labelledby="itinerary-heading">
+      <div className={styles.heading}><p className={styles.eyebrow}>One moment at a time</p><h2 id="itinerary-heading">Your itinerary</h2></div>
+      {!pkg.itinerary?.length && demo?.itinerary.length ? <p className={styles.itineraryDisclaimer}>Suggested itinerary. The final route, order of visits and timings are subject to confirmation and local availability.</p> : null}
       <Itinerary key={pkg.slug} itinerary={itinerary} demo={!pkg.itinerary?.length} />
     </section></Reveal>
 
@@ -173,29 +307,31 @@ export default function PackageExperience({ pkg }: { pkg: TourPackage }) {
     </section></Reveal>
 
     <Reveal><section id="photos" className={styles.section}>
-      <SectionHeading label="A sense of place" title="Photos / videos." />
+      <SectionHeading label="A sense of place" title="Moments from the Journey." />
       <div className={styles.gallery}><figure className={styles.galleryMain}><div><DestinationImage src={pkg.image} alt={pkg.imageAlt} /></div><figcaption>{pkg.imageAlt}</figcaption></figure>
         {pkg.slug === "goa" && <figure className={styles.video}><video controls preload="none" playsInline poster="/video/posters/beaches.jpg" aria-label="Goa coastal destination film"><source src="/video/goa-beach-aerial.mp4" type="video/mp4" />Your browser does not support video.</video><figcaption><Play size={14} aria-hidden="true" />Goa coastal film</figcaption></figure>}
       </div>
-      {pkg.slug === "goa" && <><p className={styles.eyebrow}>Destination illustrations / artistic impressions</p><div className={styles.illustrations}>{[1, 2, 3].map(index => <div key={index}><DestinationImage src={`/images/destinations/goa-illustration-${index}.png`} alt={`Goa coastal travel illustration ${index}`} /></div>)}</div></>}
-      {isMysore ? <figure className={styles.mysoreMarket}>
+      {pkg.slug === "goa" && <div className={styles.illustrations}>{[1, 2, 3].map(index => <div key={index}><DestinationImage src={`/images/destinations/goa-illustration-${index}.png`} alt={`Goa coastal travel illustration ${index}`} /></div>)}</div>}
+      {isMysore && <figure className={styles.mysoreMarket}>
         <div className={styles.mysoreMarketImage}><DestinationImage src={mysoreScenes.market.src} alt={mysoreScenes.market.alt} sizes="(max-width: 639px) 90vw, 650px" /></div>
         <figcaption><p className={styles.eyebrow}>Heritage in the everyday</p><h3>A different perspective on Mysore.</h3><p>Destination-inspired artwork / artistic impression</p></figcaption>
-      </figure> : art && <div className={styles.supportingArtwork}><div><DestinationImage src={art.src} alt={art.alt} contain /></div><p>Another perspective on the journey.<span>Destination-inspired 3D illustration</span></p></div>}
+      </figure>}
       {pkg.slug !== "goa" && <p className={styles.pending}>Additional destination photos and videos have not been published yet.</p>}
     </section></Reveal>
 
-    <Reveal><section className={`${styles.section} ${styles.policies}`} aria-label="Package policies">
-      <div><h3>Cancellation policy</h3><p>Cancellation and refund terms will be updated based on the final package policy provided by Mayura Holidays.</p></div>
-      <div><h3>Important information</h3><p>Important travel instructions, reporting details, documents and other package-specific information will be updated here.</p></div>
+    <Reveal><section className={styles.section} aria-label="Package policies">
+      <div className={styles.policies}>
+        <div className={styles.policyRow}>
+          <h3>Cancellation Policy</h3>
+          <p>Cancellation and refund terms will be updated based on the final package policy provided by Mayura Holidays.</p>
+        </div>
+        <div className={styles.policyRow}>
+          <h3>Important Information</h3>
+          <p>Important travel instructions, reporting details, documents and other package-specific information will be updated here.</p>
+        </div>
+      </div>
     </section></Reveal>
 
-    <Reveal><section id="related" className={styles.section}>
-      <SectionHeading label="Keep exploring" title="More journeys with Mayura." />
-      <div className={styles.related}>{related.map(item => <Link key={item.slug} href={`/packages/${item.slug}`} className={styles.relatedLink}>
-        <div className={styles.relatedImage}><DestinationImage src={item.image} alt={item.imageAlt} /></div>
-        <p className={styles.eyebrow}>{item.tags[0]}</p><h3>{item.name}</h3><p>{item.price} <span>{item.priceUnit}</span></p><span className={styles.textLink}>Explore package <ArrowRight size={17} /></span>
-      </Link>)}</div>
-    </section></Reveal>
+    <Reveal><RelatedPackages key={pkg.slug} items={related} /></Reveal>
   </div>;
 }
