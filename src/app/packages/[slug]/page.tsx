@@ -26,6 +26,7 @@ import { loginHref } from "@/lib/auth/paths";
 import { saveBookingIntent } from "@/lib/booking/intent";
 import Reveal from "@/components/ui/Reveal";
 import { business, whatsappHref } from "@/lib/data/business";
+import { resolvePackageVisuals } from "@/lib/data/package-visuals";
 import { packages } from "@/lib/data/packages";
 
 function formatPrice(value: unknown) {
@@ -80,6 +81,7 @@ export default function PackageDetailsPage() {
     );
   }
 
+  const visuals = resolvePackageVisuals(pkg);
   const packageData = pkg;
   const packageName = packageData.name;
   const price = formatPrice(packageData.price);
@@ -131,7 +133,7 @@ export default function PackageDetailsPage() {
       {/* Photography-led destination hero; checkout state and navigation are unchanged. */}
       <section className={styles.cinematicHero} aria-labelledby="package-title">
         <div className={styles.heroMedia}>
-          <DestinationImage key={pkg.slug} src={pkg.slug === "goa" ? "/video/posters/beaches.jpg" : pkg.image} alt={pkg.slug === "goa" ? "Aerial view of the Goa coastline" : pkg.imageAlt} eager sizes="100vw" />
+          <DestinationImage key={pkg.slug} src={visuals.hero.src} alt={visuals.hero.alt} fallback={{ src: pkg.image, alt: pkg.imageAlt }} eager sizes="100vw" />
         </div>
         <div className={styles.heroOverlay} aria-hidden="true" />
         <svg className={styles.heroRoute} viewBox="0 0 600 420" fill="none" aria-hidden="true">
@@ -156,7 +158,7 @@ export default function PackageDetailsPage() {
       </section>
 
       <div className={styles.destinationPaper} data-destination={pkg.slug}>
-      <DestinationBackdrop slug={pkg.slug} image={pkg.backgroundImage} />
+      <DestinationBackdrop image={visuals.backgroundImage} />
       <div className={styles.specialities} aria-label="Travel specialities">{specialities.map((item, index) => {
         const Icon = specialityIcons[index];
         return <div key={index} className={styles.speciality}><span className={styles.specialityIcon}><Icon size={28} strokeWidth={1.6} aria-hidden="true" /></span><div><h2>{item.title}</h2><p>{item.description}</p></div></div>;
@@ -170,7 +172,7 @@ export default function PackageDetailsPage() {
           <aside id="plan-your-trip" className="scroll-mt-28 lg:row-start-1 lg:col-start-2" aria-label="Book now">
             <div className="overflow-hidden rounded-[1.75rem] border border-line bg-white shadow-xl shadow-ink/5 lg:sticky lg:top-28">
               <div className={styles.priceHeader}>
-                <div className={styles.priceMedia}><DestinationImage key={pkg.slug} src={pkg.slug === "goa" ? "/video/posters/beaches.jpg" : pkg.image} alt={pkg.slug === "goa" ? "Daylight aerial photograph of Goa's sandy coastline" : pkg.imageAlt} sizes="(max-width: 1023px) 90vw, 340px" /></div>
+                <div className={styles.priceMedia}><DestinationImage key={pkg.slug} src={visuals.hero.src} alt={visuals.hero.alt} fallback={{ src: pkg.image, alt: pkg.imageAlt }} sizes="(max-width: 1023px) 90vw, 340px" /></div>
                 <div className={styles.priceOverlay} aria-hidden="true" />
                 <div className={styles.priceContent}>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
@@ -319,7 +321,7 @@ export default function PackageDetailsPage() {
       </section>
 
       <section className={styles.finalCta} aria-labelledby="final-cta-title">
-        <div className={styles.ctaMedia}><DestinationImage src={pkg.ctaImage || (pkg.slug === "goa" ? "/video/posters/beaches.jpg" : pkg.image)} alt="" sizes="100vw" /></div>
+        <div className={styles.ctaMedia}><DestinationImage src={pkg.ctaImage || visuals.hero.src} alt="" sizes="100vw" /></div>
         <div className={styles.ctaOverlay} aria-hidden="true" />
         <Reveal className={styles.ctaContent}>
           <p>READY FOR YOUR NEXT ADVENTURE?</p>

@@ -3,16 +3,18 @@
 import Image from "next/image";
 import { useState } from "react";
 import Reveal from "@/components/ui/Reveal";
-import { packageBackgrounds, universalTravelArtwork } from "@/lib/data/package-backgrounds";
+import { universalTravelArtwork } from "@/lib/data/package-backgrounds";
+import { isImageSource } from "@/lib/data/package-visuals";
 import styles from "./package-experience.module.css";
 
-function JournalArtwork({ src }: { src: string }) {
-  const [failed, setFailed] = useState(false);
-  return <Image src={failed ? universalTravelArtwork : src} alt="" fill unoptimized sizes="360px" onError={() => setFailed(true)} />;
+export function JournalArtwork({ src }: { src: string }) {
+  const [failed, setFailed] = useState<string[]>([]);
+  const image = [src, universalTravelArtwork].find(candidate => isImageSource(candidate) && !failed.includes(candidate));
+  return image ? <Image key={image} src={image} alt="" fill unoptimized sizes="360px" onError={() => setFailed(previous => [...previous, image])} /> : null;
 }
 
-export default function DestinationBackdrop({ slug, image }: { slug: string; image?: string }) {
-  const destinationArt = image || packageBackgrounds[slug] || universalTravelArtwork;
+export default function DestinationBackdrop({ image = universalTravelArtwork }: { image?: string }) {
+  const destinationArt = image;
   return <div aria-hidden="true" className={styles.travelBackdrop}>
     <Reveal className={`${styles.journalMotif} ${styles.journalOpening}`}><JournalArtwork key={destinationArt} src={destinationArt} /></Reveal>
     <Reveal className={`${styles.journalMotif} ${styles.journalRoute}`}><svg viewBox="0 0 400 360" fill="none" stroke="currentColor" strokeWidth="1.2" aria-hidden="true"><path className={styles.journalDottedPath} d="M25 330C260 350 65 70 228 88S335 240 375 25" pathLength="100" strokeDasharray="2 5"/><path d="m273 58 68-27-22 64-12-28-34-9 68-27-34 36" strokeLinejoin="round"/><circle cx="25" cy="330" r="5"/></svg></Reveal>

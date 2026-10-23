@@ -150,7 +150,10 @@ export default function VerifyEmailForm() {
       );
 
       if (rawProfile) {
-        pendingSignup = JSON.parse(rawProfile) as PendingSignup;
+        const candidate = JSON.parse(rawProfile) as PendingSignup;
+        if (candidate.email?.trim().toLowerCase() === email.toLowerCase()) {
+          pendingSignup = candidate;
+        }
       }
     } catch {
       pendingSignup = null;

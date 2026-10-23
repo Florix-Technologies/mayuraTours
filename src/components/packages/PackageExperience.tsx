@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { ArrowLeft, ArrowRight, ArrowUpRight, MapPin, Play } from "lucide-react";
+import HighlightImage from "./HighlightImage";
 import HighlightIllustration from "./HighlightIllustration";
 import { resolveHighlightIllustration, type HighlightTheme } from "@/lib/data/highlight-illustrations";
 import cardStyles from "./highlight-cards.module.css";
@@ -14,30 +15,20 @@ import PackageEssentials from "./PackageEssentials";
 import TravelServiceIcon from "./TravelServiceIcon";
 import Reveal from "@/components/ui/Reveal";
 import { packages, type TourPackage } from "@/lib/data/packages";
-import { destinationArtwork, mysoreScenes } from "@/lib/data/destination-artwork";
+import { resolvePackageVisuals, isImageSource, needsUnoptimizedImage, type VisualImage } from "@/lib/data/package-visuals";
 import styles from "./package-experience.module.css";
 
-const destinations: Record<string, { name: string; label: string }> = {
-  goa: { name: "Goa", label: "By the Arabian Sea" },
-  "ooty-coonoor": { name: "Ooty & Coonoor", label: "Into the Nilgiris" },
-  "mysore-srirangapatna": { name: "Mysore & Srirangapatna", label: "A journey through heritage" },
-  coorg: { name: "Coorg", label: "In coffee country" },
-  "kerala-munnar": { name: "Kerala & Munnar", label: "Backwaters to tea hills" },
-  chikmagalur: { name: "Chikmagalur", label: "Above the coffee estates" },
-};
-
-export function DestinationImage({ src, alt, className = "", eager = false, contain = false, sizes = "(max-width: 767px) 90vw, (max-width: 1023px) 70vw, 700px" }: {
-  src: string; alt: string; className?: string; eager?: boolean; contain?: boolean; sizes?: string;
+export function DestinationImage({ src, alt, fallback, className = "", eager = false, contain = false, sizes = "(max-width: 767px) 90vw, (max-width: 1023px) 70vw, 700px" }: {
+  src: string; alt: string; fallback?: VisualImage; className?: string; eager?: boolean; contain?: boolean; sizes?: string;
 }) {
-  const [failedSrc, setFailedSrc] = useState<string | null>(null);
-  const resolvedSrc = !src || failedSrc === src ? "/video/posters/western-ghats.jpg" : src;
-  const [fallbackFailed, setFallbackFailed] = useState(false);
-  return fallbackFailed ? (
-    <div className={`${styles.imageFallback} ${className}`} role="img" aria-label={alt}>
-      <MapPin aria-hidden="true" size={32} /><span>{alt}</span>
+  const [failed, setFailed] = useState<string[]>([]);
+  const photo = [{ src, alt }, ...(fallback ? [fallback] : [])].find(image => isImageSource(image.src) && !failed.includes(image.src));
+  return !photo ? (
+    <div className={`${styles.imageFallback} ${className}`} role="img" aria-label={alt || "Package image unavailable"}>
+      <MapPin aria-hidden="true" size={32} /><span>{alt || "Package image unavailable"}</span>
     </div>
-  ) : <Image src={resolvedSrc} alt={alt} fill sizes={sizes}
-      loading={eager ? "eager" : "lazy"} className={`${contain ? styles.cutout : styles.photo} ${className}`} onError={() => resolvedSrc === "/video/posters/western-ghats.jpg" ? setFallbackFailed(true) : setFailedSrc(src)} />;
+  ) : <Image key={photo.src} src={photo.src} alt={photo.alt} fill sizes={sizes} unoptimized={needsUnoptimizedImage(photo.src)}
+      loading={eager ? "eager" : "lazy"} className={`${contain && photo.src === src ? styles.cutout : styles.photo} ${className}`} onError={() => setFailed(previous => [...previous, photo.src])} />;
 }
 
 function SectionHeading({ label, title }: { label: string; title: string }) {
@@ -78,10 +69,10 @@ function HighlightExplorer({ pkg, highlights, demo = false }: { pkg: TourPackage
     const title = typeof item === "string" ? item : item.title || item.name || "Destination highlight";
     const description = typeof item === "string" ? "" : item.description || "";
     const illustration = resolveHighlightIllustration(title, description, typeof item === "string" ? undefined : item.illustration);
-    const theme = themes[index % themes.length];
+    const theme = (typeof item !== "string" && item.theme) || themes[index % themes.length];
     return <JoiningHighlight key={`${pkg.slug}-${index}`} className={cardStyles.reveal}>
       <article className={cardStyles.card} data-theme={theme} tabIndex={0}>
-        <div className={cardStyles.art}><span className={cardStyles.number}>{String(index + 1).padStart(2, "0")}</span><HighlightIllustration kind={illustration} /></div>
+        <div className={cardStyles.art}><span className={cardStyles.number}>{String(index + 1).padStart(2, "0")}</span><HighlightImage candidates={typeof item !== "string" && item.image ? [{ src: item.image, alt: item.imageAlt || title }] : []} fallback={<HighlightIllustration kind={illustration} />} /></div>
         <div className={cardStyles.copy}><span className={cardStyles.accent} aria-hidden="true" /><h3>{demo ? customerCopy(title) : title}</h3>
           {description && <p>{demo ? customerCopy(description) : description}</p>}
         </div>
@@ -220,7 +211,7 @@ function RelatedPackages({ items }: { items: TourPackage[] }) {
           }}>
           {items.map(item => {
             const duration = item.duration || item.tags.find(tag => /night|day|same-day/i.test(tag));
-            const destination = item.destination || destinations[item.slug]?.name;
+            const destination = item.destination || resolvePackageVisuals(item).name;
             return <article key={item.slug} className={styles.relatedLink} tabIndex={0} aria-labelledby={`related-title-${item.slug}`}>
               <div className={styles.relatedImage}>
                 <DestinationImage src={item.image} alt={item.imageAlt} sizes="(max-width: 639px) 85vw, (max-width: 1023px) 40vw, 260px" />
@@ -251,9 +242,9 @@ function RelatedPackages({ items }: { items: TourPackage[] }) {
 }
 
 export default function PackageExperience({ pkg }: { pkg: TourPackage }) {
-  const destination = destinations[pkg.slug] ?? { name: pkg.name, label: "Discover your destination" };
-  const art = pkg.avatar || destinationArtwork[pkg.slug];
-  const isMysore = pkg.slug === "mysore-srirangapatna";
+  const destination = resolvePackageVisuals(pkg);
+  const art = destination.avatar;
+  const isMysore = Boolean(destination.palace);
   const demo = pkg.demoContent;
   const highlights = pkg.highlights?.length ? pkg.highlights : demo?.highlights ?? [];
   const itinerary = pkg.itinerary?.length ? pkg.itinerary : demo?.itinerary ?? [];
@@ -266,8 +257,8 @@ export default function PackageExperience({ pkg }: { pkg: TourPackage }) {
     <Reveal><section className={styles.introduction} aria-labelledby="destination-heading">
       <AvatarStage className={`${styles.artworkStage} ${isMysore ? styles.mysoreStage : ""}`}>
         <div className={styles.artworkHalo} aria-hidden="true" />
-        {isMysore && <div className={styles.mysorePalace}><DestinationImage src={mysoreScenes.palace.src} alt={mysoreScenes.palace.alt} sizes="(max-width: 639px) 85vw, 420px" /></div>}
-        <div className={styles.artwork}><DestinationImage key={pkg.slug} src={art?.src ?? pkg.image} alt={art?.alt ?? pkg.imageAlt} contain={Boolean(art)} /></div>
+        {destination.palace && <div className={styles.mysorePalace}><DestinationImage src={destination.palace.src} alt={destination.palace.alt} sizes="(max-width: 639px) 85vw, 420px" /></div>}
+        <div className={styles.artwork}><DestinationImage key={pkg.slug} src={art?.src ?? pkg.image} alt={art?.alt ?? pkg.imageAlt} contain={Boolean(art)} fallback={{ src: pkg.image, alt: pkg.imageAlt }} /></div>
         <span className={styles.imageCaption}><MapPin size={15} aria-hidden="true" />{destination.name}</span>
         <svg className={styles.route} viewBox="0 0 240 160" fill="none" aria-hidden="true"><path d="M5 140C100 145 40 10 125 25S240 60 225 5" stroke="currentColor" strokeWidth="2" strokeDasharray="4 8" /></svg>
       </AvatarStage>
@@ -289,7 +280,7 @@ export default function PackageExperience({ pkg }: { pkg: TourPackage }) {
     </section></Reveal>
 
     <section id="highlights" className={`${styles.section} ${styles.highlightsSection}`}>
-      <HighlightsBackdrop key={pkg.slug} slug={pkg.slug} artwork={pkg.backgroundImage} />
+      <HighlightsBackdrop key={pkg.slug} artwork={destination.backgroundImage} />
       <SectionHeading label="Worth the journey" title="The highlights." />
       <HighlightExplorer key={pkg.slug} pkg={pkg} highlights={highlights} demo={!pkg.highlights?.length} />
     </section>
@@ -309,14 +300,15 @@ export default function PackageExperience({ pkg }: { pkg: TourPackage }) {
     <Reveal><section id="photos" className={styles.section}>
       <SectionHeading label="A sense of place" title="Moments from the Journey." />
       <div className={styles.gallery}><figure className={styles.galleryMain}><div><DestinationImage src={pkg.image} alt={pkg.imageAlt} /></div><figcaption>{pkg.imageAlt}</figcaption></figure>
-        {pkg.slug === "goa" && <figure className={styles.video}><video controls preload="none" playsInline poster="/video/posters/beaches.jpg" aria-label="Goa coastal destination film"><source src="/video/goa-beach-aerial.mp4" type="video/mp4" />Your browser does not support video.</video><figcaption><Play size={14} aria-hidden="true" />Goa coastal film</figcaption></figure>}
+        {destination.video && <figure className={styles.video}><video controls preload="none" playsInline poster={destination.video.poster} aria-label={destination.video.label}><source src={destination.video.src} type="video/mp4" />Your browser does not support video.</video><figcaption><Play size={14} aria-hidden="true" />{destination.video.title}</figcaption></figure>}
+        {pkg.gallery?.map((photo, index) => <figure key={`${photo.src}-${index}`} className={styles.galleryMain}><div><DestinationImage src={photo.src} alt={photo.alt} /></div><figcaption>{photo.alt}</figcaption></figure>)}
       </div>
-      {pkg.slug === "goa" && <div className={styles.illustrations}>{[1, 2, 3].map(index => <div key={index}><DestinationImage src={`/images/destinations/goa-illustration-${index}.png`} alt={`Goa coastal travel illustration ${index}`} /></div>)}</div>}
-      {isMysore && <figure className={styles.mysoreMarket}>
-        <div className={styles.mysoreMarketImage}><DestinationImage src={mysoreScenes.market.src} alt={mysoreScenes.market.alt} sizes="(max-width: 639px) 90vw, 650px" /></div>
-        <figcaption><p className={styles.eyebrow}>Heritage in the everyday</p><h3>A different perspective on Mysore.</h3><p>Destination-inspired artwork / artistic impression</p></figcaption>
+      {destination.illustrations && <div className={styles.illustrations}>{destination.illustrations.map(photo => <div key={photo.src}><DestinationImage src={photo.src} alt={photo.alt} /></div>)}</div>}
+      {destination.feature && <figure className={styles.mysoreMarket}>
+        <div className={styles.mysoreMarketImage}><DestinationImage src={destination.feature.src} alt={destination.feature.alt} sizes="(max-width: 639px) 90vw, 650px" /></div>
+        <figcaption><p className={styles.eyebrow}>{destination.feature.label}</p><h3>{destination.feature.title}</h3><p>Destination-inspired artwork / artistic impression</p></figcaption>
       </figure>}
-      {pkg.slug !== "goa" && <p className={styles.pending}>Additional destination photos and videos have not been published yet.</p>}
+      {!destination.video && !pkg.gallery?.length && <p className={styles.pending}>Additional destination photos and videos have not been published yet.</p>}
     </section></Reveal>
 
     <Reveal><section className={styles.section} aria-label="Package policies">

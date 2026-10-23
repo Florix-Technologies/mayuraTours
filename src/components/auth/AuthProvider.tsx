@@ -13,6 +13,7 @@ import {
   clearStoredUser,
   persistUser,
   readStoredUser,
+  readAccountProfile,
   type AuthUser,
 } from "@/lib/auth/session";
 
@@ -34,24 +35,17 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-function getInitialUser(): AuthUser | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  return readStoredUser();
-}
-
 export function AuthProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [user, setUser] = useState<AuthUser | null>(getInitialUser);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
+      setUser(readStoredUser());
       setIsReady(true);
     });
 
@@ -70,15 +64,20 @@ export function AuthProvider({
         gender?: string;
       },
     ) => {
+      const normalizedEmail = email.trim().toLowerCase();
+      const storedUser = readStoredUser();
       const nextUser: AuthUser = {
-        email: email.trim().toLowerCase(),
+        ...readAccountProfile(normalizedEmail),
+        // Migrate existing sessions before they are replaced or signed out.
+        ...(storedUser?.email === normalizedEmail ? storedUser : {}),
+        email: normalizedEmail,
         ...(profile?.name ? { name: profile.name.trim() } : {}),
         ...(profile?.age ? { age: profile.age } : {}),
         ...(profile?.gender ? { gender: profile.gender } : {}),
       };
 
       persistUser(nextUser, remember);
-      setUser(nextUser);
+      setUser(readStoredUser());
     },
     [],
   );

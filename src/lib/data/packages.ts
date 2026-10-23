@@ -1,3 +1,4 @@
+import type { PackageVisuals } from "./package-visuals";
 import type { HighlightIllustrationKind, HighlightTheme } from "./highlight-illustrations";
 import { packageHighlightGalleries, type HighlightPhoto } from "./highlight-images";
 import { packageDemoContent, type PackageDemoContent } from "./package-demo-content";
@@ -5,12 +6,17 @@ import { packageDemoContent, type PackageDemoContent } from "./package-demo-cont
 export type TourPackage = {
   /** Optional design preview content; never authoritative booking data. */
   demoContent?: PackageDemoContent;
+  /** Optional destination theme; independent of the package URL. */
+  destinationKey?: string;
+  visuals?: PackageVisuals;
   tagline?: string;
   destination?: string;
   duration?: string;
   travellerInfo?: string;
   specialities?: Array<{ title: string; description: string }>;
   gallery?: HighlightPhoto[];
+  /** Optional highlight reference photos, separate from published gallery content. */
+  highlightGallery?: HighlightPhoto[];
   /** Decorative SVG URL; failures use the universal travel illustration. */
   backgroundImage?: string;
   avatar?: { src: string; alt: string };
@@ -38,7 +44,8 @@ export type TourPackage = {
 export const packages: TourPackage[] = [
   {
     slug: "goa",
-    gallery: packageHighlightGalleries["goa"],
+    visuals: { hero: { src: "/video/posters/beaches.jpg", alt: "Aerial view of the Goa coastline" } },
+    highlightGallery: packageHighlightGalleries["goa"],
     demoContent: packageDemoContent["goa"],
     name: "Goa Beach Getaway",
     badge: "Monsoon Special",
@@ -58,7 +65,7 @@ export const packages: TourPackage[] = [
   },
   {
     slug: "ooty-coonoor",
-    gallery: packageHighlightGalleries["ooty-coonoor"],
+    highlightGallery: packageHighlightGalleries["ooty-coonoor"],
     demoContent: packageDemoContent["ooty-coonoor"],
     name: "Ooty + Coonoor Hills",
     badge: "Cool Season",
@@ -77,7 +84,7 @@ export const packages: TourPackage[] = [
   },
   {
     slug: "mysore-srirangapatna",
-    gallery: packageHighlightGalleries["mysore-srirangapatna"],
+    highlightGallery: packageHighlightGalleries["mysore-srirangapatna"],
     demoContent: packageDemoContent["mysore-srirangapatna"],
     name: "Mysore & Srirangapatna",
     badge: "Daily Departure",
@@ -95,7 +102,7 @@ export const packages: TourPackage[] = [
   },
   {
     slug: "coorg",
-    gallery: packageHighlightGalleries["coorg"],
+    highlightGallery: packageHighlightGalleries["coorg"],
     demoContent: packageDemoContent["coorg"],
     name: "Coorg Coffee Country",
     badge: "Year-round",
@@ -115,7 +122,7 @@ export const packages: TourPackage[] = [
   },
   {
     slug: "kerala-munnar",
-    gallery: packageHighlightGalleries["kerala-munnar"],
+    highlightGallery: packageHighlightGalleries["kerala-munnar"],
     demoContent: packageDemoContent["kerala-munnar"],
     name: "Kerala Backwaters & Munnar",
     badge: "God's Own Country",
@@ -136,7 +143,7 @@ export const packages: TourPackage[] = [
   },
   {
     slug: "chikmagalur",
-    gallery: packageHighlightGalleries["chikmagalur"],
+    highlightGallery: packageHighlightGalleries["chikmagalur"],
     demoContent: packageDemoContent["chikmagalur"],
     name: "Chikmagalur & Mullayanagiri",
     badge: "Trek Friendly",

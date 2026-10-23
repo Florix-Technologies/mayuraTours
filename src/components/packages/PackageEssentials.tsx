@@ -23,7 +23,7 @@ export default function PackageEssentials({ pkg }: { pkg: TourPackage }) {
 
   const find = (pattern: RegExp) => pkg.tags.find(tag => pattern.test(tag)) ?? "Not specified";
   const items = [
-    { label: "Duration", value: find(/nights?|days?|same-day/i), Icon: CalendarDays },
+    { label: "Duration", value: pkg.duration || find(/nights?|days?|same-day/i), Icon: CalendarDays },
     { label: "Accommodation", value: find(/hotel|resort|stay/i), Icon: BedDouble },
     { label: "Transport", value: find(/coach|volvo|sleeper|transport/i), Icon: Bus },
     { label: "Meals", value: find(/breakfast|lunch|dinner|meals?/i), Icon: Utensils },

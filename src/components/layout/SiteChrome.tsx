@@ -10,7 +10,7 @@ import { isAuthPagePath } from "@/lib/auth/paths";
 
 export default function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const hideChrome = isAuthPagePath(pathname);
+  const hideChrome = isAuthPagePath(pathname) || pathname === "/booking/payment";
 
   useEffect(() => {
     document.body.style.paddingBottom = hideChrome ? "0px" : "";

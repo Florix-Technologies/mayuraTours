@@ -1,7 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { DestinationImage } from "@/components/packages/PackageExperience";
+import { packages } from "@/lib/data/packages";
+import { business, telHref } from "@/lib/data/business";
+import styles from "./traveller-details.module.css";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { loginHref } from "@/lib/auth/paths";
@@ -15,6 +20,10 @@ import {
   ArrowRight,
   CalendarDays,
   Check,
+  Users,
+  UserRound,
+  House,
+  Info,
   Mail,
   Phone,
 } from "lucide-react";
@@ -32,6 +41,12 @@ const emptyTraveller = (): Traveller => ({
 });
 
 export default function TravelerDetailsPage() {
+  const { user } = useAuth();
+  // A different account receives a fresh form, including manual edits and contact data.
+  return <TravelerDetailsForm key={user?.email ?? "signed-out"} />;
+}
+
+function TravelerDetailsForm() {
   const router = useRouter();
   const { user, isAuthenticated, isReady } = useAuth();
 
@@ -45,6 +60,8 @@ export default function TravelerDetailsPage() {
   const [travellingSelf, setTravellingSelf] = useState<boolean | null>(null);
 
   const [error, setError] = useState("");
+  const [appliedProfile, setAppliedProfile] = useState<Traveller>(emptyTraveller);
+  const editedLeadFields = useRef(new Set<keyof Traveller>());
 
   useEffect(() => {
     if (!isReady) return;
@@ -63,14 +80,61 @@ export default function TravelerDetailsPage() {
     const count = Math.max(Number(booking.travellers) || 1, 1);
 
     setTravellers(
-      Array.from({ length: count }, () => emptyTraveller()),
+      Array.from({ length: count }, (_, index) => ({
+        ...(booking.travellerDetails?.[index] ?? emptyTraveller()),
+      })),
     );
+    if (booking.leadEmail) setLeadEmail(booking.leadEmail);
+    if (booking.leadPhone) setLeadPhone(booking.leadPhone);
+  }, [isAuthenticated, isReady, router]);
 
-    if (user?.email) {
-      setLeadEmail(user.email);
+  useEffect(() => {
+    // Synchronize the asynchronously restored account without replacing user input.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (user?.email) setLeadEmail((current) => current || user.email);
+  }, [user?.email]);
+
+  const profileName = user?.name?.trim() ?? "";
+  const profileAge = user?.age?.trim() ?? "";
+  const savedGender = user?.gender?.trim().toLowerCase() ?? "";
+  const profileGender = ["male", "female", "other"].includes(savedGender)
+    ? savedGender
+    : "";
+
+  useEffect(() => {
+    if (!isReady || travellingSelf !== true) return;
+
+    // Late profile data may fill untouched fields, but must preserve manual edits.
+    const profile: Traveller = {
+      fullName: profileName,
+      age: profileAge,
+      gender: profileGender,
+    };
+    const edited = new Set(editedLeadFields.current);
+    const applied = { ...profile };
+    for (const field of ["fullName", "age", "gender"] as const) {
+      if (edited.has(field)) applied[field] = "";
     }
-  }, [isAuthenticated, isReady, router, user]);
+    // Record which values this profile synchronization actually applies.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAppliedProfile(applied);
+    setTravellers((current) =>
+      current.map((traveller, index) => {
+        if (index !== 0) return traveller;
+        const next = { ...traveller };
+        for (const field of ["fullName", "age", "gender"] as const) {
+          if (!edited.has(field)) next[field] = profile[field];
+        }
+        return next;
+      }),
+    );
+  }, [isReady, travellingSelf, profileName, profileAge, profileGender, travellers.length]);
 
+  const profileApplied = travellingSelf === true && Boolean(
+    (appliedProfile.fullName && travellers[0]?.fullName === appliedProfile.fullName) ||
+    (appliedProfile.age && travellers[0]?.age === appliedProfile.age) ||
+    (appliedProfile.gender && travellers[0]?.gender === appliedProfile.gender),
+  );
   const travellerCount = travellers.length || 1;
 
   const formattedDate = useMemo(() => {
@@ -94,6 +158,7 @@ export default function TravelerDetailsPage() {
     field: keyof Traveller,
     value: string,
   ) {
+    if (index === 0) editedLeadFields.current.add(field);
     setTravellers((current) =>
       current.map((traveller, travellerIndex) =>
         travellerIndex === index
@@ -109,42 +174,15 @@ export default function TravelerDetailsPage() {
   }
 
   function handleSelfChoice(isSelf: boolean) {
+    if (travellingSelf === isSelf) return;
+
+    editedLeadFields.current.clear();
+    setAppliedProfile(emptyTraveller());
     setTravellingSelf(isSelf);
     setError("");
-
-    if (travellers.length === 0) return;
-
-    if (!isSelf) {
-      setTravellers((current) =>
-        current.map((traveller, index) =>
-          index === 0 ? emptyTraveller() : traveller,
-        ),
-      );
-
-      return;
-    }
-
-    if (!user) {
-      setError(
-        "We couldn't find your saved profile details. Please enter them manually.",
-      );
-      return;
-    }
-
-    const fullName = user.name?.trim() ?? "";
-    const age = user.age ? String(user.age) : "";
-    const gender = user.gender?.trim() ?? "";
-
     setTravellers((current) =>
       current.map((traveller, index) =>
-        index === 0
-          ? {
-              ...traveller,
-              fullName,
-              age,
-              gender,
-            }
-          : traveller,
+        index === 0 && (isSelf || travellingSelf !== null) ? emptyTraveller() : traveller,
       ),
     );
   }
@@ -212,538 +250,96 @@ export default function TravelerDetailsPage() {
     );
   }
 
+  const pkg = packages.find((item) => item.slug === intent.slug);
+  const journeyImage = pkg?.slug === "goa" ? "/video/posters/beaches.jpg" : pkg?.image || "/video/posters/western-ghats.jpg";
+  const imageAlt = pkg?.imageAlt || "Scenic landscape along the journey";
+
   return (
-    <main className="min-h-screen bg-[#F8FAFD] pb-20">
-
-      {/* HERO */}
-      <section className="relative isolate min-h-[390px] overflow-hidden bg-navy pt-24 pb-16 sm:min-h-[430px] sm:pt-28 sm:pb-20">
-
-        {/* Background image */}
-        <div
-          className="absolute inset-0 -z-20 bg-cover bg-center"
-          style={{
-            backgroundImage: "url('/images/traveller-details-hero.jpeg')",
-          }}
-        />
-
-        {/* Cinematic dark overlay */}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#031B3B]/95 via-[#062F61]/65 to-[#062F61]/20" />
-
-        {/* Subtle bottom fade */}
-        <div className="absolute inset-x-0 bottom-0 -z-10 h-24 bg-gradient-to-t from-[#0b2d52]/45 to-transparent" />
-
-        <div className="relative mx-auto max-w-6xl px-5 sm:px-8">
-
-          {/* Back button */}
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="mb-10 inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/10 px-4 py-2 text-xs font-semibold text-white backdrop-blur-md transition-all hover:bg-white/15"
-          >
-            <ArrowLeft size={15} />
-            Back to Booking
-          </button>
-
-          {/* Hero content */}
-          <div className="max-w-2xl">
-
-            {/* Step label */}
-            <div className="flex items-center gap-3">
-              <span className="h-px w-9 bg-accent" />
-
-              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/75">
-                Step 2 · Traveller Details
-              </p>
+    <main className={styles.page}>
+      <section className={styles.hero} aria-labelledby="traveller-title">
+        <div className={styles.heroImage}><DestinationImage key={intent.slug} src={journeyImage} alt={imageAlt} eager sizes="100vw" /></div>
+        <div className={styles.heroOverlay} aria-hidden="true" />
+        <div className={styles.container}>
+          <button type="button" onClick={() => router.back()} className={styles.heroBack}><ArrowLeft size={14} />Back to Booking</button>
+          <p className={styles.step}>Step 2 &bull; Traveller Details</p>
+          <h1 id="traveller-title">Who&apos;s joining<br />the journey?</h1>
+          <p className={styles.subtitle}>Tell us who&apos;s travelling so we can prepare your booking details correctly.</p>
+        </div>
+      </section>
+      <div className={`${styles.container} ${styles.content}`}>
+        <form onSubmit={handleSubmit} className={styles.layout}>
+          <div className={styles.main}>
+            <div className={styles.entry}><section className={styles.section} aria-labelledby="contact-title">
+              <p className={styles.eyebrow}>Your contact</p>
+              <h2 id="contact-title">How can we reach you?</h2>
+              <p className={styles.description}>We&apos;ll send booking updates and important travel information to these details.</p>
+              <div className={styles.contactFields}>
+                <label><span>Email address</span><div className={styles.inputIcon}><Mail size={17} aria-hidden="true" /><input type="email" autoComplete="email" value={leadEmail} onChange={(event) => { setLeadEmail(event.target.value); setError(""); }} placeholder="Enter email address" /></div></label>
+                <label><span>Mobile number</span><div className={styles.inputIcon}><Phone size={17} aria-hidden="true" /><input type="tel" autoComplete="tel" value={leadPhone} onChange={(event) => { setLeadPhone(event.target.value); setError(""); }} placeholder="Enter mobile number" /></div></label>
+              </div>
+            </section></div>
+            <div className={styles.entry}><section className={styles.bookingFor} aria-labelledby="booking-for-title">
+              <p className={styles.eyebrow}>Traveller 01</p>
+              <h2 id="booking-for-title">Who is the booking for?</h2>
+              <p className={styles.description}>Choose an option and we&apos;ll prepare the first traveller&apos;s details accordingly.</p>
+              <div className={styles.choices} role="group" aria-labelledby="booking-for-title">
+                {[{ self: true, title: "I'm travelling", detail: "Use my profile details", icon: UserRound }, { self: false, title: "I'm booking for someone", detail: "Enter their details manually", icon: Users }].map(({ self, title, detail, icon: Icon }) => (
+                  <button key={String(self)} type="button" aria-pressed={travellingSelf === self} onClick={() => handleSelfChoice(self)} className={styles.choice}>
+                    <span className={styles.choiceIcon}><Icon size={21} strokeWidth={1.6} aria-hidden="true" /></span>
+                    <span className={styles.choiceText}><strong>{title}</strong><small>{detail}</small></span>
+                    <span className={styles.check}>{travellingSelf === self && <Check size={12} strokeWidth={3} aria-hidden="true" />}</span>
+                  </button>
+                ))}
+              </div>
+              {profileApplied && <p className={styles.profileNote}>Your saved profile details have been applied to Traveller 1. You can still edit anything here.</p>}
+            </section></div>
+            <div className={styles.entry}><section className={styles.section} aria-labelledby="information-title">
+              <p className={styles.eyebrow}>Traveller information</p>
+              <div className={styles.sectionHeading}><h2 id="information-title">Traveller details</h2><span className={styles.count}>{travellerCount} {travellerCount === 1 ? "Traveller" : "Travellers"}</span></div>
+              <p className={styles.description}>Enter the details exactly as they should appear on the booking.</p>
+              <div className={styles.travellers}>
+                {travellers.map((traveller, index) => (
+                  <section key={index} className={styles.traveller} aria-labelledby={`traveller-${index}`}>
+                    <div className={styles.travellerHeader}><span className={styles.number}>{String(index + 1).padStart(2, "0")}</span><div><h3 id={`traveller-${index}`}>{index === 0 ? "Lead traveller" : `Traveller ${index + 1}`}</h3>{index === 0 && profileApplied && <small>Profile details applied</small>}</div>{index === 0 && <span className={styles.lead}>Lead</span>}</div>
+                    <div className={styles.travellerFields}>
+                      <label><span>Full name</span><input type="text" value={traveller.fullName} onChange={(event) => updateTraveller(index, "fullName", event.target.value)} placeholder="Enter full name" /></label>
+                      <label><span>Age</span><input type="number" min="1" max="120" value={traveller.age} onChange={(event) => updateTraveller(index, "age", event.target.value)} placeholder="Enter age" /></label>
+                      <label><span>Gender</span><select value={traveller.gender} onChange={(event) => updateTraveller(index, "gender", event.target.value)}><option value="">Select gender</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select></label>
+                    </div>
+                  </section>
+                ))}
+              </div>
+            </section></div>
+            {error && <p className={styles.error} role="alert">{error}</p>}
+            <div className={styles.actions}>
+              <button type="button" onClick={() => router.back()} className={styles.back}><ArrowLeft size={16} />Back</button>
+              <button type="submit" className={styles.continue}>Continue to Payment<ArrowRight size={17} /></button>
             </div>
-
-            {/* Heading */}
-            <h1 className="mt-4 text-4xl font-extrabold leading-[1.05] tracking-[-0.04em] text-white sm:text-5xl lg:text-[54px]">
-              Who&apos;s joining
-              <br />
-              the journey?
-            </h1>
-
-            {/* Description */}
-            <p className="mt-5 max-w-xl text-sm leading-7 text-white/75 sm:text-base">
-              Tell us who&apos;s travelling so we can prepare your booking
-              details correctly.
-            </p>
-
           </div>
-        </div>
-      </section>
-
-      {/* CONTENT */}
-      <section className="relative -mt-5">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8">
-          <form
-            onSubmit={handleSubmit}
-            className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_330px]"
-          >
-
-            {/* MAIN FORM */}
-            <div className="space-y-6">
-
-              {/* CONTACT */}
-              <section className="rounded-[28px] border border-[#E4E9F0] bg-white p-6 shadow-[0_20px_60px_-45px_rgba(8,45,92,0.3)] sm:p-8">
-                <div>
-                  <p className="text-[10px] font-bold tracking-[0.18em] text-accent uppercase">
-                    Your contact
-                  </p>
-
-                  <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-navy">
-                    How can we reach you?
-                  </h2>
-
-                  <p className="mt-2 max-w-xl text-sm leading-6 text-slate">
-                    We&apos;ll send booking updates and important travel
-                    information to these details.
-                  </p>
-                </div>
-
-                <div className="mt-7 grid gap-5 sm:grid-cols-2">
-
-                  <label className="block">
-                    <span className="mb-2 block text-xs font-bold text-navy">
-                      Email address
-                    </span>
-
-                    <div className="relative">
-                      <Mail
-                        size={16}
-                        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#8EA0B8]"
-                      />
-
-                      <input
-                        type="email"
-                        value={leadEmail}
-                        onChange={(event) => {
-                          setLeadEmail(event.target.value);
-                          setError("");
-                        }}
-                        placeholder="you@example.com"
-                        className="w-full rounded-2xl border border-[#DDE5EF] bg-[#FBFCFE] py-3.5 pl-11 pr-4 text-sm text-navy outline-none transition-all placeholder:text-[#9AA9BC] focus:border-blue focus:bg-white focus:ring-4 focus:ring-blue/5"
-                      />
-                    </div>
-                  </label>
-
-                  <label className="block">
-                    <span className="mb-2 block text-xs font-bold text-navy">
-                      Mobile number
-                    </span>
-
-                    <div className="relative">
-                      <Phone
-                        size={16}
-                        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#8EA0B8]"
-                      />
-
-                      <input
-                        type="tel"
-                        value={leadPhone}
-                        onChange={(event) => {
-                          setLeadPhone(event.target.value);
-                          setError("");
-                        }}
-                        placeholder="+91 98765 43210"
-                        className="w-full rounded-2xl border border-[#DDE5EF] bg-[#FBFCFE] py-3.5 pl-11 pr-4 text-sm text-navy outline-none transition-all placeholder:text-[#9AA9BC] focus:border-blue focus:bg-white focus:ring-4 focus:ring-blue/5"
-                      />
-                    </div>
-                  </label>
-
-                </div>
-              </section>
-
-              {/* WHO IS TRAVELLING */}
-              <section className="rounded-[28px] border border-[#E4E9F0] bg-white p-6 shadow-[0_20px_60px_-45px_rgba(8,45,92,0.3)] sm:p-8">
-
-                <div>
-                  <p className="text-[10px] font-bold tracking-[0.18em] text-accent uppercase">
-                    Traveller 01
-                  </p>
-
-                  <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-navy">
-                    Who is the booking for?
-                  </h2>
-
-                  <p className="mt-2 text-sm leading-6 text-slate">
-                    Choose an option and we&apos;ll prepare the first
-                    traveller&apos;s details accordingly.
-                  </p>
-                </div>
-
-                <div className="mt-6 grid gap-3 sm:grid-cols-2">
-
-                  {/* SELF */}
-                  <button
-                    type="button"
-                    onClick={() => handleSelfChoice(true)}
-                    className={`group flex items-center gap-4 rounded-2xl border p-4 text-left transition-all ${
-                      travellingSelf === true
-                        ? "border-blue bg-[#F2F7FF] ring-2 ring-blue/10"
-                        : "border-[#E1E7EF] bg-[#FCFDFE] hover:border-[#B9CBE2] hover:bg-white"
-                    }`}
-                  >
-                    <span
-                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[11px] font-extrabold transition-colors ${
-                        travellingSelf === true
-                          ? "bg-blue text-white"
-                          : "bg-[#EEF4FC] text-blue"
-                      }`}
-                    >
-                      01
-                    </span>
-
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-bold text-navy">
-                        I&apos;m travelling
-                      </span>
-
-                      <span className="mt-1 block text-xs text-slate">
-                        Use my profile details
-                      </span>
-                    </span>
-
-                    {travellingSelf === true && (
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue text-white">
-                        <Check size={13} strokeWidth={3} />
-                      </span>
-                    )}
-                  </button>
-
-                  {/* SOMEONE ELSE */}
-                  <button
-                    type="button"
-                    onClick={() => handleSelfChoice(false)}
-                    className={`group flex items-center gap-4 rounded-2xl border p-4 text-left transition-all ${
-                      travellingSelf === false
-                        ? "border-accent bg-[#FFF6F9] ring-2 ring-accent/10"
-                        : "border-[#E1E7EF] bg-[#FCFDFE] hover:border-[#D8BBC8] hover:bg-white"
-                    }`}
-                  >
-                    <span
-                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[11px] font-extrabold transition-colors ${
-                        travellingSelf === false
-                          ? "bg-accent text-white"
-                          : "bg-[#FCF0F4] text-accent"
-                      }`}
-                    >
-                      02
-                    </span>
-
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-bold text-navy">
-                        I&apos;m booking for someone
-                      </span>
-
-                      <span className="mt-1 block text-xs text-slate">
-                        Enter their details manually
-                      </span>
-                    </span>
-
-                    {travellingSelf === false && (
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent text-white">
-                        <Check size={13} strokeWidth={3} />
-                      </span>
-                    )}
-                  </button>
-
-                </div>
-
-                {travellingSelf === true && (
-                  <div className="mt-4 rounded-2xl border border-[#D7E6FA] bg-[#F5F9FF] px-4 py-3.5">
-                    <p className="text-xs leading-5 text-[#45607F]">
-                      Your saved profile details have been applied to
-                      Traveller 1. You can still edit anything here.
-                    </p>
-                  </div>
-                )}
-
-              </section>
-
-              {/* TRAVELLERS */}
-              <section className="rounded-[28px] border border-[#E4E9F0] bg-white p-6 shadow-[0_20px_60px_-45px_rgba(8,45,92,0.3)] sm:p-8">
-
-                <div className="flex items-end justify-between gap-5">
-                  <div>
-                    <p className="text-[10px] font-bold tracking-[0.18em] text-accent uppercase">
-                      Travel party
-                    </p>
-
-                    <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-navy">
-                      Traveller information
-                    </h2>
-
-                    <p className="mt-2 text-sm leading-6 text-slate">
-                      Enter the details exactly as they should appear on the
-                      booking.
-                    </p>
-                  </div>
-
-                  <span className="shrink-0 rounded-full bg-[#EEF5FF] px-3.5 py-2 text-xs font-bold text-blue">
-                    {travellerCount}{" "}
-                    {travellerCount === 1 ? "Traveller" : "Travellers"}
-                  </span>
-                </div>
-
-                <div className="mt-7 space-y-4">
-
-                  {travellers.map((traveller, index) => (
-                    <div
-                      key={index}
-                      className="overflow-hidden rounded-[24px] border border-[#E1E7EF] bg-[#FCFDFE]"
-                    >
-
-                      <div className="flex items-center justify-between border-b border-[#E8EDF3] px-5 py-4 sm:px-6">
-
-                        <div className="flex items-center gap-3">
-
-                          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-navy text-[11px] font-extrabold text-white">
-                            {String(index + 1).padStart(2, "0")}
-                          </span>
-
-                          <div>
-                            <h3 className="text-sm font-extrabold text-navy">
-                              {index === 0
-                                ? "Lead traveller"
-                                : `Traveller ${index + 1}`}
-                            </h3>
-
-                            {index === 0 && travellingSelf === true && (
-                              <p className="mt-0.5 text-[11px] font-semibold text-blue">
-                                Profile details applied
-                              </p>
-                            )}
-                          </div>
-
-                        </div>
-
-                        {index === 0 && (
-                          <span className="hidden rounded-full border border-[#DCE7F5] bg-white px-3 py-1 text-[10px] font-bold tracking-wide text-slate uppercase sm:inline-flex">
-                            Lead
-                          </span>
-                        )}
-
-                      </div>
-
-                      <div className="p-5 sm:p-6">
-
-                        <div className="grid gap-5 sm:grid-cols-2">
-
-                          <label className="block sm:col-span-2">
-                            <span className="mb-2 block text-xs font-bold text-navy">
-                              Full name
-                            </span>
-
-                            <input
-                              type="text"
-                              value={traveller.fullName}
-                              onChange={(event) =>
-                                updateTraveller(
-                                  index,
-                                  "fullName",
-                                  event.target.value,
-                                )
-                              }
-                              placeholder="Enter full name"
-                              className="w-full rounded-2xl border border-[#DDE5EF] bg-white px-4 py-3.5 text-sm text-navy outline-none transition-all placeholder:text-[#9AA9BC] focus:border-blue focus:ring-4 focus:ring-blue/5"
-                            />
-                          </label>
-
-                          <label className="block">
-                            <span className="mb-2 block text-xs font-bold text-navy">
-                              Age
-                            </span>
-
-                            <input
-                              type="number"
-                              min="1"
-                              max="120"
-                              value={traveller.age}
-                              onChange={(event) =>
-                                updateTraveller(
-                                  index,
-                                  "age",
-                                  event.target.value,
-                                )
-                              }
-                              placeholder="Enter age"
-                              className="w-full rounded-2xl border border-[#DDE5EF] bg-white px-4 py-3.5 text-sm text-navy outline-none transition-all placeholder:text-[#9AA9BC] focus:border-blue focus:ring-4 focus:ring-blue/5"
-                            />
-                          </label>
-
-                          <label className="block">
-                            <span className="mb-2 block text-xs font-bold text-navy">
-                              Gender
-                            </span>
-
-                            <select
-                              value={traveller.gender}
-                              onChange={(event) =>
-                                updateTraveller(
-                                  index,
-                                  "gender",
-                                  event.target.value,
-                                )
-                              }
-                              className="w-full cursor-pointer rounded-2xl border border-[#DDE5EF] bg-white px-4 py-3.5 text-sm font-medium text-navy outline-none transition-all focus:border-blue focus:ring-4 focus:ring-blue/5"
-                            >
-                              <option value="">Select gender</option>
-                              <option value="male">Male</option>
-                              <option value="female">Female</option>
-                              <option value="other">Other</option>
-                            </select>
-                          </label>
-
-                        </div>
-
-                      </div>
-                    </div>
-                  ))}
-
-                </div>
-              </section>
-
-              {/* ERROR */}
-              {error ? (
-                <p
-                  className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-medium text-red-600"
-                  role="alert"
-                >
-                  {error}
-                </p>
-              ) : null}
-
-              {/* ACTIONS */}
-              <div className="flex flex-col-reverse gap-3 border-t border-[#E1E7EF] pt-6 sm:flex-row sm:items-center sm:justify-between">
-
-                <button
-                  type="button"
-                  onClick={() => router.back()}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-[#DCE4ED] bg-white px-6 py-3.5 text-sm font-bold text-navy transition-all hover:border-[#C6D3E2] hover:bg-[#FBFCFE]"
-                >
-                  <ArrowLeft size={16} />
-                  Back
-                </button>
-
-                <button
-                  type="submit"
-                  className="group inline-flex items-center justify-center gap-3 rounded-full bg-navy px-7 py-3.5 text-sm font-extrabold text-white shadow-[0_15px_35px_-15px_rgba(7,53,112,0.45)] transition-all hover:-translate-y-0.5 hover:bg-accent"
-                >
-                  Continue to Payment
-
-                  <ArrowRight
-                    size={17}
-                    className="transition-transform duration-200 group-hover:translate-x-1"
-                  />
-                </button>
-
+          <aside className={styles.sidebar} aria-label="Your booking summary and assistance">
+            <section className={styles.summary} aria-labelledby="journey-title">
+              <div className={styles.summaryImage}>
+                <DestinationImage key={intent.slug} src={journeyImage} alt={imageAlt} sizes="(max-width: 1023px) 90vw, 350px" />
+                <div className={styles.summaryOverlay} />
+                <div className={styles.summaryTitle}><p>Your journey</p><h2 id="journey-title">{intent.packageName}</h2></div>
               </div>
-
-            </div>
-
-            {/* TRIP SUMMARY */}
-            <aside className="lg:sticky lg:top-28 lg:self-start">
-
-              <div className="overflow-hidden rounded-[28px] border border-[#DDE5EF] bg-white shadow-[0_24px_70px_-45px_rgba(8,45,92,0.35)]">
-
-                <div className="bg-navy px-6 py-6 text-white sm:px-7">
-
-                  <p className="text-[10px] font-bold tracking-[0.18em] text-white/55 uppercase">
-                    Your journey
-                  </p>
-
-                  <h2 className="mt-3 text-2xl font-extrabold leading-tight tracking-tight">
-                    {intent.packageName}
-                  </h2>
-
-                </div>
-
-                <div className="p-6 sm:p-7">
-
-                  <div className="space-y-5">
-
-                    {/* DATE */}
-                    <div className="flex items-start gap-4">
-
-                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-blue" />
-
-                      <div>
-                        <p className="text-[10px] font-bold tracking-[0.12em] text-[#91A0B4] uppercase">
-                          Travel date
-                        </p>
-
-                        <p className="mt-1 text-sm font-bold text-navy">
-                          {formattedDate}
-                        </p>
-                      </div>
-
-                    </div>
-
-                    {/* TRAVELLERS */}
-                    <div className="flex items-start gap-4">
-
-                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-blue" />
-
-                      <div>
-                        <p className="text-[10px] font-bold tracking-[0.12em] text-[#91A0B4] uppercase">
-                          Travellers
-                        </p>
-
-                        <p className="mt-1 text-sm font-bold text-navy">
-                          {intent.travellers}{" "}
-                          {intent.travellers === "1" ? "Adult" : "Adults"}
-                        </p>
-                      </div>
-
-                    </div>
-
-                    {/* ACCOMMODATION */}
-                    <div className="flex items-start gap-4">
-
-                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-
-                      <div>
-                        <p className="text-[10px] font-bold tracking-[0.12em] text-[#91A0B4] uppercase">
-                          Accommodation
-                        </p>
-
-                        <p className="mt-1 text-sm font-bold capitalize text-navy">
-                          {intent.accommodation || "To be confirmed"}
-                        </p>
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                  <div className="my-6 border-t border-dashed border-[#DCE4ED]" />
-
-                  <div>
-                    <p className="text-[10px] font-bold tracking-[0.14em] text-[#91A0B4] uppercase">
-                      Package price
-                    </p>
-
-                    <p className="mt-1 text-xl font-extrabold text-navy">
-                      To be confirmed
-                    </p>
-                  </div>
-
-                  <div className="mt-6 rounded-2xl bg-[#F7F9FC] px-4 py-3.5">
-                    <p className="text-[11px] leading-5 text-slate">
-                      Your details are saved securely and will be carried
-                      forward to the payment step.
-                    </p>
-                  </div>
-
-                </div>
+              <div className={styles.summaryBody}>
+                <dl className={styles.facts}>
+                  <div><dt><span className={styles.factIcon}><CalendarDays size={20} aria-hidden="true" /></span><span>Travel date</span></dt><dd>{formattedDate}</dd></div>
+                  <div><dt><span className={styles.factIcon}><Users size={20} aria-hidden="true" /></span><span>Travellers</span></dt><dd>{intent.travellers} {intent.travellers === "1" ? "Adult" : "Adults"}</dd></div>
+                  <div><dt><span className={styles.factIcon}><House size={20} aria-hidden="true" /></span><span>Accommodation</span></dt><dd className="capitalize">{intent.accommodation || "To be confirmed"}</dd></div>
+                </dl>
+                <div className={styles.price}><p>Package price</p><strong>To be confirmed</strong></div>
+                <div className={styles.security}><Info size={19} aria-hidden="true" /><p>Your details are saved securely and will be carried forward to the payment step.</p></div>
               </div>
-
-            </aside>
-
-          </form>
-        </div>
-      </section>
+            </section>
+            <section className={styles.help} aria-labelledby="help-title">
+              <div className={styles.helpText}><h2 id="help-title">Need help with your booking?</h2><p>Our team is here to assist you at every step.</p><a href={telHref(business.phone)}><Phone size={18} aria-hidden="true" />{business.phone}</a><a href={`mailto:${business.email}`}><Mail size={18} aria-hidden="true" />{business.email}</a></div>
+              <Image src="/images/traveller-details/booking-help.svg" alt="A Mayura coach travelling through peaceful hills on a winding road" width={600} height={300} className={styles.helpArtwork} unoptimized />
+            </section>
+          </aside>
+        </form>
+      </div>
     </main>
   );
 }

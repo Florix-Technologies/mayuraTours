@@ -37,11 +37,11 @@ const subjects = [
   /railway|train/i,
 ];
 
-/** Exact image > relevant package gallery > cover > local default, including load errors. */
+/** Exact image > relevant package gallery > cover, including load errors. */
 export function getHighlightImages(pkg: TourPackage, item: NonNullable<TourPackage["highlights"]>[number]): HighlightPhoto[] {
   const title = typeof item === "string" ? item : item.title || item.name || "";
   const description = typeof item === "string" ? "" : item.description || "";
-  const gallery = (pkg.gallery || []).map((photo, index) => {
+  const gallery = (pkg.highlightGallery || pkg.gallery || []).map((photo, index) => {
     const context = `${photo.alt} ${(photo.tags || []).join(" ")}`;
     const score = subjects.reduce((total, topic) => total + (topic.test(context) ? (topic.test(title) ? 3 : 0) + (topic.test(description) ? 1 : 0) : 0), 0);
     return { photo, score, index };
@@ -51,7 +51,6 @@ export function getHighlightImages(pkg: TourPackage, item: NonNullable<TourPacka
     ...explicit,
     ...gallery.map(entry => entry.photo),
     { src: pkg.image, alt: pkg.imageAlt || pkg.name },
-    { src: "/video/posters/western-ghats.jpg", alt: "Green hills and forested travel landscape" },
   ];
   const seen = new Set<string>();
   return candidates.filter(photo => {
