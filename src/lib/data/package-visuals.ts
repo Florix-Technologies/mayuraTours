@@ -1,5 +1,6 @@
+import { resolveArtwork, validArtworkSource } from "./state-artwork";
 import type { TourPackage } from "./packages";
-import { destinationArtwork, mysoreScenes } from "./destination-artwork";
+import { mysoreScenes } from "./destination-artwork";
 import { packageBackgrounds, universalTravelArtwork } from "./package-backgrounds";
 
 export type VisualImage = { src: string; alt: string };
@@ -27,23 +28,23 @@ export function resolvePackageVisuals(pkg: TourPackage) {
   const requested = (pkg.destinationKey ?? pkg.destination ?? pkg.slug).trim().toLowerCase();
   const key = aliases[requested] ?? requested;
   const preset = (destinationVisuals as Record<string, DestinationVisual>)[key];
-  const cover = { src: pkg.image, alt: pkg.imageAlt || pkg.name };
+  const cover = pkg.coverImage && isImageSource(pkg.coverImage.src) ? pkg.coverImage
+    : { src: isImageSource(pkg.image) ? pkg.image : universalTravelArtwork, alt: pkg.imageAlt || pkg.name };
+  const hero = [pkg.heroImage, pkg.visuals?.hero, cover].find(image => image && isImageSource(image.src))!;
   return {
     ...preset,
     key,
     name: pkg.destination || preset?.name || pkg.name,
     label: pkg.visuals?.label || preset?.label || "Discover your destination",
-    hero: pkg.visuals?.hero ?? cover,
-    avatar: pkg.visuals?.avatar ?? pkg.avatar ?? (preset ? destinationArtwork[key] : undefined),
+    hero,
+    avatar: resolveArtwork(pkg, key),
     backgroundImage: pkg.visuals?.backgroundImage || pkg.backgroundImage || (preset ? packageBackgrounds[key] : undefined) || universalTravelArtwork,
   };
 }
 
 /** Permit uploaded public/CDN images without allowing arbitrary URL protocols. */
 export function isImageSource(src: string | undefined): src is string {
-  if (!src || src.trim() !== src) return false;
-  if (/^\/(?!\/)/.test(src)) return true;
-  try { return ["https:", "http:"].includes(new URL(src).protocol); } catch { return false; }
+  return validArtworkSource(src);
 }
 
 export function needsUnoptimizedImage(src: string) {

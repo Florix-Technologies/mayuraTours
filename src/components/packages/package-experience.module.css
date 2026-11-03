@@ -586,3 +586,14 @@
   .related .relatedLink .relatedCopy { transform: translateY(-44px); }
   .related .relatedLink .relatedExplore { opacity: 1; visibility: visible; transform: none; pointer-events: auto; transition: none; }
 }
+
+/* The supplied palace has an opaque cream canvas; retain the complete artwork. */
+.artwork img[src*="package-artwork/karnataka/heritage"] { border-radius: 1.5rem; }
+
+/* These two package cutouts also appear in the top hero, clear of its text. */
+.cinematicHero[data-artwork-hero="true"] .heroMedia { inset: 100px 2% 55px 48%; z-index: -1; }
+.cinematicHero[data-artwork-hero="true"] .heroMedia img { object-position: center; }
+@media (max-width: 767px) {
+  .cinematicHero[data-artwork-hero="true"] .heroMedia { inset: 85px 16px auto; height: 290px; }
+  .cinematicHero[data-artwork-hero="true"] .heroContent { padding-top: 365px; }
+}

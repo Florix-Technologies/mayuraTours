@@ -42,3 +42,4 @@ next-env.d.ts
 
 # python (unrelated local tooling env in this repo)
 /venv/
+/artwork/

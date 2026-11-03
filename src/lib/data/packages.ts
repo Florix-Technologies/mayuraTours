@@ -8,6 +8,13 @@ export type TourPackage = {
   demoContent?: PackageDemoContent;
   /** Optional destination theme; independent of the package URL. */
   destinationKey?: string;
+  stateKey?: string;
+  state?: string;
+  experienceKey?: string;
+  travelExperience?: string;
+  coverImage?: { src: string; alt: string };
+  heroImage?: { src: string; alt: string };
+  artworkOverride?: { src: string; alt: string };
   visuals?: PackageVisuals;
   tagline?: string;
   destination?: string;
@@ -32,7 +39,7 @@ export type TourPackage = {
   price: string;
   priceValue?: number;
   priceUnit?: string;
-  highlights?: Array<string | { title: string; description?: string; name?: string; image?: string; imageAlt?: string; illustration?: HighlightIllustrationKind; theme?: HighlightTheme }>;
+  highlights?: Array<string | { title: string; description?: string; name?: string; image?: string; imageAlt?: string; illustration?: HighlightIllustrationKind; category?: HighlightIllustrationKind; theme?: HighlightTheme }>;
   itinerary?: Array<string | { title?: string; day?: string; description?: string; details?: string }>;
   included?: Array<string | { title?: string; name?: string; description?: string }>;
   excluded?: Array<string | { title?: string; name?: string; description?: string }>;
@@ -44,6 +51,9 @@ export type TourPackage = {
 export const packages: TourPackage[] = [
   {
     slug: "goa",
+    stateKey: "goa",
+    experienceKey: "existing",
+    destinationKey: "goa",
     visuals: { hero: { src: "/video/posters/beaches.jpg", alt: "Aerial view of the Goa coastline" } },
     highlightGallery: packageHighlightGalleries["goa"],
     demoContent: packageDemoContent["goa"],
@@ -65,6 +75,9 @@ export const packages: TourPackage[] = [
   },
   {
     slug: "ooty-coonoor",
+    stateKey: "tamil-nadu",
+    experienceKey: "hills",
+    destinationKey: "ooty-coonoor",
     highlightGallery: packageHighlightGalleries["ooty-coonoor"],
     demoContent: packageDemoContent["ooty-coonoor"],
     name: "Ooty + Coonoor Hills",
@@ -84,6 +97,10 @@ export const packages: TourPackage[] = [
   },
   {
     slug: "mysore-srirangapatna",
+    stateKey: "karnataka",
+    experienceKey: "heritage",
+    destinationKey: "mysore-srirangapatna",
+    artworkOverride: { src: "/images/package-artwork/overrides/mysore-palace-cutout.png", alt: "Transparent Mysore Palace cutout" },
     highlightGallery: packageHighlightGalleries["mysore-srirangapatna"],
     demoContent: packageDemoContent["mysore-srirangapatna"],
     name: "Mysore & Srirangapatna",
@@ -102,6 +119,9 @@ export const packages: TourPackage[] = [
   },
   {
     slug: "coorg",
+    stateKey: "karnataka",
+    experienceKey: "nature",
+    destinationKey: "coorg",
     highlightGallery: packageHighlightGalleries["coorg"],
     demoContent: packageDemoContent["coorg"],
     name: "Coorg Coffee Country",
@@ -122,6 +142,10 @@ export const packages: TourPackage[] = [
   },
   {
     slug: "kerala-munnar",
+    stateKey: "kerala",
+    experienceKey: "hills",
+    destinationKey: "kerala-munnar",
+    artworkOverride: { src: "/images/package-artwork/overrides/kerala-cultural.png", alt: "Kerala woman in a cream and gold kasavu saree with palms and a traditional lamp" },
     highlightGallery: packageHighlightGalleries["kerala-munnar"],
     demoContent: packageDemoContent["kerala-munnar"],
     name: "Kerala Backwaters & Munnar",
@@ -143,6 +167,10 @@ export const packages: TourPackage[] = [
   },
   {
     slug: "chikmagalur",
+    stateKey: "karnataka",
+    experienceKey: "nature",
+    destinationKey: "chikmagalur",
+    artworkOverride: { src: "/images/destinations/chikmagalur-avatar-3d.webp", alt: "Chikmagalur adventure traveler with mountains and coffee plants" },
     highlightGallery: packageHighlightGalleries["chikmagalur"],
     demoContent: packageDemoContent["chikmagalur"],
     name: "Chikmagalur & Mullayanagiri",

@@ -43,3 +43,5 @@
   .reveal[data-join="prepared"] { transition: none; }
 }
 @media (prefers-reduced-motion:reduce) { .card, .illustration, .vectorBackdrop, .accent, .card .copy h3 { transition: none; } }
+
+.customImage { object-fit: contain; padding: 1rem; }

@@ -82,6 +82,7 @@ export default function PackageDetailsPage() {
   }
 
   const visuals = resolvePackageVisuals(pkg);
+  const heroArtwork = pkg.slug === "chikmagalur" ? pkg.artworkOverride : undefined;
   const packageData = pkg;
   const packageName = packageData.name;
   const price = formatPrice(packageData.price);
@@ -131,9 +132,9 @@ export default function PackageDetailsPage() {
   return (
     <main className="min-h-screen bg-white text-ink">
       {/* Photography-led destination hero; checkout state and navigation are unchanged. */}
-      <section className={styles.cinematicHero} aria-labelledby="package-title">
+      <section className={styles.cinematicHero} data-artwork-hero={heroArtwork ? "true" : undefined} aria-labelledby="package-title">
         <div className={styles.heroMedia}>
-          <DestinationImage key={pkg.slug} src={visuals.hero.src} alt={visuals.hero.alt} fallback={{ src: pkg.image, alt: pkg.imageAlt }} eager sizes="100vw" />
+          <DestinationImage key={pkg.slug} src={heroArtwork?.src ?? visuals.hero.src} alt={heroArtwork?.alt ?? visuals.hero.alt} contain={Boolean(heroArtwork)} fallback={heroArtwork ?? { src: pkg.image, alt: pkg.imageAlt }} eager sizes={heroArtwork ? "(max-width: 767px) 100vw, 50vw" : "100vw"} />
         </div>
         <div className={styles.heroOverlay} aria-hidden="true" />
         <svg className={styles.heroRoute} viewBox="0 0 600 420" fill="none" aria-hidden="true">

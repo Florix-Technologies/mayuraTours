@@ -4,9 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { ArrowLeft, ArrowRight, ArrowUpRight, MapPin, Play } from "lucide-react";
-import HighlightImage from "./HighlightImage";
 import HighlightIllustration from "./HighlightIllustration";
-import { resolveHighlightIllustration, type HighlightTheme } from "@/lib/data/highlight-illustrations";
+import { resolveHighlightIllustrations, type HighlightTheme } from "@/lib/data/highlight-illustrations";
 import cardStyles from "./highlight-cards.module.css";
 import HighlightsBackdrop from "./HighlightsBackdrop";
 import { JoiningHighlight } from "./JoiningHighlights";
@@ -62,17 +61,26 @@ function DetailList({ items, excluded = false, demo = false }: {
   })}</ul> : <p className={styles.pending}>Package-specific {excluded ? "exclusions" : "inclusions"} have not been published yet.</p>;
 }
 
+/** Failed uploads fall back to the approved SVG scene within the same animated card. */
+function HighlightArtwork({ image, alt, kind }: { image?: string; alt: string; kind: Parameters<typeof HighlightIllustration>[0]["kind"] }) {
+  const [failed, setFailed] = useState<string>();
+  return image && isImageSource(image) && failed !== image
+    ? <Image src={image} alt={alt} fill sizes="(max-width: 639px) 90vw, 360px" unoptimized={needsUnoptimizedImage(image)} className={cardStyles.customImage} onError={() => setFailed(image)} />
+    : <HighlightIllustration kind={kind} />;
+}
+
 function HighlightExplorer({ pkg, highlights, demo = false }: { pkg: TourPackage; highlights: NonNullable<TourPackage["highlights"]>; demo?: boolean }) {
   if (!highlights.length) return <p className={styles.pending}>Destination highlights will be published soon.</p>;
   const themes: HighlightTheme[] = ["blue", "pink", "yellow"];
+  const illustrations = resolveHighlightIllustrations(highlights, `${pkg.destination || ""} ${pkg.name} ${pkg.slug}`);
   return <div className={cardStyles.grid}>{highlights.map((item, index) => {
     const title = typeof item === "string" ? item : item.title || item.name || "Destination highlight";
     const description = typeof item === "string" ? "" : item.description || "";
-    const illustration = resolveHighlightIllustration(title, description, typeof item === "string" ? undefined : item.illustration);
-    const theme = (typeof item !== "string" && item.theme) || themes[index % themes.length];
+    const illustration = illustrations[index];
+    const theme = themes[index % themes.length];
     return <JoiningHighlight key={`${pkg.slug}-${index}`} className={cardStyles.reveal}>
       <article className={cardStyles.card} data-theme={theme} tabIndex={0}>
-        <div className={cardStyles.art}><span className={cardStyles.number}>{String(index + 1).padStart(2, "0")}</span><HighlightImage candidates={typeof item !== "string" && item.image ? [{ src: item.image, alt: item.imageAlt || title }] : []} fallback={<HighlightIllustration kind={illustration} />} /></div>
+        <div className={cardStyles.art}><span className={cardStyles.number}>{String(index + 1).padStart(2, "0")}</span><HighlightArtwork image={demo || typeof item === "string" ? undefined : item.image} alt={typeof item === "string" ? title : item.imageAlt || title} kind={illustration} /></div>
         <div className={cardStyles.copy}><span className={cardStyles.accent} aria-hidden="true" /><h3>{demo ? customerCopy(title) : title}</h3>
           {description && <p>{demo ? customerCopy(description) : description}</p>}
         </div>
@@ -244,7 +252,9 @@ function RelatedPackages({ items }: { items: TourPackage[] }) {
 export default function PackageExperience({ pkg }: { pkg: TourPackage }) {
   const destination = resolvePackageVisuals(pkg);
   const art = destination.avatar;
-  const isMysore = Boolean(destination.palace);
+  // Only the legacy traveler illustration uses the separate palace backdrop.
+  // Standalone palace overrides keep the normal stage and must not show a second opaque palace.
+  const isMysore = Boolean(destination.palace) && art?.src === "/images/destinations/mysore-srirangapatna-avatar-3d.webp";
   const demo = pkg.demoContent;
   const highlights = pkg.highlights?.length ? pkg.highlights : demo?.highlights ?? [];
   const itinerary = pkg.itinerary?.length ? pkg.itinerary : demo?.itinerary ?? [];
@@ -257,7 +267,7 @@ export default function PackageExperience({ pkg }: { pkg: TourPackage }) {
     <Reveal><section className={styles.introduction} aria-labelledby="destination-heading">
       <AvatarStage className={`${styles.artworkStage} ${isMysore ? styles.mysoreStage : ""}`}>
         <div className={styles.artworkHalo} aria-hidden="true" />
-        {destination.palace && <div className={styles.mysorePalace}><DestinationImage src={destination.palace.src} alt={destination.palace.alt} sizes="(max-width: 639px) 85vw, 420px" /></div>}
+        {isMysore && destination.palace && <div className={styles.mysorePalace}><DestinationImage src={destination.palace.src} alt={destination.palace.alt} sizes="(max-width: 639px) 85vw, 420px" /></div>}
         <div className={styles.artwork}><DestinationImage key={pkg.slug} src={art?.src ?? pkg.image} alt={art?.alt ?? pkg.imageAlt} contain={Boolean(art)} fallback={{ src: pkg.image, alt: pkg.imageAlt }} /></div>
         <span className={styles.imageCaption}><MapPin size={15} aria-hidden="true" />{destination.name}</span>
         <svg className={styles.route} viewBox="0 0 240 160" fill="none" aria-hidden="true"><path d="M5 140C100 145 40 10 125 25S240 60 225 5" stroke="currentColor" strokeWidth="2" strokeDasharray="4 8" /></svg>
